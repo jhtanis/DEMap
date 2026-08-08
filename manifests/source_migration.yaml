@@ -1612,7 +1612,7 @@ entries:
   classification: migration_candidate
   copy_verbatim: true
   provenance_status: null
-  migration_state: not_copied
+  migration_state: copied_verbatim
 - src: scripts/retrieve_biencoder_deep.py
   dst: src/demap_repro/biencoder/deep_retrieval.py
   source_class: tracked_modified
@@ -1700,7 +1700,7 @@ entries:
   classification: migration_candidate
   copy_verbatim: true
   provenance_status: null
-  migration_state: not_copied
+  migration_state: copied_verbatim
 - src: .scratch/demap/paper_v10_revision/data/_build_2_3_4.py
   dst: src/demap_repro/reporting/inputs/build_phase12.py
   source_class: scratch
@@ -1722,7 +1722,7 @@ entries:
   classification: migration_candidate
   copy_verbatim: true
   provenance_status: null
-  migration_state: not_copied
+  migration_state: copied_verbatim
 - src: .scratch/demap/paper_v10_revision/data/_build_5_6.py
   dst: src/demap_repro/reporting/inputs/build_stage_comparison.py
   source_class: scratch
@@ -1742,7 +1742,7 @@ entries:
   classification: migration_candidate
   copy_verbatim: true
   provenance_status: null
-  migration_state: not_copied
+  migration_state: copied_verbatim
 - src: src/demap/paper/bm25/cli.py
   dst: src/demap_repro/lexical/bm25/cli.py
   source_class: tracked
@@ -2144,7 +2144,7 @@ entries:
   provenance_status: null
   migration_state: copied_verbatim
 - src: .scratch/demap/paper_v13_scientific_audit/chain_F2_pool_pairs_fulltrain_v2.sbatch
-  dst: workflows/crossencoder/pool_pairs_fulltrain.sh
+  dst: workflows/crossencoder/pool_pairs_fulltrain.sbatch
   source_class: scratch
   worktree_sha256: 15bc051942584ee1efd2e5a41250e6902eb4ebe758934d73e012edce9de39ec6
   worktree_bytes: 3596
@@ -2164,7 +2164,7 @@ entries:
   classification: migration_candidate
   copy_verbatim: true
   provenance_status: null
-  migration_state: not_copied
+  migration_state: copied_verbatim
 - src: .scratch/demap/paper_v13_scientific_audit/wt_ce_5f06f10/scripts/build_ce_training_pairs.py
   dst: src/demap_repro/crossencoder/pairs.py
   source_class: scratch
@@ -2777,7 +2777,7 @@ entries:
   provenance_status: null
   migration_state: copied_verbatim
 - src: .scratch/v17_claude/J_allowance/scripts/J1_fuzzy_val.sbatch
-  dst: src/demap_repro/sensitivity/allowance/J1_fuzzy_val.sbatch
+  dst: workflows/sensitivity/J1_regenerate_fuzzy_per_rate.sbatch
   source_class: scratch
   worktree_sha256: 7431a2a968cee753c12da1e5d12a40ba85278743fb7a8b0aa03efd84ff6f6d9f
   worktree_bytes: 3146
@@ -2797,9 +2797,9 @@ entries:
   classification: migration_candidate
   copy_verbatim: true
   provenance_status: null
-  migration_state: not_copied
+  migration_state: copied_verbatim
 - src: .scratch/v17_claude/J_allowance/scripts/J2_features_ce.sbatch
-  dst: src/demap_repro/sensitivity/allowance/J2_features_ce.sbatch
+  dst: workflows/sensitivity/J2_rebuild_pools_features_ce.sbatch
   source_class: scratch
   worktree_sha256: f753407765fab9fc4a2a9967eb64ce51eeea6b948e07ea3e3dbf2b23b1b61fac
   worktree_bytes: 8136
@@ -2819,9 +2819,9 @@ entries:
   classification: migration_candidate
   copy_verbatim: true
   provenance_status: null
-  migration_state: not_copied
+  migration_state: copied_verbatim
 - src: .scratch/v17_claude/J_allowance/scripts/J3_train_hgbc.sbatch
-  dst: src/demap_repro/sensitivity/allowance/J3_train_hgbc.sbatch
+  dst: workflows/sensitivity/J3_retrain_hgbc_per_rate.sbatch
   source_class: scratch
   worktree_sha256: 6f02c9ee17e7514585f68803bba474cc0674bf9e3f38258331be36b70937767e
   worktree_bytes: 2393
@@ -2841,9 +2841,9 @@ entries:
   classification: migration_candidate
   copy_verbatim: true
   provenance_status: null
-  migration_state: not_copied
+  migration_state: copied_verbatim
 - src: .scratch/v17_claude/J_allowance/scripts/J3b_train_hgbc_archivedft.sbatch
-  dst: src/demap_repro/sensitivity/allowance/J3b_train_hgbc_archivedft.sbatch
+  dst: workflows/sensitivity/J3b_retrain_hgbc_archived_features.sbatch
   source_class: scratch
   worktree_sha256: 3a92f769df9b99bb9d745fe707e1fc74a66563b886a11e453b2e380fcb569658
   worktree_bytes: 3044
@@ -2863,7 +2863,7 @@ entries:
   classification: migration_candidate
   copy_verbatim: true
   provenance_status: null
-  migration_state: not_copied
+  migration_state: copied_verbatim
 - src: .scratch/v17_claude/J_allowance/scripts/J4_aggregate.py
   dst: src/demap_repro/sensitivity/allowance/aggregate_retrained.py
   source_class: scratch
@@ -2905,9 +2905,11 @@ entries:
   release_gate: cde_match_derivative_unresolved
   nontrivial: true
   classification: migration_candidate
-  copy_verbatim: true
+  copy_verbatim: false
   provenance_status: null
-  migration_state: not_copied
+  migration_state: not_migrated_by_decision
+  exclusion_reason: draft figure; superseded by reporting/figures/make_figureS6_S7_allowance.py, the generator
+    whose output reached v21.
 - src: .scratch/v17_claude/J_allowance/scripts/J6_validation_report.py
   dst: src/demap_repro/sensitivity/allowance/J6_validation_report.py
   source_class: scratch
@@ -2927,9 +2929,10 @@ entries:
   release_gate: cde_match_derivative_unresolved
   nontrivial: true
   classification: migration_candidate
-  copy_verbatim: true
+  copy_verbatim: false
   provenance_status: null
-  migration_state: not_copied
+  migration_state: not_migrated_by_decision
+  exclusion_reason: draft validation report; superseded by sensitivity/allowance/validate.py.
 - src: .scratch/v17_claude/J_allowance/scripts/parity_070_features.py
   dst: src/demap_repro/sensitivity/allowance/parity_070_features.py
   source_class: scratch
@@ -3037,9 +3040,10 @@ entries:
   release_gate: cde_match_derivative_unresolved
   nontrivial: true
   classification: migration_candidate
-  copy_verbatim: true
+  copy_verbatim: false
   provenance_status: null
-  migration_state: not_copied
+  migration_state: not_migrated_by_decision
+  exclusion_reason: one-off comparison folded into sensitivity/allowance/parity_070_features.py.
 - src: manuscript/v17_claude_reports/K_fixed070/scripts/K1_score_fixed070.py
   dst: src/demap_repro/sensitivity/allowance/score_fixed_070.py
   source_class: untracked
@@ -3065,7 +3069,7 @@ entries:
   provenance_status: null
   migration_state: copied_verbatim
 - src: manuscript/v17_claude_reports/K_fixed070/scripts/K1_score_fixed070.sbatch
-  dst: src/demap_repro/sensitivity/allowance/K1_score_fixed070.sbatch
+  dst: workflows/sensitivity/K1_score_fixed_070.sbatch
   source_class: untracked
   worktree_sha256: 22245168dc36e8c6ebb9927e74aae9602a0fc3ebdf246492d3de15c44435a578
   worktree_bytes: 3017
@@ -3087,7 +3091,7 @@ entries:
   classification: migration_candidate
   copy_verbatim: true
   provenance_status: null
-  migration_state: not_copied
+  migration_state: copied_verbatim
 - src: manuscript/v17_claude_reports/K_fixed070/scripts/K2_aggregate.py
   dst: src/demap_repro/sensitivity/allowance/aggregate.py
   source_class: untracked
@@ -3133,9 +3137,10 @@ entries:
   release_gate: cde_match_derivative_unresolved
   nontrivial: true
   classification: migration_candidate
-  copy_verbatim: true
+  copy_verbatim: false
   provenance_status: null
-  migration_state: not_copied
+  migration_state: not_migrated_by_decision
+  exclusion_reason: draft; superseded by sensitivity/allowance/validate.py.
 - src: manuscript/v17_claude_reports/K_fixed070/scripts/K4_make_figure.py
   dst: src/demap_repro/sensitivity/allowance/K4_make_figure.py
   source_class: untracked
@@ -3157,9 +3162,10 @@ entries:
   release_gate: cde_match_derivative_unresolved
   nontrivial: true
   classification: migration_candidate
-  copy_verbatim: true
+  copy_verbatim: false
   provenance_status: null
-  migration_state: not_copied
+  migration_state: not_migrated_by_decision
+  exclusion_reason: draft figure; superseded by reporting/figures/make_figureS6_S7_allowance.py.
 - src: manuscript/v17_claude_reports/K_fixed070/scripts/K5_make_table.py
   dst: src/demap_repro/sensitivity/allowance/K5_make_table.py
   source_class: untracked
@@ -3181,9 +3187,10 @@ entries:
   release_gate: cde_match_derivative_unresolved
   nontrivial: true
   classification: migration_candidate
-  copy_verbatim: true
+  copy_verbatim: false
   provenance_status: null
-  migration_state: not_copied
+  migration_state: not_migrated_by_decision
+  exclusion_reason: draft Table S6; superseded by K6, then by sensitivity/allowance/report.table_s6().
 - src: manuscript/v17_claude_reports/K_fixed070/scripts/K6_make_tableS6_v19.py
   dst: src/demap_repro/sensitivity/allowance/K6_make_tableS6_v19.py
   source_class: untracked
@@ -3205,9 +3212,11 @@ entries:
   release_gate: cde_match_derivative_unresolved
   nontrivial: true
   classification: migration_candidate
-  copy_verbatim: true
+  copy_verbatim: false
   provenance_status: null
-  migration_state: not_copied
+  migration_state: not_migrated_by_decision
+  exclusion_reason: the Table S6 build that reached v21; its selection logic is reimplemented and parity-tested
+    as sensitivity/allowance/report.table_s6().
 - src: manuscript/v17_claude_reports/K_fixed070/scripts/K7_validate_sensitivity_v19.py
   dst: src/demap_repro/sensitivity/allowance/validate.py
   source_class: untracked
@@ -3272,9 +3281,10 @@ entries:
   release_gate: null
   nontrivial: true
   classification: migration_candidate
-  copy_verbatim: true
+  copy_verbatim: false
   provenance_status: null
-  migration_state: not_copied
+  migration_state: not_migrated_by_decision
+  exclusion_reason: notebook superseded by the manuscript/figures generators migrated into reporting/figures/.
 - src: notebooks/paper_figures/figure_repxloss_v10.ipynb
   dst: src/demap_repro/reporting/figures/figure_repxloss_v10.py
   source_class: untracked
@@ -3292,9 +3302,11 @@ entries:
   release_gate: null
   nontrivial: true
   classification: migration_candidate
-  copy_verbatim: true
+  copy_verbatim: false
   provenance_status: null
-  migration_state: not_copied
+  migration_state: not_migrated_by_decision
+  exclusion_reason: notebook superseded by make_figureS3_repxloss.py, the generator whose output reached
+    v21.
 - src: notebooks/paper_figures/figure_stage_comparison_v10.ipynb
   dst: src/demap_repro/reporting/figures/figure_stage_comparison_v10.py
   source_class: untracked
@@ -3311,9 +3323,10 @@ entries:
   release_gate: null
   nontrivial: true
   classification: migration_candidate
-  copy_verbatim: true
+  copy_verbatim: false
   provenance_status: null
-  migration_state: not_copied
+  migration_state: not_migrated_by_decision
+  exclusion_reason: notebook; its input table is built by reporting/inputs/build_stage_comparison.py.
 - src: notebooks/paper_figures/figure_k_ceiling_v10.ipynb
   dst: src/demap_repro/reporting/figures/figure_k_ceiling_v10.py
   source_class: untracked
@@ -3330,9 +3343,11 @@ entries:
   release_gate: null
   nontrivial: true
   classification: migration_candidate
-  copy_verbatim: true
+  copy_verbatim: false
   provenance_status: null
-  migration_state: not_copied
+  migration_state: not_migrated_by_decision
+  exclusion_reason: notebook; the K-ceiling data is produced by pool/select_k.py and tested against the
+    grid.
 - src: notebooks/paper_figures/paper_figure_style.py
   dst: src/demap_repro/reporting/figures/style.py
   source_class: untracked
