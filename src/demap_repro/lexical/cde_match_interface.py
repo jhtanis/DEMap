@@ -1,6 +1,6 @@
 """Adapter for the CDE Match-derived components whose redistribution is unresolved.
 
-Three modules in the research repository are derivative works of Oracle PL/SQL
+Two modules in the research repository are derivative works of Oracle PL/SQL
 supplied to us by NCI, or are built directly on top of that derivative:
 
 ===============================  ==================================================
@@ -10,9 +10,6 @@ research module                  what this pipeline needs from it
                                  provenance rows ``(query_id, cde_id, rule, field,
                                  rule_rank, rule_score)`` used to build the ``kw_*``
                                  evidence features and the CDE Match-Fuzzy arm.
-``demap.features.cdematch``      ``compute_cdematch_features`` and
-                                 ``CDEMATCH_FEATURE_COLUMNS`` — per-query rank and
-                                 score statistics over the candidate union.
 ``demap.features.cde_match_clone``   the Python approximation to NCI CDE Match,
                                  evaluated as its own method in Table 4, and
                                  ``ExactMatchControl``, its allowance gate.
@@ -37,6 +34,15 @@ artifact and never reach this module at all — that is the intended public path
 while the gate is open.
 
 Nothing here reimplements or approximates the gated logic.
+
+**Reclassified 2026-08-08.** ``demap.features.cdematch`` was previously routed
+through this adapter on the strength of its name. A content review found it reads
+no CDE text and implements no matching logic — it computes normalization, log
+rank, top-1 and pairwise margins, a within-query z-score and a candidate count
+from two numeric columns of an already-produced candidate list, and the same
+function was already reused verbatim on the keyword retriever's output. It is
+generic ranked-list feature arithmetic, is now part of this repository as
+:mod:`demap_repro.reranker.features.cdematch`, and no longer appears here.
 """
 from __future__ import annotations
 
@@ -51,8 +57,6 @@ __all__ = [
     "is_available",
     "load_symbol",
     "generate_candidates",
-    "compute_cdematch_features",
-    "cdematch_feature_columns",
     "exact_match_control",
 ]
 
@@ -61,8 +65,6 @@ DEFAULT_PACKAGE = "demap.features"
 #: Symbols this pipeline requires, mapped to the submodule that provides them.
 REQUIRED_SYMBOLS = {
     "generate_candidates": "keyword_retriever",
-    "compute_cdematch_features": "cdematch",
-    "CDEMATCH_FEATURE_COLUMNS": "cdematch",
     "ExactMatchControl": "cde_match_clone",
 }
 
@@ -135,14 +137,6 @@ def generate_candidates(*args, **kwargs):
     return load_symbol("generate_candidates")(*args, **kwargs)
 
 
-def compute_cdematch_features(*args, **kwargs):
-    """Per-query CDE Match rank/score features over a candidate union."""
-    return load_symbol("compute_cdematch_features")(*args, **kwargs)
-
-
-def cdematch_feature_columns():
-    """Column names produced by :func:`compute_cdematch_features`."""
-    return list(load_symbol("CDEMATCH_FEATURE_COLUMNS"))
 
 
 def exact_match_control(*args, **kwargs):

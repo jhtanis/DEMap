@@ -18,8 +18,11 @@ Function bodies below are unchanged from the source. The differences are:
   actual interface;
 * ``from demap.features.cde_match_clone import ExactMatchControl`` is dropped —
   it was imported but never referenced;
-* the two gated CDE Match symbols are resolved through
+* the keyword-provenance generator, which remains gated, is resolved through
   :mod:`demap_repro.lexical.cde_match_interface` instead of imported directly.
+  ``compute_cdematch_features`` was reclassified as independent on 2026-08-08 (it
+  is generic rank/score arithmetic over an already-produced candidate list) and is
+  imported normally.
 
 ``tests/tier3_regression/test_stage_f_source_parity.py`` pins the abstract syntax
 tree of every function here against the hash it had in the source, so a later
@@ -36,6 +39,10 @@ from demap_repro.lexical import cde_match_interface
 from demap_repro.lexical import mask as emm
 from demap_repro.pool.candidate_union import FORBIDDEN_LEAKAGE_COLUMNS
 from demap_repro.reranker.features.biencoder import compute_biencoder_features
+from demap_repro.reranker.features.cdematch import (
+    CDEMATCH_FEATURE_COLUMNS,
+    compute_cdematch_features,
+)
 from demap_repro.reranker.features.lexical_features import (
     build_kw_features,
     kw_feature_columns,
@@ -185,7 +192,7 @@ def compute_all_features(union: pd.DataFrame, cde_master: pd.DataFrame) -> pd.Da
     union = compute_biencoder_features(union)
 
     print("  Computing CDE Match features...")
-    union = cde_match_interface.compute_cdematch_features(union)
+    union = compute_cdematch_features(union)
 
     print("  Computing PV-overlap features...")
     pv_feats = compute_pv_overlap_for_union(union, cde_master=cde_master)
@@ -224,7 +231,7 @@ def feature_summary(df: pd.DataFrame) -> Dict:
     from demap_repro.reranker.features.biencoder import biencoder_feature_columns
 
     bienc_cols = list(biencoder_feature_columns())
-    cm_cols = list(cde_match_interface.cdematch_feature_columns())
+    cm_cols = list(CDEMATCH_FEATURE_COLUMNS)
     pv_cols = pv_feature_columns()
     text_cols = list(text_feature_columns(include_tier2=True, include_tier3=True))
 
