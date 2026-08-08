@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
+# Migrated Slurm driver. Paths are resolved from DEMAP_DATA_ROOT; the
+# original hardcoded research-repository root has been parameterized.
+# SBATCH --output/--error are static directives and cannot expand shell
+# variables: pass them on the command line, e.g.
+#   sbatch --output=<log>/%A_%a.out --error=<log>/%A_%a.err <this file>
 #SBATCH --job-name=J_allow_hgbc_archft
-#SBATCH --output=/vf/users/nextgen2/james/tasks/cde_project/demap/.scratch/v17_claude/J_allowance/logs/J3b_hgbc_archft_%j.out
-#SBATCH --error=/vf/users/nextgen2/james/tasks/cde_project/demap/.scratch/v17_claude/J_allowance/logs/J3b_hgbc_archft_%j.err
 #SBATCH --partition=norm
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=64g
@@ -14,7 +17,7 @@
 # Expected: metrics identical to
 # artifacts/final_reranker/hgbc_reranker_v2_eligible/with_ce_noprov/.
 set -euo pipefail
-REPO="/vf/users/nextgen2/james/tasks/cde_project/demap"
+REPO="${DEMAP_DATA_ROOT:?set DEMAP_DATA_ROOT to the data/artifact root}"
 J="$REPO/.scratch/v17_claude/J_allowance"
 WT="$REPO/.scratch/demap/paper_v13_scientific_audit/wt_hgbc_2903203"
 cd "$REPO"
@@ -38,7 +41,7 @@ echo "=== compare vs archived with_ce_noprov ==="
 "$PY" - <<'PYEOF'
 import pandas as pd, json
 from pathlib import Path
-REPO = Path("/vf/users/nextgen2/james/tasks/cde_project/demap")
+REPO = Path("${DEMAP_DATA_ROOT}")
 J = REPO / ".scratch/v17_claude/J_allowance"
 new = pd.read_csv(J / "rates/a0.70/hgbc_noprov_archivedft/hgbc_eval_by_split.csv")
 old = pd.read_csv(REPO / "artifacts/final_reranker/hgbc_reranker_v2_eligible/with_ce_noprov/hgbc_eval_by_split.csv")

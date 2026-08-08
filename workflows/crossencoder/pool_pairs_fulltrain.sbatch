@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
+# Migrated Slurm driver. Paths are resolved from DEMAP_DATA_ROOT; the
+# original hardcoded research-repository root has been parameterized.
+# SBATCH --output/--error are static directives and cannot expand shell
+# variables: pass them on the command line, e.g.
+#   sbatch --output=<log>/%A_%a.out --error=<log>/%A_%a.err <this file>
 #SBATCH --job-name=demap_v13_F2_pool
-#SBATCH --output=/vf/users/nextgen2/james/tasks/cde_project/demap/.scratch/demap/paper_v13_scientific_audit/logs/chain_F2_%j.out
-#SBATCH --error=/vf/users/nextgen2/james/tasks/cde_project/demap/.scratch/demap/paper_v13_scientific_audit/logs/chain_F2_%j.err
 #SBATCH --partition=norm
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
@@ -15,7 +18,7 @@
 # candidate text (all candidates are production-eligible after the correction);
 # empty candidate text fails closed (hardening commit 8b06ad9).
 set -euo pipefail
-REPO="/vf/users/nextgen2/james/tasks/cde_project/demap"
+REPO="${DEMAP_DATA_ROOT:?set DEMAP_DATA_ROOT to the data/artifact root}"
 CODE="$REPO/.scratch/demap/paper_v13_scientific_audit/wt_ce_5f06f10"
 cd "$REPO"
 [[ "$(git -C "$CODE" rev-parse --short=7 HEAD)" == "5f06f10" ]] || { echo "FATAL: worktree moved" >&2; exit 2; }

@@ -1,3 +1,6 @@
+# Paths below are recorded relative to the data root. In the research
+# repository they were absolute; the ${DEMAP_DATA_ROOT} prefix keeps the
+# record intact while removing the dependency on that checkout.
 schema_version: 1
 manifest_id: phase2_winners_final_v3
 supersedes: phase2_winners_final_v2 (v1 and v2 unmodified)
@@ -50,13 +53,13 @@ grid_validation:
     all-mpnet-base-v2 semihard_(1, 25): 18
 source_roots:
   none_corrected:
-  - /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_none_corrected_v2
-  - /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_none_corrected_v2_allmpnet
-  all_mpnet_semihard_1_50_canonical: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_semihard1_50_allmpnet_canonical_20260728
+  - ${DEMAP_DATA_ROOT}/artifacts/phase2_none_corrected_v2
+  - ${DEMAP_DATA_ROOT}/artifacts/phase2_none_corrected_v2_allmpnet
+  all_mpnet_semihard_1_50_canonical: ${DEMAP_DATA_ROOT}/artifacts/phase2_semihard1_50_allmpnet_canonical_20260728
   existing_arms:
-    all-mpnet-base-v2: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_finetuning/all-mpnet-base-v2
-    kamalkraj/BioSimCSE-BioLinkBERT-BASE: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1
-    NeuML/pubmedbert-base-embeddings: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1
+    all-mpnet-base-v2: ${DEMAP_DATA_ROOT}/artifacts/phase2_finetuning/all-mpnet-base-v2
+    kamalkraj/BioSimCSE-BioLinkBERT-BASE: ${DEMAP_DATA_ROOT}/artifacts/phase2_canonical_v1
+    NeuML/pubmedbert-base-embeddings: ${DEMAP_DATA_ROOT}/artifacts/phase2_canonical_v1
 slurm_jobs:
   biosimcse_pubmedbert_none: 26263415 (16/36) + 26269846 (20/36 resubmit)
   all_mpnet_none: '26268563'
@@ -110,10 +113,10 @@ winners:
   loss: symmetric_mnrl
   seed0_run_id: 20260705_203453__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-c3a18bb8e1
   seed1_run_id: 20260705_203956__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-6f14e0fbed
-  seed0_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_finetuning/all-mpnet-base-v2/runs/20260705_203453__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-c3a18bb8e1/model
-  seed1_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_finetuning/all-mpnet-base-v2/runs/20260705_203956__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-6f14e0fbed/model
-  seed0_source_root: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_finetuning/all-mpnet-base-v2
-  seed1_source_root: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_finetuning/all-mpnet-base-v2
+  seed0_checkpoint: ${DEMAP_DATA_ROOT}/artifacts/phase2_finetuning/all-mpnet-base-v2/runs/20260705_203453__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-c3a18bb8e1/model
+  seed1_checkpoint: ${DEMAP_DATA_ROOT}/artifacts/phase2_finetuning/all-mpnet-base-v2/runs/20260705_203956__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-6f14e0fbed/model
+  seed0_source_root: ${DEMAP_DATA_ROOT}/artifacts/phase2_finetuning/all-mpnet-base-v2
+  seed1_source_root: ${DEMAP_DATA_ROOT}/artifacts/phase2_finetuning/all-mpnet-base-v2
   seed0_metrics:
     split: val_dev
     recall@1: 0.7243741143127067
@@ -138,7 +141,7 @@ winners:
     mrr@100: 0.0027874239731164874
   retained_seed: 1
   retained_run_id: 20260705_203956__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-6f14e0fbed
-  retained_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_finetuning/all-mpnet-base-v2/runs/20260705_203956__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-6f14e0fbed/model
+  retained_checkpoint: ${DEMAP_DATA_ROOT}/artifacts/phase2_finetuning/all-mpnet-base-v2/runs/20260705_203956__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-6f14e0fbed/model
   retained_checkpoint_hash: model.safetensors:daf47701ef073342bd802f0a8fabe50c8c779bbe29df13091425b0fc65f41927
   recall5_tie_required_tiebreakers: false
   changed_vs_v2: false
@@ -146,7 +149,7 @@ winners:
   v2_lr: 5.0e-05
   v2_temperature: 0.03
   v2_mean_recall@5: 0.901393481341521
-  v2_retained_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_finetuning/all-mpnet-base-v2/runs/20260705_203956__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-6f14e0fbed/model
+  v2_retained_checkpoint: ${DEMAP_DATA_ROOT}/artifacts/phase2_finetuning/all-mpnet-base-v2/runs/20260705_203956__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-6f14e0fbed/model
 - model: BioSimCSE
   model_id: kamalkraj/BioSimCSE-BioLinkBERT-BASE
   phase1_parent_manifest: configs/paper/phase1_winners_final_v2.yaml
@@ -167,10 +170,10 @@ winners:
   loss: symmetric_mnrl
   seed0_run_id: 20260726_083812__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft2__20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft-329d3059__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr7e-05__bs1-1dbea5ef78
   seed1_run_id: 20260726_083815__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft2__20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft-329d3059__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr7e-05__bs1-3a78c65143
-  seed0_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/runs/20260726_083812__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft2__20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft-329d3059__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr7e-05__bs1-1dbea5ef78/model
-  seed1_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/runs/20260726_083815__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft2__20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft-329d3059__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr7e-05__bs1-3a78c65143/model
-  seed0_source_root: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1
-  seed1_source_root: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1
+  seed0_checkpoint: ${DEMAP_DATA_ROOT}/artifacts/phase2_canonical_v1/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/runs/20260726_083812__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft2__20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft-329d3059__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr7e-05__bs1-1dbea5ef78/model
+  seed1_checkpoint: ${DEMAP_DATA_ROOT}/artifacts/phase2_canonical_v1/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/runs/20260726_083815__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft2__20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft-329d3059__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr7e-05__bs1-3a78c65143/model
+  seed0_source_root: ${DEMAP_DATA_ROOT}/artifacts/phase2_canonical_v1
+  seed1_source_root: ${DEMAP_DATA_ROOT}/artifacts/phase2_canonical_v1
   seed0_metrics:
     split: val_dev
     recall@1: 0.7073689182805858
@@ -195,7 +198,7 @@ winners:
     mrr@100: 0.0008442435225217183
   retained_seed: 0
   retained_run_id: 20260726_083812__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft2__20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft-329d3059__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr7e-05__bs1-1dbea5ef78
-  retained_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/runs/20260726_083812__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft2__20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft-329d3059__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr7e-05__bs1-1dbea5ef78/model
+  retained_checkpoint: ${DEMAP_DATA_ROOT}/artifacts/phase2_canonical_v1/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/runs/20260726_083812__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft2__20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft-329d3059__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr7e-05__bs1-1dbea5ef78/model
   retained_checkpoint_hash: model.safetensors:cda4589a42d7982be7ff40ba521d3bad3c905c8614090a7dcabfd03209997592
   recall5_tie_required_tiebreakers: false
   changed_vs_v2: false
@@ -203,7 +206,7 @@ winners:
   v2_lr: 7.0e-05
   v2_temperature: 0.04
   v2_mean_recall@5: 0.8940717997165801
-  v2_retained_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/runs/20260726_083812__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft2__20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft-329d3059__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr7e-05__bs1-1dbea5ef78/model
+  v2_retained_checkpoint: ${DEMAP_DATA_ROOT}/artifacts/phase2_canonical_v1/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/runs/20260726_083812__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft2__20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft-329d3059__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr7e-05__bs1-1dbea5ef78/model
 - model: PubMedBERT
   model_id: NeuML/pubmedbert-base-embeddings
   phase1_parent_manifest: configs/paper/phase1_winners_final_v2.yaml
@@ -224,10 +227,10 @@ winners:
   loss: mnrl
   seed0_run_id: 20260726_135319__NeuML__pubmedbert-base-embeddings__ft2__20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuM-6f5820e5__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr3e-05__bs11__t0.04_-3882125ff7
   seed1_run_id: 20260726_135304__NeuML__pubmedbert-base-embeddings__ft2__20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuM-6f5820e5__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr3e-05__bs11__t0.04_-bcd9faffa0
-  seed0_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/runs/20260726_135319__NeuML__pubmedbert-base-embeddings__ft2__20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuM-6f5820e5__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr3e-05__bs11__t0.04_-3882125ff7/model
-  seed1_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/runs/20260726_135304__NeuML__pubmedbert-base-embeddings__ft2__20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuM-6f5820e5__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr3e-05__bs11__t0.04_-bcd9faffa0/model
-  seed0_source_root: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1
-  seed1_source_root: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1
+  seed0_checkpoint: ${DEMAP_DATA_ROOT}/artifacts/phase2_canonical_v1/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/runs/20260726_135319__NeuML__pubmedbert-base-embeddings__ft2__20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuM-6f5820e5__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr3e-05__bs11__t0.04_-3882125ff7/model
+  seed1_checkpoint: ${DEMAP_DATA_ROOT}/artifacts/phase2_canonical_v1/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/runs/20260726_135304__NeuML__pubmedbert-base-embeddings__ft2__20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuM-6f5820e5__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr3e-05__bs11__t0.04_-bcd9faffa0/model
+  seed0_source_root: ${DEMAP_DATA_ROOT}/artifacts/phase2_canonical_v1
+  seed1_source_root: ${DEMAP_DATA_ROOT}/artifacts/phase2_canonical_v1
   seed0_metrics:
     split: val_dev
     recall@1: 0.6901275389702409
@@ -252,7 +255,7 @@ winners:
     mrr@100: 0.0011686899623585805
   retained_seed: 0
   retained_run_id: 20260726_135319__NeuML__pubmedbert-base-embeddings__ft2__20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuM-6f5820e5__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr3e-05__bs11__t0.04_-3882125ff7
-  retained_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/runs/20260726_135319__NeuML__pubmedbert-base-embeddings__ft2__20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuM-6f5820e5__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr3e-05__bs11__t0.04_-3882125ff7/model
+  retained_checkpoint: ${DEMAP_DATA_ROOT}/artifacts/phase2_canonical_v1/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/runs/20260726_135319__NeuML__pubmedbert-base-embeddings__ft2__20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuM-6f5820e5__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr3e-05__bs11__t0.04_-3882125ff7/model
   retained_checkpoint_hash: model.safetensors:1e1d4b9cac53786447a8114d79270f51acccfe62c65959cc69705ccc1cc24659
   recall5_tie_required_tiebreakers: false
   changed_vs_v2: false
@@ -260,4 +263,4 @@ winners:
   v2_lr: 3.0e-05
   v2_temperature: 0.04
   v2_mean_recall@5: 0.896551724137931
-  v2_retained_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/runs/20260726_135319__NeuML__pubmedbert-base-embeddings__ft2__20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuM-6f5820e5__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr3e-05__bs11__t0.04_-3882125ff7/model
+  v2_retained_checkpoint: ${DEMAP_DATA_ROOT}/artifacts/phase2_canonical_v1/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/runs/20260726_135319__NeuML__pubmedbert-base-embeddings__ft2__20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuM-6f5820e5__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr3e-05__bs11__t0.04_-3882125ff7/model

@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
+# Migrated Slurm driver. Paths are resolved from DEMAP_DATA_ROOT; the
+# original hardcoded research-repository root has been parameterized.
+# SBATCH --output/--error are static directives and cannot expand shell
+# variables: pass them on the command line, e.g.
+#   sbatch --output=<log>/%A_%a.out --error=<log>/%A_%a.err <this file>
 #SBATCH --job-name=J_allow_hgbc
-#SBATCH --output=/vf/users/nextgen2/james/tasks/cde_project/demap/.scratch/v17_claude/J_allowance/logs/J3_hgbc_%A_%a.out
-#SBATCH --error=/vf/users/nextgen2/james/tasks/cde_project/demap/.scratch/v17_claude/J_allowance/logs/J3_hgbc_%A_%a.err
 #SBATCH --partition=norm
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=64g
@@ -19,7 +22,7 @@
 # NO per-rate hyperparameter retuning beyond this identical predefined grid.
 # Code = pinned worktree wt_hgbc_2903203 (the manuscript trainer).
 set -euo pipefail
-REPO="/vf/users/nextgen2/james/tasks/cde_project/demap"
+REPO="${DEMAP_DATA_ROOT:?set DEMAP_DATA_ROOT to the data/artifact root}"
 J="$REPO/.scratch/v17_claude/J_allowance"
 WT="$REPO/.scratch/demap/paper_v13_scientific_audit/wt_hgbc_2903203"
 cd "$REPO"

@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
+# Migrated Slurm driver. Paths are resolved from DEMAP_DATA_ROOT; the
+# original hardcoded research-repository root has been parameterized.
+# SBATCH --output/--error are static directives and cannot expand shell
+# variables: pass them on the command line, e.g.
+#   sbatch --output=<log>/%A_%a.out --error=<log>/%A_%a.err <this file>
 #SBATCH --job-name=J_allow_feat_ce
-#SBATCH --output=/vf/users/nextgen2/james/tasks/cde_project/demap/.scratch/v17_claude/J_allowance/logs/J2_featce_%A_%a.out
-#SBATCH --error=/vf/users/nextgen2/james/tasks/cde_project/demap/.scratch/v17_claude/J_allowance/logs/J2_featce_%A_%a.err
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:a100:1,lscratch:100
 #SBATCH --cpus-per-task=8
@@ -19,7 +22,7 @@
 # External splits (gdc_combined, cimac_v2) stay at allowance 1.0 at every rate
 # (manuscript policy).
 set -euo pipefail
-REPO="/vf/users/nextgen2/james/tasks/cde_project/demap"
+REPO="${DEMAP_DATA_ROOT:?set DEMAP_DATA_ROOT to the data/artifact root}"
 J="$REPO/.scratch/v17_claude/J_allowance"
 SCRATCH="$REPO/.scratch/demap/paper_v13_scientific_audit"
 WT="$SCRATCH/wt_ce_5f06f10"
