@@ -1,6 +1,6 @@
 # Provenance and migration policy
 
-This repository (`demap_repro`) is a **selective public-reproduction repository** built from a
+DEMap is a **selective public-reproduction repository** built from a
 separate, **immutable** research repository. This document states the rules that govern every
 file that enters it.
 
@@ -89,12 +89,12 @@ Every migrated component follows the same loop, without exception:
 
 ```
 1. identify   the exact implementation that generated the final-paper result
-2. copy       it verbatim into demap_repro (SRC untouched)
+2. copy       it verbatim into this repository (SRC untouched)
 3. record     source path, source class, worktree SHA256, HEAD blob, scope ids,
               parity artifact + SHA256, divergence notes
 4. parity     establish a regression test against the authoritative paper artifact
               BEFORE any cleanup
-5. refactor   only inside demap_repro — rename, consolidate, restructure, fix
+5. refactor   only inside this repository — rename, consolidate, restructure, fix
 6. re-parity  re-run the regression; accept the refactor only if parity holds
               within the scientifically appropriate tolerance
 ```

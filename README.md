@@ -1,6 +1,7 @@
-# demap_repro
+# DEMap
 
-Reproduction code for the DEMAP study on mapping free-text clinical data
+DEMap provides the code and reproducibility workflows used for the analyses
+reported in the accompanying manuscript on mapping free-text clinical data
 descriptors to caDSR Common Data Elements.
 
 The system retrieves candidate CDEs with a fine-tuned bi-encoder and a lexical
@@ -9,10 +10,10 @@ pooled candidates with a gradient-boosted classifier over 117 lexical and semant
 features. It reaches Recall@5 of 0.971 on the internal test set and 0.802–0.972
 across five distribution-shifted external evaluation sets.
 
-This repository contains **only** the code behind results reported in the paper,
-plus what those results depend on. It is not a copy of the research repository:
-abandoned approaches, superseded runs and debugging variants stayed behind. The
-manuscript is the scope boundary, and every included component maps to an entry in
+This repository contains **only** the code behind results reported in the
+manuscript, plus what those results depend on. Abandoned approaches, superseded
+runs and debugging variants are deliberately absent. The manuscript is the scope
+boundary, and every included component maps to an entry in
 [`manifests/paper_scope.yaml`](manifests/paper_scope.yaml).
 
 ---
@@ -21,8 +22,8 @@ manuscript is the scope boundary, and every included component maps to an entry 
 
 ```bash
 pip install -e '.[all]'      # or: pip install -e .  for the lexical/reporting subset
-pytest                       # 198 tests, no data or network required
-demap-repro --list           # the pipeline, in order
+pytest                       # 484 tests, no data or network required
+demap --list                 # the pipeline, in order
 ```
 
 The test suite runs on a clean clone. It verifies the published numbers against

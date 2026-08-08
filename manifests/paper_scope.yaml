@@ -1,4 +1,4 @@
-# paper_scope.yaml -- the FIRST scope gate for the demap_repro public repository.
+# paper_scope.yaml -- the FIRST scope gate for the DEMap paper repository.
 #
 # Every entry is a result that appears in the authoritative manuscript. A source file
 # may be migrated only if it (A) directly produces a paper_scope item, or (B) is a

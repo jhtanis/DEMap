@@ -12,7 +12,7 @@ pip install -e '.[dev]'
 pytest
 ```
 
-198 tests. No data, no weights, no network. They check:
+484 tests. No data, no weights, no network. They check:
 
 - every headline number against a committed fixture (Table 4, Table S5, Table S6,
   Figures 4/5/S5/S6/S7, the K selection, the cross-encoder bake-off, the final HGBC
@@ -44,13 +44,13 @@ manuscript's rounding.
 Stages that can be re-run at this level:
 
 ```bash
-demap-repro leakage-filter --dry-run     # 51 removed queries, 1089/1759/310/68/113
-demap-repro select-k --grid <k_selection_grid.csv>
-demap-repro ce-select --ce-root <crossencoder_fulltrain_v2_eligible>
-demap-repro table4 --out-dir <out>
-demap-repro figure4-inputs --out-dir <out>
-demap-repro figure5-inputs --out-dir <out>
-demap-repro leakage-sensitivity
+demap leakage-filter --dry-run     # 51 removed queries, 1089/1759/310/68/113
+demap select-k --grid <k_selection_grid.csv>
+demap ce-select --ce-root <crossencoder_fulltrain_v2_eligible>
+demap table4 --out-dir <out>
+demap figure4-inputs --out-dir <out>
+demap figure5-inputs --out-dir <out>
+demap leakage-sensitivity
 ```
 
 ---
@@ -72,9 +72,9 @@ An ordering flip is a real failure even inside the tolerance; a small magnitude
 difference is not.
 
 ```bash
-demap-repro biencoder --help      # screening, Phase 1, Phase 2
-demap-repro ce-train --help       # one backbone under the frozen protocol
-demap-repro train-hgbc --help     # the 16-config grid, selected on Validation Dev
+demap biencoder --help      # screening, Phase 1, Phase 2
+demap ce-train --help       # one backbone under the frozen protocol
+demap train-hgbc --help     # the 16-config grid, selected on Validation Dev
 ```
 
 Fixed settings that must not drift when retraining:

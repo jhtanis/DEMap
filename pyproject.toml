@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "demap-repro"
+name = "DEMap"
 version = "1.0.0"
-description = "Reproduction code for the DEMAP CDE-mapping paper: benchmark construction, bi-encoder and cross-encoder training, lexical retrieval, and the final HGBC reranker."
+description = "DEMap: code and reproducibility workflows for the reported CDE-mapping analyses — benchmark construction, bi-encoder and cross-encoder training, lexical retrieval, and the final HGBC reranker."
 readme = "README.md"
 requires-python = ">=3.10"
 # No license is declared: the terms for this repository have not been decided.
@@ -46,14 +46,16 @@ figures = ["matplotlib==3.10.8"]
 extract = ["lxml==6.1.0"]
 dev = ["pytest==9.0.3"]
 all = [
-  "demap-repro[neural]",
-  "demap-repro[figures]",
-  "demap-repro[extract]",
-  "demap-repro[dev]",
+  "DEMap[neural]",
+  "DEMap[figures]",
+  "DEMap[extract]",
+  "DEMap[dev]",
 ]
 
 [project.scripts]
-demap-repro = "demap_repro.cli:main"
+# Console script. The import package stays demap_repro; renaming it would
+# break every module path and every recorded provenance entry for no gain.
+demap = "demap_repro.cli:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }

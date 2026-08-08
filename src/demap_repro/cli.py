@@ -1,11 +1,11 @@
-"""``demap-repro`` — one entry point per reproduction stage.
+"""``demap`` — one entry point per reproduction stage.
 
 Every stage is also importable and runnable as a module; this dispatcher exists so
 the pipeline reads as an ordered list rather than a directory of scripts::
 
-    demap-repro --list
-    demap-repro select-k --grid artifacts/final_reranker/k_selection/k_selection_grid.csv
-    demap-repro leakage-filter --dry-run
+    demap --list
+    demap select-k --grid artifacts/final_reranker/k_selection/k_selection_grid.csv
+    demap leakage-filter --dry-run
 
 Stages that need components with unresolved redistribution status say so when they
 run, rather than failing with an import error. See ``docs/provenance.md``.
@@ -115,7 +115,7 @@ def _print_stages() -> None:
 def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     ap = argparse.ArgumentParser(
-        prog="demap-repro", description=__doc__, add_help=False,
+        prog="demap", description=__doc__, add_help=False,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("stage", nargs="?", help="stage name; omit with --list to see all")
     ap.add_argument("--list", action="store_true", help="list the stages in pipeline order")
