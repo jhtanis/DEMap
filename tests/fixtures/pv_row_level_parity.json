@@ -1,0 +1,32 @@
+{
+  "query": {
+    "total_rows": 69102,
+    "comparable_rows": 46948,
+    "exact_matches": 46948,
+    "mismatches": 0,
+    "pct_identical": 100.0,
+    "missing_to_present": 0,
+    "present_to_missing": 0,
+    "changed_rendered_string_both_present": 0
+  },
+  "cde": {
+    "total_rows": 69102,
+    "comparable_rows": 46948,
+    "exact_matches": 46948,
+    "mismatches": 0,
+    "pct_identical": 100.0,
+    "missing_to_present": 0,
+    "present_to_missing": 0,
+    "changed_rendered_string_both_present": 0
+  },
+  "pv_type": {
+    "comparable_rows": 46948,
+    "exact_matches": 46948,
+    "mismatches": 0
+  },
+  "pv_n": {
+    "comparable_rows": 46948,
+    "exact_matches": 0,
+    "mismatches": 46948
+  }
+}

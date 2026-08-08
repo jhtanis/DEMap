@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "description": "Summary of the authoritative fixed-K (K=30) feature table that the final HGBC was trained and evaluated on. The table itself is 54 MB and is not distributed; these are the invariants the reproduction must satisfy.",
+  "source_artifact": "artifacts/final_reranker/hgbc_features_v2_eligible/feature_table_fixedk30_crossenc_v2.parquet",
+  "source_sha256": "62eeae7a53dfacef10b445553379675303f647090cfeb8a956f97aedbf505e44",
+  "n_rows": 423395,
+  "n_columns": 137,
+  "ce_feature_columns": [
+    "crossenc_score",
+    "crossenc_rank",
+    "crossenc_margin_to_top1",
+    "crossenc_margin_to_next",
+    "crossenc_score_z_by_query",
+    "crossenc_missing"
+  ],
+  "ce_feature_columns_present": [
+    "crossenc_score",
+    "crossenc_rank",
+    "crossenc_margin_to_top1",
+    "crossenc_margin_to_next",
+    "crossenc_score_z_by_query",
+    "crossenc_missing"
+  ],
+  "n_duplicate_candidate_keys": 0,
+  "allowance_mask": {
+    "version": "exact_match_mask_v1",
+    "rate": 0.7,
+    "seed": 42
+  },
+  "per_split": {
+    "cctg": {
+      "routing": "cadsr_a070",
+      "n_rows": 30370,
+      "n_queries": 1097,
+      "n_positive_rows": 1088,
+      "n_exact_candidate_rows": 1454,
+      "n_rows_with_ce": 30370,
+      "mean_candidates_per_query": 27.6846,
+      "n_queries_gold_blocked_at_070": 267,
+      "n_queries_gold_allowed_at_070": 785,
+      "n_blocked_queries_with_exact_gold": 0,
+      "n_allowed_queries_with_exact_gold": 779
+    },
+    "cdash": {
+      "routing": "cadsr_a070",
+      "n_rows": 8620,
+      "n_queries": 324,
+      "n_positive_rows": 468,
+      "n_exact_candidate_rows": 753,
+      "n_rows_with_ce": 8620,
+      "mean_candidates_per_query": 26.6049,
+      "n_queries_gold_blocked_at_070": 90,
+      "n_queries_gold_allowed_at_070": 224,
+      "n_blocked_queries_with_exact_gold": 0,
+      "n_allowed_queries_with_exact_gold": 221
+    },
+    "cimac_v2": {
+      "routing": "external_a10",
+      "n_rows": 3582,
+      "n_queries": 131,
+      "n_positive_rows": 114,
+      "n_exact_candidate_rows": 227,
+      "n_rows_with_ce": 3582,
+      "mean_candidates_per_query": 27.3435,
+      "n_queries_gold_blocked_at_070": 38,
+      "n_queries_gold_allowed_at_070": 76,
+      "n_blocked_queries_with_exact_gold": 27,
+      "n_allowed_queries_with_exact_gold": 62
+    },
+    "gdc_combined": {
+      "routing": "external_a10",
+      "n_rows": 1920,
+      "n_queries": 72,
+      "n_positive_rows": 71,
+      "n_exact_candidate_rows": 87,
+      "n_rows_with_ce": 1920,
+      "mean_candidates_per_query": 26.6667,
+      "n_queries_gold_blocked_at_070": 23,
+      "n_queries_gold_allowed_at_070": 48,
+      "n_blocked_queries_with_exact_gold": 22,
+      "n_allowed_queries_with_exact_gold": 48
+    },
+    "oid_alt": {
+      "routing": "cadsr_a070",
+      "n_rows": 51438,
+      "n_queries": 1766,
+      "n_positive_rows": 1640,
+      "n_exact_candidate_rows": 1424,
+      "n_rows_with_ce": 51438,
+      "mean_candidates_per_query": 29.1268,
+      "n_queries_gold_blocked_at_070": 302,
+      "n_queries_gold_allowed_at_070": 1226,
+      "n_blocked_queries_with_exact_gold": 0,
+      "n_allowed_queries_with_exact_gold": 1224
+    },
+    "test": {
+      "routing": "cadsr_a070",
+      "n_rows": 109524,
+      "n_queries": 3959,
+      "n_positive_rows": 4151,
+      "n_exact_candidate_rows": 3622,
+      "n_rows_with_ce": 109524,
+      "mean_candidates_per_query": 27.6646,
+      "n_queries_gold_blocked_at_070": 1152,
+      "n_queries_gold_allowed_at_070": 2751,
+      "n_blocked_queries_with_exact_gold": 0,
+      "n_allowed_queries_with_exact_gold": 2600
+    },
+    "val_dev": {
+      "routing": "cadsr_a070",
+      "n_rows": 108800,
+      "n_queries": 3934,
+      "n_positive_rows": 4140,
+      "n_exact_candidate_rows": 3567,
+      "n_rows_with_ce": 108800,
+      "mean_candidates_per_query": 27.6563,
+      "n_queries_gold_blocked_at_070": 1131,
+      "n_queries_gold_allowed_at_070": 2759,
+      "n_blocked_queries_with_exact_gold": 0,
+      "n_allowed_queries_with_exact_gold": 2627
+    },
+    "val_train": {
+      "routing": "cadsr_a070",
+      "n_rows": 109141,
+      "n_queries": 3946,
+      "n_positive_rows": 4109,
+      "n_exact_candidate_rows": 3625,
+      "n_rows_with_ce": 109141,
+      "mean_candidates_per_query": 27.6586,
+      "n_queries_gold_blocked_at_070": 1144,
+      "n_queries_gold_allowed_at_070": 2758,
+      "n_blocked_queries_with_exact_gold": 0,
+      "n_allowed_queries_with_exact_gold": 2607
+    }
+  }
+}

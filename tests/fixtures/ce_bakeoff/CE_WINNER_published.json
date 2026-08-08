@@ -1,0 +1,38 @@
+{
+  "selection_split": "val_dev",
+  "selection_metric": "recall@5",
+  "winner_tag": "ncbi_MedCPT-Cross-Encoder",
+  "winner_label": "MedCPT-Cross-Encoder",
+  "winner_checkpoint": "/vf/users/nextgen2/james/tasks/cde_project/demap/artifacts/final_reranker/crossencoder_fulltrain_v2_eligible/runs/ncbi_MedCPT-Cross-Encoder",
+  "val_dev_metrics": {
+    "recall@1": 0.711997966446365,
+    "recall@5": 0.9123029994916116,
+    "recall@10": 0.9588205388917131,
+    "mrr@100": 0.8002268853037474
+  },
+  "ranking": [
+    {
+      "model_tag": "ncbi_MedCPT-Cross-Encoder",
+      "recall@1": 0.711997966446365,
+      "recall@5": 0.9123029994916116,
+      "recall@10": 0.9588205388917131,
+      "mrr@100": 0.8002268853037474
+    },
+    {
+      "model_tag": "BAAI_bge-reranker-base",
+      "recall@1": 0.6936959837315709,
+      "recall@5": 0.9036603965429588,
+      "recall@10": 0.9483985765124556,
+      "mrr@100": 0.7856463528276636
+    },
+    {
+      "model_tag": "cross-encoder_ms-marco-MiniLM-L-6-v2",
+      "recall@1": 0.6423487544483986,
+      "recall@5": 0.8741738688357905,
+      "recall@10": 0.9359430604982206,
+      "mrr@100": 0.7443160584627243
+    }
+  ],
+  "pairs": "corrected FULLTRAIN pairs (eligibility-enforced; 0 ineligible, 0 empty-text)",
+  "protocol": "frozen fulltrain: BCE pointwise, ep2, lr2e-5, bs32, len512, seed 20260527, TRAIN=full train split"
+}

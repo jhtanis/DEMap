@@ -1,0 +1,55 @@
+dataset,method,recall@5,ce_winner_tag,ce_winner_label
+Test,final_reranker,0.9714574387471584,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+Test,ce_pool_rerank,0.9138671381662036,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+Test,ft_mpnet,0.9116,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+Test,cde_match_fuzzy,0.7731750442030816,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+Test,python_cde_match_approx,0.7191,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+Test,bm25,0.3609,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+Test,old_final_reranker,0.9689,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+Test,old_ce_pool_rerank,0.9068,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+Test,old_cde_match_fuzzy,0.7701,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CCTG,final_reranker,0.9088422971741112,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CCTG,ce_pool_rerank,0.7183226982680037,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CCTG,ft_mpnet,0.7046,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CCTG,cde_match_fuzzy,0.780309936189608,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CCTG,python_cde_match_approx,0.7393,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CCTG,bm25,0.392,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CCTG,old_final_reranker,0.8833,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CCTG,old_ce_pool_rerank,0.7101,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CCTG,old_cde_match_fuzzy,0.7758,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+OID ALT,final_reranker,0.8323895809739524,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+OID ALT,ce_pool_rerank,0.5639864099660249,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+OID ALT,ft_mpnet,0.4281,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+OID ALT,cde_match_fuzzy,0.7021517553793885,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+OID ALT,python_cde_match_approx,0.7695,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+OID ALT,bm25,0.1755,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+OID ALT,old_final_reranker,0.8318,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+OID ALT,old_ce_pool_rerank,0.573,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+OID ALT,old_cde_match_fuzzy,0.7022,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CDASH,final_reranker,0.9197530864197532,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CDASH,ce_pool_rerank,0.8641975308641975,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CDASH,ft_mpnet,0.8395,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CDASH,cde_match_fuzzy,0.8302469135802469,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CDASH,python_cde_match_approx,0.75,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CDASH,bm25,0.7099,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CDASH,old_final_reranker,0.9228,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CDASH,old_ce_pool_rerank,0.8642,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CDASH,old_cde_match_fuzzy,0.8272,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+GDC,final_reranker,0.9722222222222222,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+GDC,ce_pool_rerank,0.9027777777777778,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+GDC,ft_mpnet,0.8333,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+GDC,cde_match_fuzzy,0.9722222222222222,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+GDC,python_cde_match_approx,0.9861,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+GDC,bm25,0.5417,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+GDC,old_final_reranker,0.9861,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+GDC,old_ce_pool_rerank,0.9028,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+GDC,old_cde_match_fuzzy,0.9722,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CIMAC,final_reranker,0.8015267175572519,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CIMAC,ce_pool_rerank,0.5954198473282443,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CIMAC,ft_mpnet,0.5649,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CIMAC,cde_match_fuzzy,0.7862595419847328,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CIMAC,python_cde_match_approx,0.6794,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CIMAC,bm25,0.1603,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CIMAC,old_final_reranker,0.8168,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CIMAC,old_ce_pool_rerank,0.6336,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
+CIMAC,old_cde_match_fuzzy,0.7786,ncbi_MedCPT-Cross-Encoder,FT-MedCPT
