@@ -534,16 +534,16 @@ entries:
   role: 'Table S3 stage 2/2: CONFIRMED producer. Cell 13 groups query_cde_pv_pair_records.csv by cde_pv_type
     (groups with >= 100 both_present rows) plus an ''overall'' row, and writes table04_pv_overlap_query_vs_cde.csv.
     PV_DIAG_DIR resolves to artifacts/summaries/pv_frozen_diagnostics (NOT the _with_gdc variant).'
-  divergence_note: UNTRACKED in SRC. Convert notebook -> headless script in DST. The artifact carries
-    6 groups; v21 Table S3 reports 4 of them (BINARY_WITH_UNKNOWN_NA and BINARY omitted).
+  divergence_note: 'Cell 13 (the Table S3 grouping) ported to a module. AUDIT 2026-08-08: the earlier
+    reason claimed tests covered it, but no DST code performed the grouping. The full chain pairs.parquet
+    -> pv_frozen_diagnostics -> this module now reproduces the CORRECTED Table S3 (38,964 / 24,158 / 3,040
+    / 8,815) end to end; the other notebook cells build tables not reported in v21.'
   release_gate: null
   nontrivial: true
   classification: migration_candidate
-  copy_verbatim: false
+  copy_verbatim: true
   provenance_status: resolved_slice1_5
-  migration_state: not_migrated_by_decision
-  exclusion_reason: notebook; the Table S3 grouping it performed is covered by the corrected expected-results
-    entry and tests.
+  migration_state: parity_reverified
 - src: src/demap/features/pv_parser.py
   dst: src/demap_repro/text/pv_parser.py
   source_class: tracked
@@ -3264,7 +3264,7 @@ entries:
   migration_state: not_migrated_by_decision
   exclusion_reason: lexical-only two-method grid; v21 reports the three/four-method aggregate instead.
 - src: notebooks/paper_figures/figure_representation_heatmaps_v12.ipynb
-  dst: src/demap_repro/reporting/figures/figure_representation_heatmaps_v12.py
+  dst: src/demap_repro/reporting/figures/make_figure2_S1_S2_heatmaps.py
   source_class: untracked
   worktree_sha256: 68fa76b51e32ac5c4ba7bb265496132be76a3d0863164a9da6d8600580f66f10
   worktree_bytes: 480058
@@ -3277,14 +3277,16 @@ entries:
   parity_artifact_sha256: 7023f306b524fc7a269a7c234e71276450db63d62ea91ef67957656a160f16d9
   required_config: []
   role: Figures 2, S1, S2; convert notebook -> headless script in DST
-  divergence_note: UNTRACKED in SRC.
+  divergence_note: 'Converted notebook -> headless generator. AUDIT 2026-08-08: the earlier ''superseded
+    by the manuscript/figures generators'' reason was WRONG — no manuscript/figures generator exists for
+    Figures 2/S1/S2; this notebook was their only producer. Regenerated figures reproduce the published
+    provenance records exactly (same source hash, same anchor/best cells, same geometry).'
   release_gate: null
   nontrivial: true
   classification: migration_candidate
-  copy_verbatim: false
+  copy_verbatim: true
   provenance_status: null
-  migration_state: not_migrated_by_decision
-  exclusion_reason: notebook superseded by the manuscript/figures generators migrated into reporting/figures/.
+  migration_state: parity_reverified
 - src: notebooks/paper_figures/figure_repxloss_v10.ipynb
   dst: src/demap_repro/reporting/figures/figure_repxloss_v10.py
   source_class: untracked
@@ -3305,10 +3307,10 @@ entries:
   copy_verbatim: false
   provenance_status: null
   migration_state: not_migrated_by_decision
-  exclusion_reason: notebook superseded by make_figureS3_repxloss.py, the generator whose output reached
-    v21.
+  exclusion_reason: 'Genuinely superseded: v21 embeds make_figureS3_repxloss_v21.py output, which IS migrated
+    as reporting/figures/make_figureS3_repxloss.py. Verified 2026-08-08.'
 - src: notebooks/paper_figures/figure_stage_comparison_v10.ipynb
-  dst: src/demap_repro/reporting/figures/figure_stage_comparison_v10.py
+  dst: src/demap_repro/reporting/figures/make_figureS4_stage_comparison.py
   source_class: untracked
   worktree_sha256: 27b569ef1c7495410fbc7634205b00107415d89673af91799f2b1b4ab7c2050c
   worktree_bytes: 110016
@@ -3319,16 +3321,17 @@ entries:
   parity_artifact_sha256: ceb480b8101d44826c0b7528992145a3b2e50aa7802c2a8b6942c708497d9452
   required_config: []
   role: Figure S4; convert notebook -> headless script in DST
-  divergence_note: UNTRACKED in SRC.
+  divergence_note: 'Converted notebook -> headless generator. AUDIT 2026-08-08: the earlier reason confused
+    the INPUT table (build_stage_comparison.py) with the figure itself. Regenerated Figure S4 reproduces
+    the published provenance record exactly.'
   release_gate: null
   nontrivial: true
   classification: migration_candidate
-  copy_verbatim: false
+  copy_verbatim: true
   provenance_status: null
-  migration_state: not_migrated_by_decision
-  exclusion_reason: notebook; its input table is built by reporting/inputs/build_stage_comparison.py.
+  migration_state: parity_reverified
 - src: notebooks/paper_figures/figure_k_ceiling_v10.ipynb
-  dst: src/demap_repro/reporting/figures/figure_k_ceiling_v10.py
+  dst: src/demap_repro/reporting/figures/make_figureS5_k_ceiling.py
   source_class: untracked
   worktree_sha256: 226384eb2c9b3a43de54f9f221032fef14a5046893f5827c36fe1a20f03a9f4c
   worktree_bytes: 159459
@@ -3339,15 +3342,15 @@ entries:
   parity_artifact_sha256: 8585a2fedd96ec98005d48e84b69d14f25225888026d98bb63a8c9e44f8acfa2
   required_config: []
   role: Figure S5; convert notebook -> headless script in DST
-  divergence_note: UNTRACKED in SRC.
+  divergence_note: 'Converted notebook -> headless generator. AUDIT 2026-08-08: K selection lives in pool/select_k.py,
+    but the FIGURE had no producer in DST. Regenerated Figure S5 reproduces the published provenance record
+    exactly.'
   release_gate: null
   nontrivial: true
   classification: migration_candidate
-  copy_verbatim: false
+  copy_verbatim: true
   provenance_status: null
-  migration_state: not_migrated_by_decision
-  exclusion_reason: notebook; the K-ceiling data is produced by pool/select_k.py and tested against the
-    grid.
+  migration_state: parity_reverified
 - src: notebooks/paper_figures/paper_figure_style.py
   dst: src/demap_repro/reporting/figures/style.py
   source_class: untracked
@@ -3571,6 +3574,36 @@ entries:
   copy_verbatim: true
   provenance_status: null
   migration_state: copied_verbatim
+- src: src/demap/features/cdematch.py
+  dst: src/demap_repro/reranker/features/cdematch.py
+  source_class: tracked
+  classification: migration_candidate
+  copy_verbatim: true
+  nontrivial: true
+  worktree_sha256: 2dccbce41fb036bd37120cf7172b67df28faaa9ffc2f1b136b409bff2818248c
+  worktree_bytes: 9075
+  head_blob: null
+  paper_scope_ids:
+  - SM-S55-01
+  - MT-T4
+  - MT-F6
+  required_config: []
+  parity_artifact: artifacts/final_reranker/hgbc_features_v2_eligible/feature_table_fixedk30_crossenc_v2.parquet
+  parity_artifact_sha256: null
+  role: 'Generic ranked-list feature arithmetic: score normalization, log1p rank, top-1 and pairwise margins,
+    within-query z-score, candidate count.'
+  release_gate: null
+  migration_state: copied_verbatim
+  divergence_note: 'RECLASSIFIED 2026-08-08 from gated (cde_match_derivative_unresolved) to independent,
+    on content rather than on its name. Evidence: (1) it reads only query_id, cdematch_rank, cdematch_score
+    and in_cdematch_topk — no CDE text, no catalog field, no rule set, no string comparison; (2) every
+    output is standard ranked-list arithmetic; (3) it contains no reference to SQL, Oracle, NCI, or any
+    supplied artefact; (4) its single commit 84d51c9 ''Add CDE Match derived features (PR-C)'' is a feature-engineering
+    change, not a port; (5) decisively, build_fixed_k_feature_table.py already applied the same function
+    verbatim to the KEYWORD retriever''s output and renamed the outputs to seqkw_*, which only works because
+    the function is retriever-agnostic. The only CDE Match-specific constant is CDEMATCH_SCORE_MAX = 100.0,
+    an observed property of the upstream score scale, not algorithm internals. The genuinely derivative
+    components (cde_match_clone.py, keyword_retriever.py, the NCI PL/SQL) remain gated and uncopied.'
 gated_material:
 - src: scripts/cde_match/cdeMatch_matchFlow.sql
   source_class: tracked
@@ -3688,18 +3721,6 @@ gated_material:
   - SM-S53-01
   - SM-S55-01
   - MT-T4
-  release_gate: cde_match_derivative_unresolved
-  copied_to_dst: false
-  migration_state: not_copied
-- src: src/demap/features/cdematch.py
-  source_class: tracked
-  worktree_sha256: 2dccbce41fb036bd37120cf7172b67df28faaa9ffc2f1b136b409bff2818248c
-  worktree_bytes_or_filecount: 9075
-  digest_kind: file
-  role: CDE Match ranking/eval helpers
-  paper_scope_ids:
-  - MT-T4
-  - SM-S52-01
   release_gate: cde_match_derivative_unresolved
   copied_to_dst: false
   migration_state: not_copied
