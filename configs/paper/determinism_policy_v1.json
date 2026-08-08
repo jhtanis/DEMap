@@ -1,0 +1,64 @@
+{
+  "pipeline_determinism_version": "demap_reranker_determinism_v1",
+  "adopted": "2026-07-27",
+  "summary": "Reranking is deterministic by construction. No environment variable (in particular PYTHONHASHSEED) is part of the algorithm or required at runtime.",
+  "policies": {
+    "keyword_tie_break_policy_version": "keyword_tie_break_v1_score_desc_then_catalog_row_asc",
+    "keyword_tie_break_keys": [
+      "rule_score DESCENDING (primary retrieval score)",
+      "catalog row index ASCENDING (position in KeywordCatalogIndex.cde_ids; unique, frozen at index build, shipped inside the index)"
+    ],
+    "keyword_tie_break_scope": "every (query, rule, field) group in demap.features.keyword_retriever: exact, charngram, wordngram, token, pv, containment; top_k_per_rule truncation keeps the first K under this total order",
+    "keyword_feature_rank_keys": [
+      "per_source_ranks: rule_score DESCENDING then cde_id ASCENDING",
+      "rrf_fuse: rrf_score DESCENDING then cde_id ASCENDING",
+      "best_rule/best_field: weighted contribution DESCENDING then RULE_CODES ASCENDING then FIELD_CODES ASCENDING"
+    ],
+    "kw_feature_emission_order": "(query_id, cde_id) ASCENDING — makes downstream public-id version collapse deterministic for every caller",
+    "candidate_union_policy_version": "candidate_union_v1_publicid_dedup_stable",
+    "candidate_union_keys": [
+      "pool = bi-encoder top-20 UNION keyword_v1 fuzzy top-10",
+      "deduplicated by CDE public id",
+      "row order fixed by the existing stable (kind='mergesort') sorts in demap.features.candidate_union",
+      "source flags in_biencoder_topk / in_cdematch_topk / in_keyword_topk are set-membership, order-independent"
+    ],
+    "final_score_tie_break_policy_version": "final_rank_v1_score_desc_then_public_id_asc",
+    "final_score_tie_break_keys": [
+      "final_score DESCENDING (HGBC predict_proba[:, 1])",
+      "CDE public id ASCENDING — numeric comparison when the id parses as an integer, lexicographic otherwise; non-numeric ids sort last"
+    ],
+    "final_ranking_invariants": [
+      "rank starts at 1 within each query",
+      "top-K applied only after scoring and ranking",
+      "no exact-match pinning",
+      "no hidden ranking tier or score override"
+    ]
+  },
+  "explicitly_forbidden_as_ordering_inputs": [
+    "Python set iteration order",
+    "dict/Counter construction order derived from a set",
+    "object identity or hash values",
+    "filesystem enumeration order",
+    "joblib/pickle incidental ordering",
+    "process environment (PYTHONHASHSEED and anything else)",
+    "incoming feature-table row order"
+  ],
+  "root_cause_fixed": {
+    "where": "demap.features.keyword_retriever._token_overlap and the PV rule in generate_candidates",
+    "what": "both built a Counter by iterating a Python set of query tokens; CPython randomizes string hashing per process (PEP 456), so the candidate array layout — and therefore which exactly-tied candidates survived top_k_per_rule truncation — varied between processes",
+    "affected_rules": ["token (all 5 text fields)", "pv (PV_SUMMARY)"],
+    "unaffected_rules": ["exact", "charngram", "wordngram"],
+    "downstream_features_that_moved": [
+      "rrf_score", "keyword_rank", "n_rule_hits", "n_distinct_rules",
+      "best_rule_code", "best_field_code", "kw_token_*", "kw_pv_score"
+    ],
+    "reproduction": ".scratch/demap/deterministic_reranker_fix/REPRO_REPORT.md"
+  },
+  "historical_outputs": {
+    "status": "outputs produced before this policy are hash-seed samples and are SUPERSEDED for production reproducibility",
+    "named": [
+      "artifacts/final_reranker/in_the_wild_retest_james12/top10_ranked_results.csv (2026-07-19/20)"
+    ],
+    "note": "no explicit rule can reproduce an arbitrary hash-seed sample; the policy was chosen on principle, not to match any saved output"
+  }
+}

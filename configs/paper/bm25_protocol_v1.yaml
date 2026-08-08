@@ -1,0 +1,128 @@
+# Canonical BM25 baseline protocol — single source of truth for the paper's lexical baseline.
+#
+# Run with:   PYTHONPATH=src .venv/bin/python -m demap paper bm25 --run
+# Validate:   PYTHONPATH=src .venv/bin/python -m demap paper bm25 --validate-only
+#
+# Every lock here is enforced fail-closed by src/demap/paper/bm25/protocol.py. Historical BM25
+# paths (January 79,479-row catalog, legacy splits, pair-level metrics) are quarantined in
+# src/demap/experiments/bm25_quarantine.py and cannot produce canonical output.
+schema_version: 1
+protocol_id: bm25_protocol_v1
+
+# --------------------------------------------------------------------------------------
+# Retrieval catalog — the June production catalog, NOT the January benchmark-construction one
+# --------------------------------------------------------------------------------------
+catalog:
+  path: data/processed/cadsr_xml_2026-06-18/cde_master_enriched_eval_production_cde_match.parquet
+  sha256: 2e360368307c7589325a43eebcbd6f6ec22090530ccf3521862cc1b9cb62a200
+  rows: 62976
+  unique_public_ids: 62858
+  retired_cdes: 0                      # must be exactly zero
+  excluded_admin_contexts: [TEST, Training]
+  excluded_admin_context_rows: 0       # must be exactly zero
+# Explicitly forbidden as a retrieval catalog (upstream query/gold/split source only).
+forbidden_catalogs:
+  - path: data/processed/cde_master_enriched.parquet
+    rows: 79479
+    reason: January benchmark-construction collection; contains retired CDEs
+
+# --------------------------------------------------------------------------------------
+# Representation grid (4 x 10 = 40 cells), in exact displayed order
+# --------------------------------------------------------------------------------------
+query_representations:
+  - {id: Q1, name: RAW,       column: query_text_raw}
+  - {id: Q3, name: RAW_PV,    column: query_text_q3}
+  - {id: Q4, name: RAW_PV_PH, column: query_text_q4}
+  - {id: Q2, name: PREF_PV,   column: query_text}
+cde_representations:
+  - {order: 1,  name: PQT,                  recipe: v3}
+  - {order: 2,  name: LN_DEF,               recipe: v2}
+  - {order: 3,  name: SN_PQT,               recipe: v1_v3}
+  - {order: 4,  name: SN_LN_DEF_PQT,        recipe: v1_v2a_v2b_v3}
+  - {order: 5,  name: SN_LN_DEF_PV,         recipe: v1_v2a_v2b_v5}
+  - {order: 6,  name: SN_LN_PQT_PV,         recipe: v1_v2a_v3_v5}
+  - {order: 7,  name: SN_LN_DEF_PQT_PV,     recipe: v1_v2a_v2b_v3_v5}
+  - {order: 8,  name: SN_DEC_DEF_PQT_PV,    recipe: v1_v6_v2b_v3_v5}
+  - {order: 9,  name: SN_LN_DEF_PQT_VD_PV,  recipe: v1_v2a_v2b_v3_v4_v5}
+  - {order: 10, name: SN_LN_DEC_DEF_PQT_PV, recipe: v1_v2a_v6_v2b_v3_v5}
+n_cells: 40
+
+# --------------------------------------------------------------------------------------
+# Representation selection — val_dev ONLY. Test may never influence selection.
+# --------------------------------------------------------------------------------------
+selection:
+  split: val_dev
+  split_path: data/processed/splits/val_dev.parquet
+  split_sha256: 7231bad2cadeacef06771468f457c565bb42fadd54ab307e5d56ca3484d3c1b2
+  n_queries: 3934                       # query-level (deduplicated); 4234 pair-level
+  forbidden_selection_splits: [test, cctg, oid_alt, cdash, gdc_combined, cimac_v2]
+  # Established BM25 rule (scripts/paper_select_bm25_winner.py), preserved verbatim.
+  criterion: [recall@5, mrr@100, query_variant, recipe]
+  criterion_directions: [desc, desc, asc, asc]
+  tie_margin: none
+  # Only Q1/Q3 exist on ALL six reporting datasets (eval_canonical/cimac_v2.parquet has no
+  # query_text (Q2) and no query_text_q4 (Q4) column), so only these may be frozen.
+  freezable_query_variants: [Q1, Q3]
+  # The frozen winner this protocol must reproduce.
+  expected_winner:
+    query_variant: Q3
+    query_column: query_text_q3
+    recipe: v1_v2a_v3_v5
+    cde_representation: SN_LN_PQT_PV
+    val_dev_recall5: 0.3688357905439756
+
+# --------------------------------------------------------------------------------------
+# BM25 implementation — fixed, never tuned
+# --------------------------------------------------------------------------------------
+bm25:
+  variant: Okapi BM25 (Lucene non-negative IDF)
+  implementation: demap.experiments.bm25_baseline.build_bm25_model
+  k1: 1.2
+  b: 0.75
+  tokenizer: baseline
+  min_token_len: 1
+  query_binary: true
+  stopwords: null
+  stemming: null
+  parameters_tuned: false
+  cde_format: labeled
+  sep: ' | '
+  recipe_configs:
+    v1: {filter_numeric_only: true, filter_versioned_id_short_name: true}
+    placeholder_policy: omit
+    short_name_placeholder: <MISSING_SHORT_NAME>
+    pv_placeholder: <MISSING_PV_SUMMARY>
+
+# --------------------------------------------------------------------------------------
+# Evaluation — identical definitions to the neural methods
+# --------------------------------------------------------------------------------------
+evaluation:
+  metric_helper: scripts/evaluate_non_exact_subset.eval_method
+  denominator: query_level          # unique query_id; missing queries count as misses
+  gold_matching: public_id_any_gold # NOT version-exact
+  forbid_pair_level: true
+  forbid_version_exact: true
+  dedup: public_id_best_score       # dedup AFTER scoring, ranks compacted
+  ranking_depth: 200
+  deterministic: true
+  seeds: null
+  reachable_gold_filtering: inherited from data/processed/eval_canonical
+  datasets:
+    - {name: test,         path: data/processed/eval_canonical/test.parquet,         n_queries: 3959, sha256: 5890039fcef613587902a03ba06955ca8b81b62699542a30e99f08dd9f2946b2}
+    - {name: cctg,         path: data/processed/eval_canonical/cctg.parquet,         n_queries: 1097, sha256: 920a9df69e382c7a747fdac2c9fd4e5b4e747f79ebc4373cd025844be98d1d72}
+    - {name: oid_alt,      path: data/processed/eval_canonical/oid_alt.parquet,      n_queries: 1766, sha256: 809784a5ee4b0ef8c9878681595014aefae7252e1d8ddc4af2a02a4d3334d2a5}
+    - {name: cdash,        path: data/processed/eval_canonical/cdash.parquet,        n_queries: 324,  sha256: b3dffb13dd1f98cb42a4fe57f1ee33c4d838f0dc5b030a9973ad33169b090dc6}
+    - {name: gdc_combined, path: data/processed/eval_canonical/gdc_combined.parquet, n_queries: 72,   sha256: 289c4f5fc966748c54fc3d4c8c0edda28937b55910796a65db7834034bf86f21}
+    - {name: cimac_v2,     path: data/processed/eval_canonical/cimac_v2.parquet,     n_queries: 131,  sha256: 1d0797330864cb8a73d277c1885fa5bba41a63d3a011cfaaa148e59c6dce4fe0}
+  # Present in the repo but NEVER reportable.
+  forbidden_datasets:
+    - {name: external_holdout_standard, reason: leakage - query samples also appeared in training}
+    - {name: val, reason: legacy split scheme; superseded by val_dev}
+
+# --------------------------------------------------------------------------------------
+# Output
+# --------------------------------------------------------------------------------------
+output:
+  root: artifacts/bm25_canonical_v1
+  version: v1
+  no_overwrite: true                # an existing, protocol-compatible root is validated, not rebuilt

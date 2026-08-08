@@ -1,0 +1,103 @@
+# Canonical evaluation dataset registry — single source of truth for the reporting eval set
+# used by ALL model families (keyword, bi-encoder, cross-encoder, reranker/HGBC, cdematch, reporting).
+#
+# Reachability is vs the production CDE catalog. Every canonical dataset is reachability-FILTERED:
+# any query whose gold CDE is absent from the production catalog is DROPPED (never counted as a miss).
+# Materialize with:  PYTHONPATH=src python scripts/materialize_canonical_eval.py
+# Dropped-query reports: artifacts/manifests/eval_canonical/<name>_dropped_queries.csv
+
+production_catalog: data/processed/cadsr_xml_2026-06-18/cde_master_enriched_eval_production_cde_match.parquet
+production_catalog_size: 62976
+query_variant: Q3            # query_text_q3
+recipe: v1_v6_v2b_v3_v5
+materialized_dir: data/processed/eval_canonical
+
+canonical:
+  - name: test
+    path: data/processed/eval_canonical/test.parquet
+    source: [data/processed/splits/test.parquet]
+    rule: reachability_filter
+    original_rows: 4258
+    reachable_rows: 4258
+    dropped_rows: 0
+    query_text_q3: true
+    use: canonical
+
+  - name: cctg
+    path: data/processed/eval_canonical/cctg.parquet
+    source: [data/processed/splits/external_holdout_org.parquet]
+    rule: "family == 'CCTG' (query_source REF) + reachability_filter"
+    original_rows: 1169
+    reachable_rows: 1159
+    dropped_rows: 10
+    query_text_q3: true
+    use: canonical
+
+  - name: oid_alt
+    path: data/processed/eval_canonical/oid_alt.parquet
+    source: [data/processed/splits/external_holdout_org.parquet]
+    rule: "family == 'OID' (query_source ALT) + reachability_filter"
+    original_rows: 2007
+    reachable_rows: 1908
+    dropped_rows: 99
+    query_text_q3: true
+    use: canonical
+
+  - name: cdash
+    path: data/processed/eval_canonical/cdash.parquet
+    source: [data/processed/splits/external_holdout_refslice.parquet]
+    rule: "rename of refslice (CDASH/Refslice) + reachability_filter"
+    original_rows: 527
+    reachable_rows: 526
+    dropped_rows: 1
+    query_text_q3: true
+    use: canonical
+
+  - name: gdc_combined
+    path: data/processed/eval_canonical/gdc_combined.parquet
+    source:
+      - data/processed/splits/external_holdout_gdc_questiontext.parquet
+      - data/processed/splits/external_holdout_gdc_altnames.parquet
+    rule: "concat + drop_duplicates(subset=[pair_id]) (72 rows) + reachability_filter"
+    original_rows: 72
+    reachable_rows: 72
+    dropped_rows: 0
+    query_text_q3: true
+    use: canonical
+
+  - name: cimac_v2
+    path: data/processed/eval_canonical/cimac_v2.parquet
+    source: [data/processed/splits/cimac_v2_reachable.parquet]
+    rule: "corrected-PV reachable CIMAC v2 + reachability_filter (no-op)"
+    original_rows: 131
+    reachable_rows: 131
+    dropped_rows: 0
+    query_text_q3: true
+    use: canonical
+
+# ---- Non-canonical ----
+non_canonical:
+  - name: external_holdout_standard
+    use: excluded
+    reason: "query samples also appeared in training (leakage) — must NOT be reported"
+  - name: cimac_appendix_a_eval
+    use: auxiliary
+    reason: "stress-test; not part of canonical reporting unless explicitly requested"
+  - name: clinical_synonym
+    use: auxiliary
+    reason: "semantic stress-test; not canonical"
+  - name: theradex6_test
+    use: auxiliary
+    reason: "small external stress-test; not canonical"
+  - name: cimac_appendix_a_v2
+    use: forbidden
+    reason: "197-row raw request set; lacks query_text_q3; NOT the corrected 131-row reachable cimac_v2"
+
+# Display names for reporting tables/figures.
+display_names:
+  test: Test
+  cctg: CCTG
+  oid_alt: OID ALT
+  cdash: CDASH
+  gdc_combined: GDC
+  cimac_v2: CIMAC v2

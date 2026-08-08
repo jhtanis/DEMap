@@ -1,0 +1,3822 @@
+schema_version: 1
+manifest_id: source_migration_v1
+generated_utc: '2026-08-08T16:49:27.317352+00:00'
+source_repository:
+  path: /data/nextgen2/james/tasks/cde_project/demap
+  git_head: cf8743f535f4f4fb8eb7bcc71362986d615ec58f
+  status: immutable_read_only
+destination_repository:
+  path: /data/nextgen2/james/tasks/cde_project/demap_repro
+  git: not_initialized
+migration_states:
+- not_copied
+- copied_verbatim
+- parity_established
+- refactored
+- parity_reverified
+release_gates:
+  nci_cde_match_source:
+    description: NCI-supplied Oracle PL/SQL and the CDE Match logic PDF, delivered for internal use.
+    status: unresolved
+    affects_stages:
+    - C
+    - D
+    - E
+    - F
+    - G
+    - H2
+    decision_needed: Written NCI determination on redistribution of the supplied source material.
+    dimension: code_redistributable
+    blocks_reproducible_by_retraining: false
+    dimension_note: Redistribution of the SUPPLIED source only. Never publishable by us; not a retraining
+      question.
+    copy_policy: NEVER copy into DST. Read from immutable SRC only, if ever needed for parity.
+  cde_match_derivative_unresolved:
+    description: Python approximation to NCI CDE Match (cde_match_clone.py) and the CDE Match-Fuzzy keyword
+      retriever built on it. Both are derivative works of the supplied PL/SQL, and CDE Match-Fuzzy is
+      one of the two candidate sources for the final system.
+    status: unresolved
+    affects_stages:
+    - C
+    - D
+    - E
+    - F
+    - G
+    - H2
+    decision_needed: Whether the Python derivative may be published. If not, stages D-H consume released
+      precomputed candidate/pool artifacts instead.
+    dimension: code_redistributable
+    blocks_reproducible_by_retraining: false
+    dimension_note: Redistribution of OUR derivative implementation. The method has no learned parameters,
+      so 'reproducible_by_retraining' is not_applicable; downstream stages can instead consume a user-supplied
+      or precomputed candidate artifact.
+    copy_policy: Do not copy into DST until cleared.
+  cde_match_derived_artifacts:
+    description: Candidate/result parquets produced by the clone and by CDE Match-Fuzzy, and the official
+      NCI CDE Match service outputs.
+    status: unresolved
+    affects_stages:
+    - C
+    - D
+    - E
+    - F
+    - G
+    - H1
+    - H2
+    decision_needed: Whether derived outputs may be released even if the implementation may not.
+    dimension: data_redistributable
+    blocks_reproducible_by_retraining: false
+    dimension_note: 'Redistribution of the candidate/result parquets. Independent of whether the implementation
+      may be published: releasing the artifacts alone would keep every downstream stage runnable in precomputed
+      mode.'
+    copy_policy: Do not copy into DST until cleared.
+  official_nci_cde_match_frozen:
+    description: Saved output of the live NCI CDE Match production service (GDC and CIMAC only).
+    status: unresolved
+    affects_stages:
+    - G
+    decision_needed: Whether the saved service output may be redistributed.
+    dimension: externally_frozen_result
+    blocks_reproducible_by_retraining: true
+    dimension_note: Saved output of a live third-party service. Never a runnable public experiment under
+      any resolution; it is a frozen input, not a gate on our code.
+    copy_policy: Never runnable publicly; treat as frozen externally supplied numbers.
+  cimac_unresolved:
+    description: CIMAC-CIDC Appendix A source workbook and every CIMAC-derived evaluation artifact.
+    status: unresolved
+    affects_stages:
+    - A
+    - B5a
+    - G
+    - H1
+    decision_needed: Whether CIMAC raw or derived (n=131 query/gold) data may be published.
+    dimension: data_redistributable
+    blocks_reproducible_by_retraining: false
+    dimension_note: Distinguish raw workbook redistribution from processed n=131 evaluation-set redistribution.
+      A user holding the workbook locally can run the CIMAC stages regardless of the decision.
+    copy_policy: Do not copy into DST until cleared.
+  cadsr_snapshot_unresolved:
+    description: caDSR nightly XML exports of 2026-01-12 (benchmark construction) and 2026-06-18 (production
+      catalog). These are nightly exports, not archived public releases.
+    status: unresolved
+    affects_stages:
+    - A
+    decision_needed: Whether the snapshots or the derived splits/catalog may be published. Byte-exact
+      re-acquisition by an external user is impossible either way.
+    dimension: data_redistributable
+    blocks_reproducible_by_retraining: false
+    dimension_note: Distinguish snapshot redistribution from derived split/catalog redistribution. Neither
+      blocks the code; both bound how much of Level 3 an external user can execute.
+    copy_policy: Do not copy into DST until cleared.
+  finetuned_weights_unresolved:
+    description: FT-MPNet, FT-BioSimCSE and FT-PubMedBERT Phase 2 checkpoints.
+    status: unresolved
+    affects_stages:
+    - B3
+    - B4
+    - B5a
+    - B5b
+    decision_needed: Confirm base-model licenses permit redistribution of fine-tuned derivatives.
+    dimension: weights_redistributable
+    blocks_reproducible_by_retraining: false
+    dimension_note: 'Redistribution of OUR fine-tuned bi-encoder checkpoints. Does NOT imply the result
+      is irreproducible: the base checkpoints are public HF models and the training protocol is documented,
+      so reproducible_by_retraining is yes.'
+    copy_policy: Do not copy into DST; destined for Zenodo if cleared.
+  medcpt_derivative_weights_unresolved:
+    description: FT-MedCPT cross-encoder checkpoint (and FT-BGE / FT-MiniLM comparison checkpoints).
+    status: unresolved
+    affects_stages:
+    - E
+    - F
+    - G
+    - H2
+    decision_needed: Whether NLM/NCBI MedCPT terms permit distribution of a fine-tuned derivative.
+    dimension: weights_redistributable
+    blocks_reproducible_by_retraining: false
+    dimension_note: Redistribution of OUR fine-tuned FT-MedCPT (and FT-BGE / FT-MiniLM) weights. Distinct
+      from MedCPT base-model availability, which is public, and from the ability to reproduce the fine-tuning,
+      which is yes.
+    copy_policy: Do not copy into DST; destined for Zenodo if cleared.
+entries:
+- src: src/demap/extraction/extract_cadsr_xml.py
+  dst: src/demap_repro/data/extract_cadsr_xml.py
+  source_class: tracked
+  worktree_sha256: d8a5f8a9256209b5d55dca5a6be66b5400a775620f3b34ee728e1f9643813c56
+  worktree_bytes: 29523
+  head_blob: 8d23afd711250014d020ac8b62774574c0e37b62
+  paper_scope_ids:
+  - SM-S13-01
+  - SM-S14-01
+  parity_artifact: .scratch/demap/paper_v16/lineage_verified.json
+  parity_artifact_sha256: 2e434e2b7acb8002c70269e51a4e8989cc75299984dcc30d880342ab710d40fd
+  required_config:
+  - configs/paper/dataset_v1.yaml
+  role: caDSR released-CDEs XML -> normalized parquet
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/extraction/merge_cadsr_parquet.py
+  dst: src/demap_repro/data/merge_cadsr_parquet.py
+  source_class: tracked
+  worktree_sha256: 991f657f56801c66064ff9be5d5a2ebd036f811209260cb682b0265ff9860496
+  worktree_bytes: 12978
+  head_blob: 52eafc80af2d7df2923c4d8456cc7ac5d0983a3e
+  paper_scope_ids:
+  - SM-S13-01
+  - SM-S14-01
+  parity_artifact: .scratch/demap/paper_v16/lineage_verified.json
+  parity_artifact_sha256: 2e434e2b7acb8002c70269e51a4e8989cc75299984dcc30d880342ab710d40fd
+  required_config: []
+  role: merge normalized parquet across the 14 XML files
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/text/enrich_master.py
+  dst: src/demap_repro/data/enrich_master.py
+  source_class: tracked
+  worktree_sha256: b46e0f2f631a82f452e085186ade9221d5c96f405686c0e8795a31375bd10ae2
+  worktree_bytes: 16817
+  head_blob: 980a82eb16ade539d7e56023874a66e6dd5c653c
+  paper_scope_ids:
+  - SM-S13-01
+  - SM-S14-01
+  parity_artifact: .scratch/demap/paper_v16/lineage_verified.json
+  parity_artifact_sha256: 2e434e2b7acb8002c70269e51a4e8989cc75299984dcc30d880342ab710d40fd
+  required_config: []
+  role: build the enriched CDE master used for text recipes
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/text/normalize.py
+  dst: src/demap_repro/text/normalize.py
+  source_class: tracked
+  worktree_sha256: d29291fd567db618e65ca9629533704b04b258a21e08ab61758798c2620b0827
+  worktree_bytes: 2572
+  head_blob: 2bd9d57c67a6039dc2b1e17ab4468d34e7329511
+  paper_scope_ids:
+  - SM-S13-01
+  - SM-S52-01
+  - SM-S62-01
+  - SM-TS3
+  - SM-S15-01
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: shared text normalization; also used by the PV frozen diagnostics and referenced by the leakage-filter
+    normalization rule
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/text/recipes.py
+  dst: src/demap_repro/text/recipes.py
+  source_class: tracked
+  worktree_sha256: 3682408ce7ed52a34106be20c14d98da69ba44322a031006139b4e5eb1a87e9f
+  worktree_bytes: 11913
+  head_blob: 663b94960fa20662e4da4154cb64eb8079ff9855
+  paper_scope_ids:
+  - MT-F2
+  - SM-FS1
+  - SM-FS2
+  - MT-T2
+  - MT-T3
+  - SM-S51-01
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config:
+  - configs/paper/biencoder_protocol_v2.yaml
+  role: query variants + 10 CDE text recipes
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/dataset/inwild_queries.py
+  dst: src/demap_repro/data/queries.py
+  source_class: tracked
+  worktree_sha256: ae1ad33ab2317ba508a543cedf66349a55142d978a3a9e8cb717bce74ff81c1d
+  worktree_bytes: 98845
+  head_blob: 317ef0b164be74dd5e7f577408bee127bcc9c424
+  paper_scope_ids:
+  - SM-S13-01
+  - SM-TS1
+  - SM-TS2
+  parity_artifact: .scratch/demap/paper_v16/lineage_verified.json
+  parity_artifact_sha256: 2e434e2b7acb8002c70269e51a4e8989cc75299984dcc30d880342ab710d40fd
+  required_config: []
+  role: ALT/REF in-the-wild query construction
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/dataset/build_pairs.py
+  dst: src/demap_repro/data/pairs.py
+  source_class: tracked
+  worktree_sha256: 74fad281dd46014d5f1fa6ced3411646947811f5f3ce6e7cf47d0bc237c8f96e
+  worktree_bytes: 3029
+  head_blob: fc2f5981c096e9c41f82291693dc847610510344
+  paper_scope_ids:
+  - SM-S13-01
+  parity_artifact: .scratch/demap/paper_v16/lineage_verified.json
+  parity_artifact_sha256: 2e434e2b7acb8002c70269e51a4e8989cc75299984dcc30d880342ab710d40fd
+  required_config: []
+  role: query->CDE pair construction + duplicate-pair removal
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/dataset/split_policy.py
+  dst: src/demap_repro/data/splits.py
+  source_class: tracked
+  worktree_sha256: 4a0ac2891d7ca907c1463e2a1c39cd72d1c7a27f648390453451f70c7bb0a448
+  worktree_bytes: 16519
+  head_blob: 4a4fdb933cc87558e357a55a9c37b2193ab92be4
+  paper_scope_ids:
+  - MT-T1
+  - SM-S13-01
+  parity_artifact: data/processed/splits/SPLIT_MANIFEST.json
+  parity_artifact_sha256: bd89d27de2870f50ac0de120885034068f8b187400d9a3dfbb6b23c1a9341a1f
+  required_config: []
+  role: query-level stratified train/val_train/val_dev/test + caDSR holdouts
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/dataset/gdc_testset.py
+  dst: src/demap_repro/data/gdc.py
+  source_class: tracked
+  worktree_sha256: 8bfc897d9800449bb6e1f85971f8deec91142263ab6c22ab59ee6dffb2a40b0b
+  worktree_bytes: 13811
+  head_blob: e0a744e1dc7dcda51f2d49be0f2ee1dd4e40fe26
+  paper_scope_ids:
+  - MT-T1
+  - SM-TS1
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: GDC external evaluation-set import
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: scripts/import_gdc_testset.py
+  dst: src/demap_repro/data/cli/import_gdc.py
+  source_class: tracked
+  worktree_sha256: f49f8039258a4e627bfa297aa4d9405204e6ef800d0ab4f472cab514e11a76f1
+  worktree_bytes: 8378
+  head_blob: c5551f72256883b26ce450e5a707294c1c73e59e
+  paper_scope_ids:
+  - MT-T1
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: GDC import entrypoint
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/pipeline/make_dataset.py
+  dst: src/demap_repro/data/pipeline.py
+  source_class: tracked
+  worktree_sha256: 078b4c9ce45f8bcff36219eaf0bdd6732a2f9647ec84e9792f24a79d7595bc56
+  worktree_bytes: 29634
+  head_blob: 553d0443d182f22a052da9607e31db27446b868b
+  paper_scope_ids:
+  - SM-S13-01
+  parity_artifact: .scratch/demap/paper_v16/lineage_verified.json
+  parity_artifact_sha256: 2e434e2b7acb8002c70269e51a4e8989cc75299984dcc30d880342ab710d40fd
+  required_config:
+  - configs/paper/dataset_v1.yaml
+  role: dataset build orchestration
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/pipeline/catalog_filter.py
+  dst: src/demap_repro/data/catalog_filter.py
+  source_class: tracked
+  worktree_sha256: 4ec5b3d3ea33acc652cefd87b2cf4316e64da9779777b84ec23c0c83783216cc
+  worktree_bytes: 20962
+  head_blob: 8a1c0a5aae92b07d133af3d5f2e420303f310140
+  paper_scope_ids:
+  - SM-S14-01
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config:
+  - configs/paper/catalog_v1.yaml
+  role: production-catalog construction + orphan-query removal
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/features/eligibility.py
+  dst: src/demap_repro/data/eligibility.py
+  source_class: tracked
+  worktree_sha256: b5d9b304e7cf657e52bfeb354d839ce1eccafd2281db350c2880cfbec10d31ed
+  worktree_bytes: 7598
+  head_blob: fd8bf755d7450a2c140e151c42e5595b38edba23
+  paper_scope_ids:
+  - SM-S14-01
+  - SM-S52-01
+  - SM-S54-01
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: production_cde_match eligibility predicate (62,976-CDE universe)
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/evaluation/canonical_datasets.py
+  dst: src/demap_repro/evaluation/canonical_datasets.py
+  source_class: tracked
+  worktree_sha256: 4b0cad4e9f38a2c31d5ff30e58a9f6cfb44772766c3423c32a3b012a90097f4c
+  worktree_bytes: 2859
+  head_blob: 8d67ee9b2d68d42e7d5f9da27d440c3614ab967f
+  paper_scope_ids:
+  - MT-T1
+  - MT-T4
+  - SM-TS4
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config:
+  - configs/paper/eval_datasets_v1.yaml
+  role: canonical six-dataset registry loader
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: scripts/materialize_canonical_eval.py
+  dst: src/demap_repro/data/cli/materialize_eval.py
+  source_class: tracked
+  worktree_sha256: 2416ec59c4b139c5f2fa8b3b2c3dd2476f4ad9cecf131256af6f7948f238aff3
+  worktree_bytes: 4607
+  head_blob: 2e77cff6f8c1c7020ec6b4377176040a509d0819
+  paper_scope_ids:
+  - MT-T1
+  - MT-T4
+  - SM-TS4
+  parity_artifact: data/processed/eval_canonical
+  parity_artifact_sha256: 219d40440836b3eec2681e65e12a1410121bdd3cd647e9e17b567a50d2326d8b
+  required_config:
+  - configs/paper/eval_datasets_v1.yaml
+  role: materialize the six reachability-filtered canonical evaluation sets
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: configs/evaluation/canonical_eval_datasets.yaml
+  dst: configs/paper/eval_datasets_v1.yaml
+  source_class: tracked
+  worktree_sha256: 6105d0edd51a5d20a059a20d361280e0a9b8bcc9f9692de77024bf4b924a698f
+  worktree_bytes: 3651
+  head_blob: 0c4d2c9823fb34ece2b2fdb5d520c8de1367394c
+  paper_scope_ids:
+  - MT-T1
+  - MT-T4
+  - SM-TS4
+  parity_artifact: data/processed/eval_canonical
+  parity_artifact_sha256: 219d40440836b3eec2681e65e12a1410121bdd3cd647e9e17b567a50d2326d8b
+  required_config: []
+  role: canonical evaluation registry (single source of truth)
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: scripts/build_reachable_eval_splits.py
+  dst: src/demap_repro/data/reachability.py
+  source_class: tracked
+  worktree_sha256: 1313f4e2ca8bf330ee9fb9eb14aff3b3cfde3dbd2ff4fb647190b3c169994629
+  worktree_bytes: 3914
+  head_blob: f123401189d10cea9e09c5ceea965593c4c4895d
+  paper_scope_ids:
+  - MT-T1
+  - SM-S13-01
+  - SM-S14-01
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config:
+  - configs/paper/catalog_v1.yaml
+  role: any-gold reachability filter against the June production catalog
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/analysis/pv_frozen_diagnostics.py
+  dst: src/demap_repro/data/pv_frozen_diagnostics.py
+  source_class: tracked
+  worktree_sha256: e131fe210c30c130eb6c48c78a79900425af19601ab439333857b8fcc50ed232
+  worktree_bytes: 35756
+  head_blob: 480d582246a64d7531940b589f4fd070d33a7a22
+  paper_scope_ids:
+  - SM-TS3
+  parity_artifact: artifacts/summaries/pv_frozen_diagnostics/query_cde_pv_pair_records.csv
+  parity_artifact_sha256: c944fd4a1967783421785dd52745bf722437847534a1d4cf1f5d9322c7d868a1
+  required_config:
+  - configs/paper/dataset_v1.yaml
+  role: 'Table S3 stage 1/2: CONFIRMED producer. CLI `demap pv-frozen-diagnostics`. Reads the frozen data/processed/pairs.parquet
+    (query-side PV_BLOCK + paired gold-CDE PV block; cde_master_enriched.parquet only for integrity checks)
+    and emits per-pair records carrying both_present, normalized_block_match, query_shorter_than_cde,
+    cde_pv_type, item_jaccard.'
+  divergence_note: Supersedes the Slice-1 speculative attribution to src/demap/features/pv_overlap.py
+    and scripts/diagnose_pv_overlap.py, which are NOT the Table S3 producers.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: resolved_slice1_5
+  migration_state: copied_verbatim
+- src: notebooks/07_dataset_statistics_tables_and_figure.ipynb
+  dst: src/demap_repro/reporting/dataset_tables_pv_overlap.py
+  source_class: tracked
+  worktree_sha256: fdbafd6d9eafcc7063f3c36632ebd3e35d06a6646db74eec578e40ffc8653074
+  worktree_bytes: 316321
+  head_blob: a2f5a63adb625e94f99bf2c81a105817b755bcfa
+  paper_scope_ids:
+  - SM-TS3
+  parity_artifact: artifacts/tables/table04_pv_overlap_query_vs_cde.csv
+  parity_artifact_sha256: 1b0a552265b68f6a780242966423ec58c87a52e805fbf85470fe9644fd802d99
+  required_config: []
+  role: 'Table S3 stage 2/2: CONFIRMED producer. Cell 13 groups query_cde_pv_pair_records.csv by cde_pv_type
+    (groups with >= 100 both_present rows) plus an ''overall'' row, and writes table04_pv_overlap_query_vs_cde.csv.
+    PV_DIAG_DIR resolves to artifacts/summaries/pv_frozen_diagnostics (NOT the _with_gdc variant).'
+  divergence_note: UNTRACKED in SRC. Convert notebook -> headless script in DST. The artifact carries
+    6 groups; v21 Table S3 reports 4 of them (BINARY_WITH_UNKNOWN_NA and BINARY omitted).
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: false
+  provenance_status: resolved_slice1_5
+  migration_state: not_migrated_by_decision
+  exclusion_reason: notebook; the Table S3 grouping it performed is covered by the corrected expected-results
+    entry and tests.
+- src: src/demap/features/pv_parser.py
+  dst: src/demap_repro/text/pv_parser.py
+  source_class: tracked
+  worktree_sha256: 8c582e8fa938864c1ee8e287cf686be44141828960a6b8f9659f115560d0b4b3
+  worktree_bytes: 16623
+  head_blob: 1f1430d7a01320eceaa35bc76645c065565fbc79
+  paper_scope_ids:
+  - SM-TS3
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: PV block parsing helper
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/text/pv_summary.py
+  dst: src/demap_repro/text/pv_summary.py
+  source_class: tracked
+  worktree_sha256: 7186aed5e43eb49c46101ce3ed0fcc1448bfa3af3d0ea2f11d9998a8a6d25945
+  worktree_bytes: 11603
+  head_blob: cde787e8a2a8778153341f8c1b4228f7d46dc157
+  paper_scope_ids:
+  - SM-TS3
+  - MT-T1
+  - MT-F2
+  - MT-T2
+  - MT-T3
+  - SM-FS1
+  - SM-FS2
+  - SM-S52-01
+  - SM-S55-01
+  parity_artifact: data/processed/pairs.parquet
+  parity_artifact_sha256: 1664cc537b3aae4ebc14f874e425ffb7b0d97ba3b1a1373cda8197b8c3665751
+  required_config:
+  - configs/paper/dataset_v1.yaml
+  role: public PV-summary adapter build_pv_summary_table / build_pv_summary_with_diagnostics; delegates
+    to pv_summary_v2.build_pv_summary_tables
+  divergence_note: 'PV-GENERATION AUDIT 2026-08-07: current SRC worktree code is VERIFIED IDENTICAL to
+    the implementation that produced the frozen data/processed/pairs.parquet. Evidence: exactly one commit
+    each (13821ac, 2026-05-12 13:32), worktree clean vs HEAD, pairs.parquet written 2026-05-13 14:43,
+    and the only later commit touching the chain (c651f44, 2026-07-05) adds the catalog-filter stage without
+    touching PV. Row-level regeneration over all 69,102 pair rows reproduced PV_BLOCK_SDE, PV_BLOCK_CDE,
+    PV_TYPE and PV_N with 100% exact parity (46,948/46,948 comparable rows; the other 22,154 rows are
+    CDEs with zero upstream PVs, frozen PV_N=0 and both blocks empty). MIGRATE THE CURRENT IMPLEMENTATION.'
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: verified_equivalent_slice2_pre_audit
+  migration_state: parity_established
+- src: src/demap/text/pv_summary_v2.py
+  dst: src/demap_repro/text/pv_summary_v2.py
+  source_class: tracked
+  worktree_sha256: 74ad3443c8617e5c939ab44327ec197ad49dfa40096b958df7e348b079c37d20
+  worktree_bytes: 24721
+  head_blob: 533306f307e9df3d0410d986e7f72ba05805bfb1
+  paper_scope_ids:
+  - SM-TS3
+  - MT-T1
+  - MT-F2
+  - MT-T2
+  - MT-T3
+  - SM-FS1
+  - SM-FS2
+  - SM-S52-01
+  - SM-S55-01
+  parity_artifact: data/processed/pairs.parquet
+  parity_artifact_sha256: 1664cc537b3aae4ebc14f874e425ffb7b0d97ba3b1a1373cda8197b8c3665751
+  required_config:
+  - configs/paper/dataset_v1.yaml
+  role: 'conservative dual-summary engine: canonicalize_pv_pool, compute_side_sample_size, allocate_strata_counts,
+    sample_side_subset, render_query_side / render_cde_side, apply_small_n_policy, apply_anti_leakage,
+    build_dual_summary_for_group'
+  divergence_note: 'PV-GENERATION AUDIT 2026-08-07: current SRC worktree code is VERIFIED IDENTICAL to
+    the implementation that produced the frozen data/processed/pairs.parquet. Evidence: exactly one commit
+    each (13821ac, 2026-05-12 13:32), worktree clean vs HEAD, pairs.parquet written 2026-05-13 14:43,
+    and the only later commit touching the chain (c651f44, 2026-07-05) adds the catalog-filter stage without
+    touching PV. Row-level regeneration over all 69,102 pair rows reproduced PV_BLOCK_SDE, PV_BLOCK_CDE,
+    PV_TYPE and PV_N with 100% exact parity (46,948/46,948 comparable rows; the other 22,154 rows are
+    CDEs with zero upstream PVs, frozen PV_N=0 and both blocks empty). MIGRATE THE CURRENT IMPLEMENTATION.
+    Safeguards verified live on the paper CDE set (14,590 groups): caps 8 query / 10 CDE never exceeded;
+    omission 18.57%; identity retry fired on 2,749 groups (18.84% pre-identity -> 15.17% residual); subset
+    trigger 0 under the cadsr profile (active only for gdc_strict); placeholder 0.'
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: verified_equivalent_slice2_pre_audit
+  migration_state: parity_established
+- src: data/processed/dataset_build_manifest.json
+  dst: manifests/dataset_build_manifest_paper_era.json
+  source_class: untracked
+  worktree_sha256: a7f282729e5f6eb1c0554e28950ee794f1c5ca73bed1c1b729ef3e85bd119453
+  worktree_bytes: 5323
+  head_blob: null
+  paper_scope_ids:
+  - SM-TS3
+  - MT-T1
+  - MT-F2
+  - MT-T2
+  - MT-T3
+  - SM-FS1
+  - SM-FS2
+  - SM-S52-01
+  - SM-S55-01
+  parity_artifact: data/processed/pairs.parquet
+  parity_artifact_sha256: 1664cc537b3aae4ebc14f874e425ffb7b0d97ba3b1a1373cda8197b8c3665751
+  required_config: []
+  role: records the exact PV parameters of the paper-era build (pv_max_n_query 8, pv_max_n_cde 10, sde_generic_label_p
+    0.30, salt default 'demap', center 0.5, min_n 2, jitter 1, generic_boost 0.10, generic_cap 0.70, small_n_generic_threshold
+    0.5, max_resample_attempts 3), plus commit 13821ac and dirty:true/dirty_paths:2
+  divergence_note: 'The build was made from a DIRTY tree (2 modified paths, unrecorded). The row-level
+    regeneration test empirically rules those edits out of the PV chain: current clean HEAD code reproduces
+    the frozen PV blocks exactly.'
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: resolved_slice2_pre_audit
+  migration_state: copied_verbatim
+- src: data/interim/cadsr_merged/cde_permissible_values.parquet
+  dst: docs/historical/upstream_pv_input.NOT_COPIED
+  source_class: untracked
+  worktree_sha256: 353aadc836e8a46a6653036bb4214b8f6e318adeae9d042dbffd5433f3ee4553
+  worktree_bytes: 56053477
+  head_blob: null
+  paper_scope_ids:
+  - SM-TS3
+  - MT-T1
+  - MT-F2
+  - MT-T2
+  - MT-T3
+  - SM-FS1
+  - SM-FS2
+  - SM-S52-01
+  - SM-S55-01
+  parity_artifact: data/processed/pairs.parquet
+  parity_artifact_sha256: 1664cc537b3aae4ebc14f874e425ffb7b0d97ba3b1a1373cda8197b8c3665751
+  required_config: []
+  role: upstream PV input (719,304 rows) that fed the paper-era PV summaries; 402,080 rows over 14,590
+    CDE groups after restriction to the benchmark CDE set
+  divergence_note: null
+  release_gate: cadsr_snapshot_unresolved
+  nontrivial: true
+  classification: gated_input_reference
+  copy_verbatim: false
+  provenance_status: resolved_slice2_pre_audit
+  migration_state: not_migrated_by_decision
+  exclusion_reason: gated upstream input (cadsr_snapshot_unresolved); never copied.
+- src: .scratch/demap/paper_v11_validation/build_eval_canonical_v2.py
+  dst: src/demap_repro/data/leakage_filter.py
+  source_class: scratch
+  worktree_sha256: 1c2c004a03576720520312ba4b8c90577bb83dfdc269bb77c0dda64e868bc6b3
+  worktree_bytes: 4706
+  head_blob: null
+  paper_scope_ids:
+  - SM-S15-01
+  - SM-TS5
+  - MT-P38-02
+  parity_artifact: data/processed/eval_canonical_v2
+  parity_artifact_sha256: 4eafb852fc81e82d7b7d29a211c7176c6c4d04943ab6a8a2f9737ee9d6ad8b96
+  required_config:
+  - configs/paper/sensitivity_leakage_v1.yaml
+  role: 'CONFIRMED producer of the leakage-filtered evaluation sets. Rule E, applied to the five external
+    holdouts only (test passes through unchanged): exclude query q iff there exists a train pair t with
+    norm(q.query_text_raw) == norm(t.query_text_raw) AND publicid(q.cde_publicid) == publicid(t.cde_publicid),
+    OR q.query_id in train.query_id; norm(x) = collapse_ws(re.sub(r''[^a-z0-9]+'', '' '', lower(x))),
+    publicid(x) = x.split(''::'')[0]. Whole-query removal. Refuses to overwrite existing outputs.'
+  divergence_note: 'Only implementation; no canonical equivalent in SRC tracked code. Verified against
+    artifacts/manifests/eval_canonical_v2/: removals 8/1097 cctg, 7/1766 oid_alt, 14/324 cdash, 4/72 gdc_combined,
+    18/131 cimac_v2; test 3959 passthrough. All 51 removals fired on the norm_text+gold clause; the query_id_in_train
+    clause never triggered, so the effective criterion is exactly the one stated in v21 S1.5.'
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: resolved_slice1_5
+  migration_state: parity_reverified
+- src: artifacts/manifests/eval_canonical_v2/eval_canonical_v2_manifest.json
+  dst: manifests/eval_canonical_v2_manifest.json
+  source_class: untracked
+  worktree_sha256: cbef8bccbdf69c381b5df38bf6fdcd11db20c9a2e1ca3da43170a5eafe914354
+  worktree_bytes: 4030
+  head_blob: null
+  paper_scope_ids:
+  - SM-S15-01
+  - SM-TS5
+  parity_artifact: data/processed/eval_canonical_v2
+  parity_artifact_sha256: 4eafb852fc81e82d7b7d29a211c7176c6c4d04943ab6a8a2f9737ee9d6ad8b96
+  required_config: []
+  role: per-dataset v1/v2 counts, train reference SHA256 and output SHA256s for the leakage filter
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: resolved_slice1_5
+  migration_state: copied_verbatim
+- src: artifacts/manifests/eval_canonical_v2/removed_queries.csv
+  dst: manifests/eval_canonical_v2_removed_queries.csv
+  source_class: untracked
+  worktree_sha256: e99ff6d7cdd2ae94cb053681d11b9f83ecbf400bfa680083a79d482d4ddf46d9
+  worktree_bytes: 10993
+  head_blob: null
+  paper_scope_ids:
+  - SM-S15-01
+  - SM-TS5
+  - MT-P38-02
+  parity_artifact: data/processed/eval_canonical_v2
+  parity_artifact_sha256: 4eafb852fc81e82d7b7d29a211c7176c6c4d04943ab6a8a2f9737ee9d6ad8b96
+  required_config: []
+  role: the 51 removed query_ids with their gold public id and removal reason -- the regression fixture
+    for the DST leakage-filter reimplementation
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: resolved_slice1_5
+  migration_state: copied_verbatim
+- src: src/demap/utils/paths.py
+  dst: src/demap_repro/utils/paths.py
+  source_class: tracked
+  worktree_sha256: 37a5e56d42013caa3949dec5966887a66d340fa467c63fe4bf78854142db63ef
+  worktree_bytes: 4019
+  head_blob: fab37656ef402afd7cd50f1b920649d8f12d05b7
+  paper_scope_ids:
+  - MT-T1
+  - SM-S13-01
+  - SM-S14-01
+  - SM-TS1
+  - SM-TS2
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: path conventions
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/utils/io.py
+  dst: src/demap_repro/utils/io.py
+  source_class: tracked
+  worktree_sha256: 45a82227995606f42f57727fff8042c3298574e7020653c96f1a019bc68926fb
+  worktree_bytes: 1131
+  head_blob: 30260f4ea0a8a62f28015adb5a26600e028884d0
+  paper_scope_ids:
+  - MT-T1
+  - SM-S13-01
+  - SM-S14-01
+  - SM-TS1
+  - SM-TS2
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: IO helpers
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/utils/config.py
+  dst: src/demap_repro/utils/config.py
+  source_class: tracked
+  worktree_sha256: 162dae9a61ba90cb9e3fb1a8a80555443deda3f88f4f7ed359e4b87e2c205164
+  worktree_bytes: 1641
+  head_blob: 00281284149c4f84e824ed3268202a0960b8c7d4
+  paper_scope_ids:
+  - MT-T1
+  - SM-S13-01
+  - SM-S14-01
+  - SM-TS1
+  - SM-TS2
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: config loading
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: .scratch/demap/paper_v13_scientific_audit/build_s4_statistics_v13.py
+  dst: src/demap_repro/data/characterization.py
+  source_class: scratch
+  worktree_sha256: c046df49fa4d76ca8271aa86f5037e82141236ddcfa7c591d5401466769ebe42
+  worktree_bytes: 6005
+  head_blob: null
+  paper_scope_ids:
+  - SM-TS1
+  - SM-TS2
+  parity_artifact: .scratch/demap/paper_v13_scientific_audit/s4_provenance_shift_v13.csv
+  parity_artifact_sha256: d9b6ff4111bd0f88e5638b6938dc146aeff14b2fafc2c038ef73431fd99de2e2
+  required_config: []
+  role: Tables S1/S2 dataset-characterization statistics
+  divergence_note: Only implementation; no canonical equivalent exists in SRC tracked code.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: parity_established
+- src: scripts/build_cimac_appendix_a_v2_split.py
+  dst: src/demap_repro/data/cimac/appendix_a_v2.py
+  source_class: tracked
+  worktree_sha256: 9f2680c59f5853bae663cd9bfe1f5767dcb6d8397a7858bdcaf66816de5639bc
+  worktree_bytes: 8248
+  head_blob: b4d9507c823e1acb712a2544eefe328be95015b8
+  paper_scope_ids:
+  - MT-T1
+  - SM-TS1
+  - MT-T4
+  parity_artifact: data/processed/splits/cimac_appendix_a_v2.parquet
+  parity_artifact_sha256: ae187e427e7b4c5f60d480960c30ce2be938453ddcafd0caed0859618092f832
+  required_config: []
+  role: 'CIMAC step 1/4: Appendix A v2 workbook -> split parquet'
+  divergence_note: Reads data/raw/cimac/CIMAC-CIDC_Master_AppendixA_v2.xlsx (UNTRACKED). The git-tracked
+    CIMAC-CIDC_Master_AppendixA.xlsx is the superseded v1 and is NOT the paper input.
+  release_gate: cimac_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: scripts/build_corrected_cimac_pv_split.py
+  dst: src/demap_repro/data/cimac/corrected_pv_split.py
+  source_class: tracked
+  worktree_sha256: ead50aeb2c2b42ec6322e28fc64207c43f10a5486e3b29df1ada4fc74f9c994b
+  worktree_bytes: 6459
+  head_blob: 90411f4c9d72b03a634421d1b085b3a2d34836bb
+  paper_scope_ids:
+  - MT-T1
+  - MT-T4
+  - SM-TS4
+  parity_artifact: data/processed/splits/cimac_v2_reachable.parquet
+  parity_artifact_sha256: 1d0797330864cb8a73d277c1885fa5bba41a63d3a011cfaaa148e59c6dce4fe0
+  required_config: []
+  role: 'CIMAC step 3/4: PV-enriched corrected split; asserts strata 131 / 92 / 39'
+  divergence_note: Steps 2/4 and 4/4 are build_reachable_eval_splits.py and materialize_canonical_eval.py
+    above.
+  release_gate: cimac_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/paper/biencoder/phase0.py
+  dst: src/demap_repro/biencoder/phase0.py
+  source_class: tracked
+  worktree_sha256: c80b3520372be112fcef1576b982f43ffda07238a5147e97620225cafa5b3c14
+  worktree_bytes: 4043
+  head_blob: dfa4278528185491c0ef6641ac8e485668073cb1
+  paper_scope_ids:
+  - MT-F2
+  - MT-T2
+  - MT-T3
+  - MT-F3
+  - MT-P34-01
+  - SM-FS1
+  - SM-FS2
+  - SM-FS3
+  - SM-S43-01
+  - SM-S44-01
+  - SM-FS4
+  - SM-TS4
+  parity_artifact: configs/paper/phase2_winners_final_v3.yaml
+  parity_artifact_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  required_config:
+  - configs/paper/biencoder_protocol_v2.yaml
+  role: canonical bi-encoder workflow package (B1-B5a)
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/paper/biencoder/phase1.py
+  dst: src/demap_repro/biencoder/phase1.py
+  source_class: tracked
+  worktree_sha256: ae0afc1b1f1189c2b3d4b6f15e7b731336a777ccdb553cfa210dc3b0a2a89180
+  worktree_bytes: 18831
+  head_blob: ca8e613c8b15b6ed028e6c9cabfabd0bb24d63aa
+  paper_scope_ids:
+  - MT-F2
+  - MT-T2
+  - MT-T3
+  - MT-F3
+  - MT-P34-01
+  - SM-FS1
+  - SM-FS2
+  - SM-FS3
+  - SM-S43-01
+  - SM-S44-01
+  - SM-FS4
+  - SM-TS4
+  parity_artifact: configs/paper/phase2_winners_final_v3.yaml
+  parity_artifact_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  required_config:
+  - configs/paper/biencoder_protocol_v2.yaml
+  role: canonical bi-encoder workflow package (B1-B5a)
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/paper/biencoder/phase1_results.py
+  dst: src/demap_repro/biencoder/phase1_results.py
+  source_class: tracked
+  worktree_sha256: 38398d1f85999bdc6a4b9822aad0c7ea69fb98c7f1f62c7daef1f2b5a832fee8
+  worktree_bytes: 15155
+  head_blob: aa47d2b9177061793757cceecbc3452ce8900f9b
+  paper_scope_ids:
+  - MT-F2
+  - MT-T2
+  - MT-T3
+  - MT-F3
+  - MT-P34-01
+  - SM-FS1
+  - SM-FS2
+  - SM-FS3
+  - SM-S43-01
+  - SM-S44-01
+  - SM-FS4
+  - SM-TS4
+  parity_artifact: configs/paper/phase2_winners_final_v3.yaml
+  parity_artifact_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  required_config:
+  - configs/paper/biencoder_protocol_v2.yaml
+  role: canonical bi-encoder workflow package (B1-B5a)
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/paper/biencoder/phase2.py
+  dst: src/demap_repro/biencoder/phase2.py
+  source_class: tracked
+  worktree_sha256: e618800bd4ea2b191fae31046c1bd08f4b86b897c341f6295d2fcd67898d4353
+  worktree_bytes: 31927
+  head_blob: a95ae847470adf55b1c80c196b7f3c00fda647ae
+  paper_scope_ids:
+  - MT-F2
+  - MT-T2
+  - MT-T3
+  - MT-F3
+  - MT-P34-01
+  - SM-FS1
+  - SM-FS2
+  - SM-FS3
+  - SM-S43-01
+  - SM-S44-01
+  - SM-FS4
+  - SM-TS4
+  parity_artifact: configs/paper/phase2_winners_final_v3.yaml
+  parity_artifact_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  required_config:
+  - configs/paper/biencoder_protocol_v2.yaml
+  role: canonical bi-encoder workflow package (B1-B5a)
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/paper/biencoder/hardneg.py
+  dst: src/demap_repro/biencoder/hardneg.py
+  source_class: tracked
+  worktree_sha256: a0e21e25f00121b377424c9fbcbb9ba21d7b5e039aca2a77e4e26484d6b20d4d
+  worktree_bytes: 18171
+  head_blob: d2213f73b392714ba7d4b4610ab50c4dcc9d2a5a
+  paper_scope_ids:
+  - MT-F2
+  - MT-T2
+  - MT-T3
+  - MT-F3
+  - MT-P34-01
+  - SM-FS1
+  - SM-FS2
+  - SM-FS3
+  - SM-S43-01
+  - SM-S44-01
+  - SM-FS4
+  - SM-TS4
+  parity_artifact: configs/paper/phase2_winners_final_v3.yaml
+  parity_artifact_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  required_config:
+  - configs/paper/biencoder_protocol_v2.yaml
+  role: canonical bi-encoder workflow package (B1-B5a)
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/paper/biencoder/select.py
+  dst: src/demap_repro/biencoder/select.py
+  source_class: tracked
+  worktree_sha256: 3709cfc85bf139d721d71ec6129ad7415f246bc40ad60cf4c5bc985c0382ce18
+  worktree_bytes: 16443
+  head_blob: 7a176632ba327c7a511644fbdaab66367ef616d2
+  paper_scope_ids:
+  - MT-F2
+  - MT-T2
+  - MT-T3
+  - MT-F3
+  - MT-P34-01
+  - SM-FS1
+  - SM-FS2
+  - SM-FS3
+  - SM-S43-01
+  - SM-S44-01
+  - SM-FS4
+  - SM-TS4
+  parity_artifact: configs/paper/phase2_winners_final_v3.yaml
+  parity_artifact_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  required_config:
+  - configs/paper/biencoder_protocol_v2.yaml
+  role: canonical bi-encoder workflow package (B1-B5a)
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/paper/biencoder/winners.py
+  dst: src/demap_repro/biencoder/winners.py
+  source_class: tracked
+  worktree_sha256: eb0c74e1246363d56bbbe179b1e3388a2789aa34ae16e23e7711c449c83244cb
+  worktree_bytes: 2823
+  head_blob: 4991241fadc4e3e856e9f2776cf18e7f7fa6e7d3
+  paper_scope_ids:
+  - MT-F2
+  - MT-T2
+  - MT-T3
+  - MT-F3
+  - MT-P34-01
+  - SM-FS1
+  - SM-FS2
+  - SM-FS3
+  - SM-S43-01
+  - SM-S44-01
+  - SM-FS4
+  - SM-TS4
+  parity_artifact: configs/paper/phase2_winners_final_v3.yaml
+  parity_artifact_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  required_config:
+  - configs/paper/biencoder_protocol_v2.yaml
+  role: canonical bi-encoder workflow package (B1-B5a)
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/paper/biencoder/protocol.py
+  dst: src/demap_repro/biencoder/protocol.py
+  source_class: tracked
+  worktree_sha256: d4d63712dfe10573b5af164223e8376daf706e1329899ad66b37e29dae22bbe6
+  worktree_bytes: 6178
+  head_blob: 5d533e0a8f8c4d8be528aa17712a1bd82f67efd3
+  paper_scope_ids:
+  - MT-F2
+  - MT-T2
+  - MT-T3
+  - MT-F3
+  - MT-P34-01
+  - SM-FS1
+  - SM-FS2
+  - SM-FS3
+  - SM-S43-01
+  - SM-S44-01
+  - SM-FS4
+  - SM-TS4
+  parity_artifact: configs/paper/phase2_winners_final_v3.yaml
+  parity_artifact_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  required_config:
+  - configs/paper/biencoder_protocol_v2.yaml
+  role: canonical bi-encoder workflow package (B1-B5a)
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/paper/biencoder/quarantine.py
+  dst: src/demap_repro/biencoder/quarantine.py
+  source_class: tracked
+  worktree_sha256: 1f558881a9d9e91d3ac3449633f07773559c901d009d5a43362ea963f772337a
+  worktree_bytes: 8691
+  head_blob: bafaa1a984e5e752ebce76dfa1a958c6310bb790
+  paper_scope_ids:
+  - MT-F2
+  - MT-T2
+  - MT-T3
+  - MT-F3
+  - MT-P34-01
+  - SM-FS1
+  - SM-FS2
+  - SM-FS3
+  - SM-S43-01
+  - SM-S44-01
+  - SM-FS4
+  - SM-TS4
+  parity_artifact: configs/paper/phase2_winners_final_v3.yaml
+  parity_artifact_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  required_config:
+  - configs/paper/biencoder_protocol_v2.yaml
+  role: canonical bi-encoder workflow package (B1-B5a)
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/paper/biencoder/cli.py
+  dst: src/demap_repro/biencoder/cli.py
+  source_class: tracked
+  worktree_sha256: 14869de068d476db4431f1fe47f9309373de60ee1bd9c308dc69613c196c9ae1
+  worktree_bytes: 14917
+  head_blob: 863189e62994783f41b1e8a421c6f85d5fc5e4cf
+  paper_scope_ids:
+  - MT-F2
+  - MT-T2
+  - MT-T3
+  - MT-F3
+  - MT-P34-01
+  - SM-FS1
+  - SM-FS2
+  - SM-FS3
+  - SM-S43-01
+  - SM-S44-01
+  - SM-FS4
+  - SM-TS4
+  parity_artifact: configs/paper/phase2_winners_final_v3.yaml
+  parity_artifact_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  required_config:
+  - configs/paper/biencoder_protocol_v2.yaml
+  role: canonical bi-encoder workflow package (B1-B5a)
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/paper/biencoder/__init__.py
+  dst: src/demap_repro/biencoder/__init__.py
+  source_class: tracked
+  worktree_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  worktree_bytes: 0
+  head_blob: e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+  paper_scope_ids:
+  - MT-F2
+  - MT-T2
+  - MT-T3
+  - MT-F3
+  - MT-P34-01
+  - SM-FS1
+  - SM-FS2
+  - SM-FS3
+  - SM-S43-01
+  - SM-S44-01
+  - SM-FS4
+  - SM-TS4
+  parity_artifact: configs/paper/phase2_winners_final_v3.yaml
+  parity_artifact_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  required_config:
+  - configs/paper/biencoder_protocol_v2.yaml
+  role: canonical bi-encoder workflow package (B1-B5a)
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/paper/__init__.py
+  dst: src/demap_repro/biencoder/__init___pkg.py
+  source_class: tracked
+  worktree_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  worktree_bytes: 0
+  head_blob: e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+  paper_scope_ids:
+  - MT-F2
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: package init
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: false
+  provenance_status: null
+  migration_state: not_migrated_by_decision
+  exclusion_reason: package shim with no scientific content; the DST layout does not need it.
+- src: src/demap/experiments/baseline_grid.py
+  dst: src/demap_repro/biencoder/engine/baseline_grid.py
+  source_class: tracked
+  worktree_sha256: de7268aa7ad9082a575121e2b2be2e781e2eae991de42f0d86cb820ef982a88a
+  worktree_bytes: 56300
+  head_blob: a86c906bf1808a9544fdc84bd1452b38f6e0d3c6
+  paper_scope_ids:
+  - MT-F2
+  - MT-F3
+  - SM-S43-01
+  - SM-S44-01
+  - SM-TS4
+  parity_artifact: configs/paper/phase2_winners_final_v3.yaml
+  parity_artifact_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  required_config:
+  - configs/paper/biencoder_protocol_v2.yaml
+  role: off-the-shelf retrieval + pair-level metrics (B1)
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/experiments/finetune_phase1.py
+  dst: src/demap_repro/biencoder/engine/finetune_phase1.py
+  source_class: tracked
+  worktree_sha256: aa133836b0a2e744a6dc10ca9d137350a53b445ebd65633d5c8fa32b4360a0cd
+  worktree_bytes: 85900
+  head_blob: 79c8d4bb688cd6723aad64dc7bd93859f443342f
+  paper_scope_ids:
+  - MT-F2
+  - MT-F3
+  - SM-S43-01
+  - SM-S44-01
+  - SM-TS4
+  parity_artifact: configs/paper/phase2_winners_final_v3.yaml
+  parity_artifact_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  required_config:
+  - configs/paper/biencoder_protocol_v2.yaml
+  role: Phase 1 contrastive fine-tuning
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/experiments/finetune_phase2.py
+  dst: src/demap_repro/biencoder/engine/finetune_phase2.py
+  source_class: tracked
+  worktree_sha256: 3fcc04f33c7cadb4ae1c304247b8aa590e04c50d8eb345f34e47d9b473bdc3d6
+  worktree_bytes: 73898
+  head_blob: f635e05d2b33a1a2092d3be25a11e1ded28a5f61
+  paper_scope_ids:
+  - MT-F2
+  - MT-F3
+  - SM-S43-01
+  - SM-S44-01
+  - SM-TS4
+  parity_artifact: configs/paper/phase2_winners_final_v3.yaml
+  parity_artifact_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  required_config:
+  - configs/paper/biencoder_protocol_v2.yaml
+  role: Phase 2 refinement incl. the in-repo _HardNegMN objective
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/experiments/mine_hardneg.py
+  dst: src/demap_repro/biencoder/engine/mine_hardneg.py
+  source_class: tracked
+  worktree_sha256: 136030e7fd1c3d1eb6e5f12291ace01ed590a0cab0c96c0b98f95b24235bfcc7
+  worktree_bytes: 16044
+  head_blob: f172886093a23854526de988601cf08549ea0edf
+  paper_scope_ids:
+  - MT-F2
+  - MT-F3
+  - SM-S43-01
+  - SM-S44-01
+  - SM-TS4
+  parity_artifact: configs/paper/phase2_winners_final_v3.yaml
+  parity_artifact_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  required_config:
+  - configs/paper/biencoder_protocol_v2.yaml
+  role: hard/semi-hard negative mining
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/experiments/modern_trainer.py
+  dst: src/demap_repro/biencoder/engine/modern_trainer.py
+  source_class: tracked
+  worktree_sha256: fa57aba88e7896556c439ed74b56ebe960044f34f36ce09f0d9b7fdebbc525a4
+  worktree_bytes: 10906
+  head_blob: 687591f1fcd0785065df49f39d458fb6dbcb5312
+  paper_scope_ids:
+  - MT-F2
+  - MT-F3
+  - SM-S43-01
+  - SM-S44-01
+  - SM-TS4
+  parity_artifact: configs/paper/phase2_winners_final_v3.yaml
+  parity_artifact_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  required_config:
+  - configs/paper/biencoder_protocol_v2.yaml
+  role: trainer wrapper
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/experiments/eval_checkpoint.py
+  dst: src/demap_repro/biencoder/engine/eval_checkpoint.py
+  source_class: tracked
+  worktree_sha256: af31ccf9dffc09912303796e63267bf186f988e9ee5ef0b5808c5f7a12bb6da1
+  worktree_bytes: 7606
+  head_blob: b231384541d46498c1c12787cc134987ca5d9eb0
+  paper_scope_ids:
+  - MT-F2
+  - MT-F3
+  - SM-S43-01
+  - SM-S44-01
+  - SM-TS4
+  parity_artifact: configs/paper/phase2_winners_final_v3.yaml
+  parity_artifact_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  required_config:
+  - configs/paper/biencoder_protocol_v2.yaml
+  role: checkpoint evaluation protocol
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/modeling/st_loader.py
+  dst: src/demap_repro/biencoder/engine/st_loader.py
+  source_class: tracked
+  worktree_sha256: c513ccfa6f3663e613d61cbd716e1e19ba0ecf75cbd313fbf71c530907cd5f81
+  worktree_bytes: 6956
+  head_blob: 8a0c95a2ead610eb22e27315dd89ff08ba016c6a
+  paper_scope_ids:
+  - MT-F2
+  - MT-F3
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: SentenceTransformer loading
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/training/samplers.py
+  dst: src/demap_repro/biencoder/engine/samplers.py
+  source_class: tracked
+  worktree_sha256: 8db7c0c5add46794fe74f758703906760dcca83bd780a150449c1c66c7a8270a
+  worktree_bytes: 6413
+  head_blob: d4aa1e7f81011e8823188ada6e71528f3d497111
+  paper_scope_ids:
+  - SM-S44-01
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: negative sampling
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/training/loss_logging.py
+  dst: src/demap_repro/biencoder/engine/loss_logging.py
+  source_class: tracked
+  worktree_sha256: c599f853450f698a92209ada54ab399c6789ac16c804e5fb100e99e647c1ec15
+  worktree_bytes: 3553
+  head_blob: cda0a4aa5a7f11cfe8391c516b3daba2f485e2b4
+  paper_scope_ids:
+  - SM-S44-01
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: loss logging
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: configs/paper/biencoder_protocol_v2.yaml
+  dst: configs/paper/biencoder_protocol_v2.yaml
+  source_class: tracked
+  worktree_sha256: e846f0fdcf40975c71db5ee420886b47a8e023601192e6a3eb5bc6940b6c775e
+  worktree_bytes: 9780
+  head_blob: b59fdcb6f94be16b8da34f92b1de0538c32c950b
+  paper_scope_ids:
+  - MT-F2
+  - MT-T2
+  - MT-T3
+  - MT-F3
+  - SM-S43-01
+  - SM-S44-01
+  parity_artifact: configs/paper/phase2_winners_final_v3.yaml
+  parity_artifact_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  required_config: []
+  role: frozen bi-encoder protocol; excluded_strategies pins out the curriculum arm
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: configs/paper/phase1_winners_final_v2.yaml
+  dst: configs/paper/phase1_winners_final_v2.yaml
+  source_class: tracked
+  worktree_sha256: b7f9df289aa39a21575daabdeb5fde85b32453d2089786e32ba8d1e902d19df3
+  worktree_bytes: 13130
+  head_blob: d193dc6117d38e3b93dce53b8d92e1f45511d7d2
+  paper_scope_ids:
+  - MT-F3
+  - SM-S43-01
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: Phase 1 winner manifest (3 models)
+  divergence_note: Contains absolute /data/nextgen2 checkpoint paths; must be rewritten relative in DST.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: configs/paper/phase2_winners_final_v3.yaml
+  dst: configs/paper/phase2_winners_final_v3.yaml
+  source_class: tracked
+  worktree_sha256: 3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074
+  worktree_bytes: 15773
+  head_blob: 8fba5ac2c009b2cf41dc137d0d89e21bafd1cb7e
+  paper_scope_ids:
+  - MT-F3
+  - MT-P34-01
+  - MT-P39-01
+  - SM-S44-01
+  - SM-TS4
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: Phase 2 winner manifest with checkpoint SHA256, seed metrics and Slurm IDs
+  divergence_note: Absolute checkpoint paths; also records the excluded historical all-MPNet semihard
+    [1,25] runs as non-canonical.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/analysis/paper_publication_representation.py
+  dst: src/demap_repro/reporting/representation_tables.py
+  source_class: tracked
+  worktree_sha256: 93864cd5dfd3ba6be35dcdfe6d74c76fde210a3303cf5aa6658e337f0b876bfc
+  worktree_bytes: 30695
+  head_blob: cce874744a726d7cf715a6c5e12d2cadb0e9b544
+  paper_scope_ids:
+  - MT-T2
+  - MT-T3
+  - SM-FS3
+  parity_artifact: .scratch/demap/paper_v10_revision/data/section4_3_repxloss.csv
+  parity_artifact_sha256: 65f5f640f88fdf8a0f03aeab74ce97b53e17d4b88abafdaf25b947068397c103
+  required_config: []
+  role: rep x loss aggregation for Tables 2/3 and Figure S3
+  divergence_note: Tracked and clean at HEAD, but its sibling modules paper_tuning_eval.py and paper_publication_figures.py
+    are tracked-modified; copy all three from the worktree together so the reporting layer stays internally
+    consistent.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/analysis/paper_tuning_eval.py
+  dst: src/demap_repro/reporting/tuning_eval.py
+  source_class: tracked_modified
+  worktree_sha256: 026ae85b30f999b05d937644971eff257b794c3ff26f9dd1827baf904e4840b6
+  worktree_bytes: 28973
+  head_blob: 1b0fc944f368062c85fc170e13dbc3291b708fde
+  paper_scope_ids:
+  - MT-F3
+  - SM-FS4
+  parity_artifact: .scratch/demap/paper_v10_revision/data/phase2_winners.csv
+  parity_artifact_sha256: 1ff85ced0cea7c0b1535b6bf8d903b429c403b6716f7b6bd612ef924cc460531
+  required_config: []
+  role: Phase 1/2 tuning aggregation
+  divergence_note: Worktree version differs from HEAD; the worktree version is authoritative.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: scripts/aggregate_publication_biencoder_tables.py
+  dst: src/demap_repro/reporting/biencoder_tables.py
+  source_class: tracked
+  worktree_sha256: 595228cae7889d5ab7e3e53748829da9ecb7621df3f337cef4ad80e53133d521
+  worktree_bytes: 12932
+  head_blob: d57d0b726ce7a9593a3d7985cca75918625f1e32
+  paper_scope_ids:
+  - SM-TS4
+  parity_artifact: .scratch/demap/paper_v10_revision/data/s5_retained_biencoder_recall5.csv
+  parity_artifact_sha256: 54cef2edac7e0833cda395831c892ebc8edc4be95167272868140c1df2356b5d
+  required_config: []
+  role: Table S4 six-dataset aggregation
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: manuscript/v17_claude_reports/K_fixed070/scripts/build_cimac_q2_shim.py
+  dst: src/demap_repro/biencoder/cimac_q2_shim.py
+  source_class: untracked
+  worktree_sha256: 2acdeb95ca37b175aa173b281c5489a6b36bef469730b0d9940add24db4c7d55
+  worktree_bytes: 6482
+  head_blob: null
+  paper_scope_ids:
+  - SM-TS4
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/rerun_biosimcse_cimac_q2_results.json
+  parity_artifact_sha256: 8d73dd1b12b1daf553e6e8a71381c1f5046aec3e1ecf0956dcd95c5e705cb0b3
+  required_config: []
+  role: BioSimCSE CIMAC Q2 rerun shim producing the Table S4 CIMAC cell 0.4809 +/- 0.0324
+  divergence_note: Untracked; only implementation of the v21 Table S4 BioSimCSE/CIMAC correction.
+  release_gate: cimac_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: scripts/retrieve_biencoder_deep.py
+  dst: src/demap_repro/biencoder/deep_retrieval.py
+  source_class: tracked_modified
+  worktree_sha256: cfa694e096520d0a79ff83706dc54c95b995e1c3335b9dea8fe1984cde9e7d78
+  worktree_bytes: 16606
+  head_blob: da88d69b9ba5dc726f75df36a4eb5b6b4259a01a
+  paper_scope_ids:
+  - SM-S53-01
+  - SM-FS5
+  - SM-S54-01
+  - SM-S55-01
+  - MT-T4
+  parity_artifact: artifacts/final_reranker/biencoder_deep
+  parity_artifact_sha256: 19ca1ee0abf2a8b6e9978249e5a31807e0730f75e1a67b771f0beff3e6157f46
+  required_config: []
+  role: 'B5b: FT-MPNet deep top-1000 catalog retrieval feeding D/E/F/G'
+  divergence_note: 'Worktree version differs from HEAD: adds the catalog-embedding cache and the Slurm-GPU
+    -> local-GPU -> local-CPU fallback ladder. Worktree version is authoritative.'
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/retrieval/catalog_embedding_cache.py
+  dst: src/demap_repro/biencoder/catalog_embedding_cache.py
+  source_class: untracked
+  worktree_sha256: 7e299ab03b522619823e69e192817391d520973b27c02459ed63ed8e812d6433
+  worktree_bytes: 17792
+  head_blob: null
+  paper_scope_ids:
+  - SM-S53-01
+  - SM-FS5
+  - SM-S54-01
+  - SM-S55-01
+  - MT-T4
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: catalog embedding cache required by deep_retrieval
+  divergence_note: UNTRACKED in SRC and never committed, but imported by the modified tracked script.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/retrieval/__init__.py
+  dst: src/demap_repro/biencoder/_retrieval_init.py
+  source_class: untracked
+  worktree_sha256: f471ae474f3149ac1bb262478d983fa2620c3942694dcf2a1d7d40823a3b7984
+  worktree_bytes: 68
+  head_blob: null
+  paper_scope_ids:
+  - SM-S53-01
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: package init
+  divergence_note: UNTRACKED in SRC.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: false
+  provenance_status: null
+  migration_state: not_migrated_by_decision
+  exclusion_reason: package shim with no scientific content.
+- src: .scratch/demap/paper_v10_revision/data/_build_phase0.py
+  dst: src/demap_repro/reporting/inputs/build_phase0.py
+  source_class: scratch
+  worktree_sha256: 2b3c2749d9b43460fe3f57eea40fa2ad7d3304ef8b4d5d1e5f71e7f4a20776e4
+  worktree_bytes: 7041
+  head_blob: null
+  paper_scope_ids:
+  - MT-F2
+  - SM-FS1
+  - SM-FS2
+  parity_artifact: .scratch/demap/paper_v10_revision/data/phase0_heatmaps.csv
+  parity_artifact_sha256: 7023f306b524fc7a269a7c234e71276450db63d62ea91ef67957656a160f16d9
+  required_config: []
+  role: builds phase0_heatmaps.csv from the representation-sweep metrics.json
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: .scratch/demap/paper_v10_revision/data/_build_2_3_4.py
+  dst: src/demap_repro/reporting/inputs/build_phase12.py
+  source_class: scratch
+  worktree_sha256: 01c03964f50328462fbeff0ca21bdd1d737d17849cc1b1403b186bb25ef9e764
+  worktree_bytes: 12177
+  head_blob: null
+  paper_scope_ids:
+  - MT-T2
+  - MT-T3
+  - MT-F3
+  - SM-FS3
+  parity_artifact: .scratch/demap/paper_v10_revision/data/phase2_winners.csv
+  parity_artifact_sha256: 1ff85ced0cea7c0b1535b6bf8d903b429c403b6716f7b6bd612ef924cc460531
+  required_config: []
+  role: builds phase1_winners.csv / phase2_winners.csv / section4_3_repxloss.csv
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: .scratch/demap/paper_v10_revision/data/_build_5_6.py
+  dst: src/demap_repro/reporting/inputs/build_stage_comparison.py
+  source_class: scratch
+  worktree_sha256: 6bbce775b212ee0e8c0fdea298fd24bf9e7f2c06263583518210f5546d6955df
+  worktree_bytes: 15008
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS4
+  - SM-TS4
+  parity_artifact: .scratch/demap/paper_v10_revision/data/stage_comparison.csv
+  parity_artifact_sha256: ceb480b8101d44826c0b7528992145a3b2e50aa7802c2a8b6942c708497d9452
+  required_config: []
+  role: builds stage_comparison.csv and s5_retained_biencoder_recall5.csv
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: src/demap/paper/bm25/cli.py
+  dst: src/demap_repro/lexical/bm25/cli.py
+  source_class: tracked
+  worktree_sha256: d2b1b4e2052772c54783645a5aac9dba44a38534b41c9691174bb3c5611285a4
+  worktree_bytes: 3154
+  head_blob: 8ce40a376e4b4d8e2076655cf176c1c550881e91
+  paper_scope_ids:
+  - SM-S51-01
+  - MT-T4
+  - SM-TS5
+  parity_artifact: artifacts/bm25_canonical_v1/bm25_canonical_metrics.csv
+  parity_artifact_sha256: 556e1918e2bb939fe480b977834b599ff112dcd4d67d8d9533df61e0478197b4
+  required_config:
+  - configs/paper/bm25_protocol_v1.yaml
+  role: canonical BM25 baseline package
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/paper/bm25/protocol.py
+  dst: src/demap_repro/lexical/bm25/protocol.py
+  source_class: tracked
+  worktree_sha256: d3c24c5d7a2f801f1ac7b05d2c68b5b045e594ad9bbc700d94877542549df33d
+  worktree_bytes: 10200
+  head_blob: d97a285af56c48fcce86b2fd239abe8b68758e76
+  paper_scope_ids:
+  - SM-S51-01
+  - MT-T4
+  - SM-TS5
+  parity_artifact: artifacts/bm25_canonical_v1/bm25_canonical_metrics.csv
+  parity_artifact_sha256: 556e1918e2bb939fe480b977834b599ff112dcd4d67d8d9533df61e0478197b4
+  required_config:
+  - configs/paper/bm25_protocol_v1.yaml
+  role: canonical BM25 baseline package
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/paper/bm25/run.py
+  dst: src/demap_repro/lexical/bm25/run.py
+  source_class: tracked
+  worktree_sha256: fc2612565b04337399e281093b2f1f8b8af0ae1fb79654dd8cedca6b4e875f2e
+  worktree_bytes: 15636
+  head_blob: 62a8e05835710ce1e78cd893284191679778c7f3
+  paper_scope_ids:
+  - SM-S51-01
+  - MT-T4
+  - SM-TS5
+  parity_artifact: artifacts/bm25_canonical_v1/bm25_canonical_metrics.csv
+  parity_artifact_sha256: 556e1918e2bb939fe480b977834b599ff112dcd4d67d8d9533df61e0478197b4
+  required_config:
+  - configs/paper/bm25_protocol_v1.yaml
+  role: canonical BM25 baseline package
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/paper/bm25/__init__.py
+  dst: src/demap_repro/lexical/bm25/__init__.py
+  source_class: tracked
+  worktree_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  worktree_bytes: 0
+  head_blob: e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+  paper_scope_ids:
+  - SM-S51-01
+  - MT-T4
+  - SM-TS5
+  parity_artifact: artifacts/bm25_canonical_v1/bm25_canonical_metrics.csv
+  parity_artifact_sha256: 556e1918e2bb939fe480b977834b599ff112dcd4d67d8d9533df61e0478197b4
+  required_config:
+  - configs/paper/bm25_protocol_v1.yaml
+  role: canonical BM25 baseline package
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/experiments/bm25_baseline.py
+  dst: src/demap_repro/lexical/bm25/engine.py
+  source_class: tracked
+  worktree_sha256: 45614d2a0abe72f7af16dd5a3fb52b46a42bef8044b8ad3311765858115b7d46
+  worktree_bytes: 29641
+  head_blob: 9e0320f0aa3e5c5341d799d6245a612ca4331e91
+  paper_scope_ids:
+  - SM-S51-01
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: BM25 scoring engine
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/experiments/bm25_quarantine.py
+  dst: src/demap_repro/lexical/bm25/quarantine.py
+  source_class: tracked
+  worktree_sha256: 4c0575bf6c2d13d7a73932501d3bad7c31acbb3cbb6be9256eb4c0c3ccd46d9a
+  worktree_bytes: 10278
+  head_blob: b647028007ec45636861eac30e8c8bc415836cf3
+  paper_scope_ids:
+  - SM-S51-01
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: fail-closed guard against the retired-catalog BM25 artifacts
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: configs/paper/bm25_protocol_v1.yaml
+  dst: configs/paper/bm25_protocol_v1.yaml
+  source_class: tracked
+  worktree_sha256: 69341bfd9940e0c2322700b7a5931e802127a1826e7ab63386dcf0e5af5fe3ce
+  worktree_bytes: 6997
+  head_blob: ab7f0deaa4e39a30528970f8f5c952ec78b2f39e
+  paper_scope_ids:
+  - SM-S51-01
+  parity_artifact: artifacts/bm25_canonical_v1/bm25_val_dev_selection.csv
+  parity_artifact_sha256: 45f3fe651fa354805cd093a19ee1724a4061370f889d5d25242d695e58a1ad62
+  required_config: []
+  role: BM25 protocol with SHA256-pinned production catalog
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/features/exact_match_mask.py
+  dst: src/demap_repro/lexical/mask.py
+  source_class: tracked
+  worktree_sha256: b0384a4654371a15744bcebd19cd337123e7dae29d6d6ca8ffc89d438e2a55c3
+  worktree_bytes: 3067
+  head_blob: c0645d799f799cb7fbffb835ca99a4322e0646d3
+  paper_scope_ids:
+  - SM-S62-01
+  - MT-F5
+  - MT-T4
+  - SM-FS6
+  - SM-FS7
+  - SM-TS6
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: shared nested gold-scoped exact-match mask (SHA-1 of query id, seed 42)
+  divergence_note: Not CDE Match derivative; releasable independently of the gated keyword arm.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: .scratch/demap/paper_v13_scientific_audit/run_non_exact_eval_v13.py
+  dst: src/demap_repro/lexical/non_exact_subset.py
+  source_class: scratch
+  worktree_sha256: 2ca9c8f02c7785d8a7167e5438cd9818cbf3cfd0fb80ada73ca807f43953d831
+  worktree_bytes: 10963
+  head_blob: null
+  paper_scope_ids:
+  - MT-F5
+  parity_artifact: .scratch/demap/paper_v10_revision/data2/nonexact_subset_recall5.csv
+  parity_artifact_sha256: 561cbe2f6d55c46fbd2928487756bebe40573f09e93bfc3a8337230f7e397794
+  required_config:
+  - configs/paper/non_exact_eval_defaults.yaml
+  role: Figure 5C non-exact-subset evaluation (the EXECUTED implementation)
+  divergence_note: DIVERGENT from tracked scripts/evaluate_non_exact_subset.py. The .scratch version produced
+    the published panel and governs parity.
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: scripts/evaluate_non_exact_subset.py
+  dst: src/demap_repro/lexical/_reference_non_exact_subset.py
+  source_class: tracked
+  worktree_sha256: e2f44d5c3acb13c702444b6a23ec4e9ded5b181567301ae312a3850dee02b47a
+  worktree_bytes: 11739
+  head_blob: b95594c0be87b93dc2777c6b8359cc054e1a5d2f
+  paper_scope_ids:
+  - MT-F5
+  parity_artifact: .scratch/demap/paper_v10_revision/data2/nonexact_subset_recall5.csv
+  parity_artifact_sha256: 561cbe2f6d55c46fbd2928487756bebe40573f09e93bfc3a8337230f7e397794
+  required_config: []
+  role: tracked non-exact-subset variant, retained for divergence review only
+  divergence_note: Superseded by run_non_exact_eval_v13.py; do not use for parity.
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: false
+  provenance_status: null
+  migration_state: not_migrated_by_decision
+  exclusion_reason: divergent from the executed run_non_exact_eval_v13.py, which is what was migrated.
+- src: configs/final_reranker/non_exact_eval_defaults.yaml
+  dst: configs/paper/non_exact_eval_defaults.yaml
+  source_class: tracked
+  worktree_sha256: 19085cccb30219cabaf22397355abedae555a5e821b8a340d71ff9f262ec972d
+  worktree_bytes: 1241
+  head_blob: 53bdeef58c9d580dc3e86cd88a7b58fd56c3f4ff
+  paper_scope_ids:
+  - MT-F5
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: non-exact-subset evaluation defaults
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: .scratch/demap/paper_v10_revision/data2/_build_data2.py
+  dst: docs/historical/_build_data2.py.NOT_COPIED
+  source_class: scratch
+  worktree_sha256: 0e4f9ce02000667a4e471c66f47d65101f46bfb6df2efc8728930252848dff8b
+  worktree_bytes: 20998
+  head_blob: null
+  paper_scope_ids:
+  - MT-F4
+  - MT-F5
+  - MT-P36-01
+  parity_artifact: .scratch/demap/paper_v10_revision/data2/keyword_fullset_recall5.csv
+  parity_artifact_sha256: 7599cd8061192824f5c615a0f3cdd38e05d04611ec28155d158b430bb9af4ae7
+  required_config: []
+  role: HISTORICAL REFERENCE ONLY -- the pre-correction builder of the Figure 4 / Figure 5 input CSVs
+  divergence_note: STALE. Its sibling provenance.json (generated 2026-07-27, git head fab9719) proves
+    it reads the PRE-CORRECTION roots artifacts/final_reranker/{crossencoder,crossencoder_fulltrain}/,
+    not the eligibility-corrected *_v2_eligible roots. The five CSVs it once wrote were later OVERWRITTEN
+    during the v13 correction (the *.pre_v13.bak files beside them are the pre-correction versions); the
+    builder and provenance.json were never updated. Re-running it would silently revert Figure 4 to MedCPT
+    0.9128 / BGE 0.8940 / MiniLM 0.8699 and revert Figure 5 to the pre-correction keyword values. NOT
+    copied as reproduction code. The DST Figure 4/5 input builder must be NEWLY WRITTEN against the corrected
+    roots listed in supersedes_current_sources below, then parity-tested against the current CSVs.
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: historical_reference_stale
+  copy_verbatim: false
+  provenance_status: null
+  migration_state: not_migrated_by_decision
+  supersedes_current_sources:
+    crossencoder_finetuned.csv: artifacts/final_reranker/crossencoder_fulltrain_v2_eligible/comparison/BAKEOFF_ce_selection_val_dev.csv
+      (chain F3, Slurm 26337570-26337572) + the val_train slice-bakeoff rows from artifacts/final_reranker/crossencoder_v2_eligible/comparison/
+    crossencoder_offtheshelf.csv: artifacts/final_reranker/crossencoder_v2_eligible/offtheshelf_epoch0/comparison/crossenc_eval_by_split_SN_DEC_DEF_PQT_PV_SN_DEC_DEF_PQT_PV_<backbone>__epoch0.csv
+      (Slurm 26469876)
+    keyword_selection.csv: .scratch/demap/paper_v13_scientific_audit/keyword_selection_val_dev_v13.json
+      + artifacts/final_reranker/keyword_fuzzy_v2_eligible/cde_match_clone_summary_val_dev__allow0.70.json
+      + artifacts/final_reranker/cde_match_clone/cde_match_clone_summary_val_dev__allow0.70.json
+    keyword_fullset_recall5.csv: .scratch/demap/paper_v13_scientific_audit/kwfuzzy_corrected_metrics.csv
+      + artifacts/final_reranker/keyword_fuzzy_v2_eligible/cde_match_clone_summary_<dataset>__allow<rate>.json
+    nonexact_subset_recall5.csv: artifacts/final_reranker/non_exact_subset_eval_v2_eligible/method_metrics_non_exact.csv
+      (corrected keyword index)
+  exclusion_reason: 'historical_reference_stale: reads pre-correction roots; the DST Figure 4/5 input
+    builders were written fresh (reporting/inputs/).'
+- src: src/demap/features/candidate_union.py
+  dst: src/demap_repro/pool/candidate_union.py
+  source_class: tracked
+  worktree_sha256: 9a56d6c10fd58288fb894ada08f62f6a4bc45863692a198516f03f241ceec9c7
+  worktree_bytes: 38449
+  head_blob: 655b9f380701357ee9939b0fd851e6daba5ab5be
+  paper_scope_ids:
+  - SM-S53-01
+  - SM-FS5
+  - SM-S55-01
+  - MT-T4
+  parity_artifact: artifacts/final_reranker/k_selection/k_selection_grid.csv
+  parity_artifact_sha256: 299385a2b77afb25dee17b451887814d088b0b76674631207e1d9f3f56fb8de2
+  required_config:
+  - configs/paper/pool_protocol_v1.yaml
+  role: public-id-deduplicated candidate union (FT-MPNet top-20 U keyword top-10)
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: .scratch/demap/final_reranker_steps_cd/k_selection_recheck.py
+  dst: src/demap_repro/pool/select_k.py
+  source_class: scratch
+  worktree_sha256: ae76809756428b9cd01217e9fdab80a4774f3204ebda1dc833c26dacae82fbcc
+  worktree_bytes: 8583
+  head_blob: null
+  paper_scope_ids:
+  - SM-S53-01
+  - SM-FS5
+  parity_artifact: artifacts/final_reranker/k_selection/k_selection_grid.csv
+  parity_artifact_sha256: 299385a2b77afb25dee17b451887814d088b0b76674631207e1d9f3f56fb8de2
+  required_config:
+  - configs/paper/pool_protocol_v1.yaml
+  role: K sweep + val_train selection; the EXECUTED producer of k_selection_grid.csv
+  divergence_note: No canonical equivalent in SRC tracked code. Governs parity for K = 30.
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: parity_reverified
+- src: .scratch/demap/reranker_k_selection_val_train/select_k.py
+  dst: src/demap_repro/pool/_reference_select_k_valtrain.py
+  source_class: scratch
+  worktree_sha256: 0e0528bfbed6f53143ffef4ec165b9ab494bd71a759de022d77284fc76194d53
+  worktree_bytes: 5827
+  head_blob: null
+  paper_scope_ids:
+  - SM-S53-01
+  parity_artifact: artifacts/final_reranker/k_selection/k_selection_grid.csv
+  parity_artifact_sha256: 299385a2b77afb25dee17b451887814d088b0b76674631207e1d9f3f56fb8de2
+  required_config: []
+  role: earlier val_train-only K selection variant, retained for reconciliation
+  divergence_note: One of three near-duplicate K implementations; reconcile to one in DST.
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: false
+  provenance_status: null
+  migration_state: not_migrated_by_decision
+  exclusion_reason: near-duplicate K selector superseded by pool/select_k.py; retained in SRC as provenance
+    only.
+- src: .scratch/demap/reranker_k_ceiling_audit/build_k_ceiling.py
+  dst: src/demap_repro/reporting/figures/k_ceiling.py
+  source_class: scratch
+  worktree_sha256: f3ebee8468ae872aec25a390f4dedd55015caf478a2cefded4e1862c933bdcf9
+  worktree_bytes: 5453
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS5
+  parity_artifact: notebooks/data/reranker_k_ceiling_recall5.csv
+  parity_artifact_sha256: 8585a2fedd96ec98005d48e84b69d14f25225888026d98bb63a8c9e44f8acfa2
+  required_config: []
+  role: Figure S5 table + figure builder from k_selection_grid.csv
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: false
+  provenance_status: null
+  migration_state: not_migrated_by_decision
+  exclusion_reason: near-duplicate K ceiling builder superseded by pool/select_k.py.
+- src: .scratch/demap/paper_v13_scientific_audit/build_ce_pool_train_v2.py
+  dst: src/demap_repro/crossencoder/pool_train.py
+  source_class: scratch
+  worktree_sha256: eef59b2da24ada608cdb102f324345be48387560bcf61abf89dc49088ecc2682
+  worktree_bytes: 12675
+  head_blob: null
+  paper_scope_ids:
+  - MT-F4
+  - SM-S54-01
+  parity_artifact: artifacts/final_reranker/crossencoder_fulltrain_v2_eligible
+  parity_artifact_sha256: dbf8f8a8053fd7d2263f4e245947d56b18722f3ff80731f7b07d57a7feb1822f
+  required_config:
+  - configs/paper/crossencoder_protocol_v1.yaml
+  role: 'E1: corrected CE training pool over the full train split + val_dev'
+  divergence_note: No canonical equivalent; the executed producer of the corrected CE pool.
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: parity_reverified
+- src: .scratch/demap/paper_v13_scientific_audit/build_ce_pool_se20_kwfuzzy10_v2.py
+  dst: src/demap_repro/crossencoder/pool_eval.py
+  source_class: scratch
+  worktree_sha256: 0c2f4575444643417938a57ecdc812c84a3e3f7ea42de564624ad764e5dc7e6a
+  worktree_bytes: 16791
+  head_blob: null
+  paper_scope_ids:
+  - MT-F4
+  - SM-S54-01
+  - MT-T4
+  parity_artifact: artifacts/final_reranker/crossencoder_v2_eligible
+  parity_artifact_sha256: 9d2bcf85c3f9d20073c61e0d699ecadfc242259515e6c3511f2c50798dca8693
+  required_config:
+  - configs/paper/crossencoder_protocol_v1.yaml
+  role: 'E1: corrected se20 U kwfuzzy10 evaluation pool'
+  divergence_note: No canonical equivalent; governs pool parity.
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: .scratch/demap/paper_v13_scientific_audit/chain_F2_pool_pairs_fulltrain_v2.sbatch
+  dst: workflows/crossencoder/pool_pairs_fulltrain.sh
+  source_class: scratch
+  worktree_sha256: 15bc051942584ee1efd2e5a41250e6902eb4ebe758934d73e012edce9de39ec6
+  worktree_bytes: 3596
+  head_blob: null
+  paper_scope_ids:
+  - MT-F4
+  - SM-S54-01
+  parity_artifact: artifacts/final_reranker/crossencoder_fulltrain_v2_eligible
+  parity_artifact_sha256: dbf8f8a8053fd7d2263f4e245947d56b18722f3ff80731f7b07d57a7feb1822f
+  required_config:
+  - configs/paper/crossencoder_protocol_v1.yaml
+  role: 'E2: the stage that removes the 172 train queries with no obtainable positive'
+  divergence_note: The 172-query removal exists only inside this chain job (logged as 'dropped 172 train
+    queries with no obtainable positive'); it must become an explicit, testable step in DST.
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: .scratch/demap/paper_v13_scientific_audit/wt_ce_5f06f10/scripts/build_ce_training_pairs.py
+  dst: src/demap_repro/crossencoder/pairs.py
+  source_class: scratch
+  worktree_sha256: 05780621c7dc5886817885632db160d805d9dd52b21f674dd8e2b05040649f69
+  worktree_bytes: 10498
+  head_blob: null
+  paper_scope_ids:
+  - MT-F4
+  - SM-S54-01
+  parity_artifact: artifacts/final_reranker/crossencoder_fulltrain_v2_eligible
+  parity_artifact_sha256: dbf8f8a8053fd7d2263f4e245947d56b18722f3ff80731f7b07d57a7feb1822f
+  required_config:
+  - configs/paper/crossencoder_protocol_v1.yaml
+  role: 'E3: CE training-pair construction (1,311,461 train / 108,800 dev rows) -- THE EXECUTED PAPER-PRODUCING
+    IMPLEMENTATION'
+  divergence_note: 'CORRECTED 2026-08-08. chain_F2_pool_pairs_fulltrain_v2.sbatch runs $CODE/scripts/build_ce_training_pairs.py
+    where CODE is the PINNED GIT WORKTREE .scratch/demap/paper_v13_scientific_audit/wt_ce_5f06f10 (HEAD
+    5f06f10504645d5d0edf25e72fdfaa6fa4ef9dac, asserted by the job before it runs). These bytes govern
+    scientific parity. Two other files in SRC are NOT the executed implementation and must not be used
+    as the initial parity source: scripts/build_ce_training_pairs_fulltrain.py (the previously-recorded,
+    INCORRECT target) and the current-worktree scripts/build_ce_training_pairs.py (mtime 2026-07-29, after
+    the run). Both differ byte-wise from the pinned version. They may be adopted later only if proven
+    behaviourally identical.'
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: parity_established
+- src: scripts/build_ce_training_pairs_fulltrain.py
+  dst: src/demap_repro/crossencoder/_reference_pairs_fulltrain.py
+  source_class: tracked
+  worktree_sha256: e7c8ec497b495331972bff3c606edc62018483fc2b7fadc46599a2041b7f848b
+  worktree_bytes: 14829
+  head_blob: d416e8d5bd0a8f569a5cc8b25605c66b3d44088d
+  paper_scope_ids:
+  - MT-F4
+  - SM-S54-01
+  parity_artifact: artifacts/final_reranker/crossencoder_fulltrain_v2_eligible
+  parity_artifact_sha256: dbf8f8a8053fd7d2263f4e245947d56b18722f3ff80731f7b07d57a7feb1822f
+  required_config:
+  - configs/paper/crossencoder_protocol_v1.yaml
+  role: earlier fulltrain pair-builder variant, retained for reconciliation only
+  divergence_note: NOT the executed implementation. Recorded as the parity source in the Slice-1 ledger
+    by mistake; superseded by the pinned-worktree entry above.
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: false
+  provenance_status: null
+  migration_state: not_migrated_by_decision
+  exclusion_reason: not the executed implementation; the pinned worktree build_ce_training_pairs.py governs
+    parity.
+- src: scripts/finetune_crossencoder_fulltrain.py
+  dst: src/demap_repro/crossencoder/train.py
+  source_class: tracked
+  worktree_sha256: 0311a867ac41c0f870e3aa3c7bf0e22203899fafc2d823f300f676431cd96c7f
+  worktree_bytes: 13639
+  head_blob: 31246902ba061ba30273cc13ba6c891f964980b1
+  paper_scope_ids:
+  - MT-F4
+  - SM-S54-01
+  parity_artifact: artifacts/final_reranker/crossencoder_fulltrain_v2_eligible/CE_WINNER.json
+  parity_artifact_sha256: 40843baed8f06ebdf516f36394f7dd3ac3798ae2b2a870a2f6ca169a5817cfae
+  required_config:
+  - configs/paper/crossencoder_protocol_v1.yaml
+  role: 'E4: frozen CE training protocol (BCE pointwise, 2 ep, lr 2e-5, bs 32, len 512, seed 20260527)'
+  divergence_note: null
+  release_gate: medcpt_derivative_weights_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: parity_established
+- src: .scratch/demap/paper_v13_scientific_audit/chain_F4_ce_select_fulltrain_v2.py
+  dst: src/demap_repro/crossencoder/select.py
+  source_class: scratch
+  worktree_sha256: ec14b86c00102d4e1599588060595f8bd8eb26236ae033bcf17d853c100f3fd5
+  worktree_bytes: 3152
+  head_blob: null
+  paper_scope_ids:
+  - MT-F4
+  - SM-S54-01
+  parity_artifact: artifacts/final_reranker/crossencoder_fulltrain_v2_eligible/CE_WINNER.json
+  parity_artifact_sha256: 40843baed8f06ebdf516f36394f7dd3ac3798ae2b2a870a2f6ca169a5817cfae
+  required_config:
+  - configs/paper/crossencoder_protocol_v1.yaml
+  role: 'E5: bake-off aggregation + CE_WINNER.json (val_dev Recall@5)'
+  divergence_note: No canonical equivalent; the executed producer of the FT-MedCPT selection.
+  release_gate: medcpt_derivative_weights_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: parity_reverified
+- src: scripts/score_crossencoder.py
+  dst: src/demap_repro/crossencoder/score.py
+  source_class: tracked
+  worktree_sha256: 5e1479020712ceece9939795a13257e3d7b84aae3566dd59a8aa92c89f8e7077
+  worktree_bytes: 11923
+  head_blob: f643805101ecd0a540e3239179258f5387c910ff
+  paper_scope_ids:
+  - MT-F4
+  - SM-S54-01
+  - SM-S55-01
+  - MT-T4
+  parity_artifact: artifacts/final_reranker/hgbc_features_v2_eligible/feature_table_fixedk30_crossenc_v2.parquet
+  parity_artifact_sha256: 62eeae7a53dfacef10b445553379675303f647090cfeb8a956f97aedbf505e44
+  required_config:
+  - configs/paper/crossencoder_protocol_v1.yaml
+  role: 'E6: score the fixed-K pool with the selected CE'
+  divergence_note: null
+  release_gate: medcpt_derivative_weights_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: scripts/build_crossencoder_eligible_ranking.py
+  dst: src/demap_repro/crossencoder/eligible_ranking.py
+  source_class: tracked
+  worktree_sha256: 53d28d9b7d73ca58ab1ac9647d871dc4ad0313a6ac7f1e2b5873f6c2bf7e1d43
+  worktree_bytes: 4411
+  head_blob: cdb0d44c452724753adfaa1404173a329c5600a3
+  paper_scope_ids:
+  - MT-T4
+  parity_artifact: artifacts/final_reranker/crossencoder_v2_eligible/comparison
+  parity_artifact_sha256: c79d377e82f5f97847cf5ebe3436e747e9cdcae9ee241bb4f1b0770e7b400313
+  required_config: []
+  role: CE-alone top-30 pool reranking used for the Table 4 FT-MedCPT column
+  divergence_note: null
+  release_gate: medcpt_derivative_weights_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: scripts/eval_crossencoder_rerank.py
+  dst: src/demap_repro/crossencoder/evaluate.py
+  source_class: tracked
+  worktree_sha256: 0c0a4276a7867513f5b4b7cf6684fd2399e4e961d9d7d8582ed77c392e0f9ea9
+  worktree_bytes: 8003
+  head_blob: 077680683ca5f86c463c3d4a981d8fd6a9d6f886
+  paper_scope_ids:
+  - MT-F4
+  - SM-S54-01
+  - MT-T4
+  parity_artifact: artifacts/final_reranker/crossencoder_fulltrain_v2_eligible/comparison/BAKEOFF_ce_selection_val_dev.csv
+  parity_artifact_sha256: 343c83ff11a63fad6f9c9466c8aced4f916c7a39b3473d9516e2e8c22ef04c36
+  required_config: []
+  role: CE reranking evaluation harness
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: configs/final_reranker/stepE_ce_defaults.yaml
+  dst: configs/paper/crossencoder_protocol_v1.yaml
+  source_class: tracked
+  worktree_sha256: b2bbcd4bcf76d19df45a9f44b2b1b34274f019652a79703491a0b0912e43022c
+  worktree_bytes: 3360
+  head_blob: c1264f96c777194ba9921bc15c327ab7eb7fa8bd
+  paper_scope_ids:
+  - MT-F4
+  - SM-S54-01
+  parity_artifact: artifacts/final_reranker/crossencoder_fulltrain_v2_eligible/CE_WINNER.json
+  parity_artifact_sha256: 40843baed8f06ebdf516f36394f7dd3ac3798ae2b2a870a2f6ca169a5817cfae
+  required_config: []
+  role: CE text representation + query column locks (SN_DEC_DEF_PQT_PV, query_text_q3)
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: scripts/build_fixed_k_feature_table.py
+  dst: src/demap_repro/reranker/fixed_k_features.py
+  source_class: tracked_modified
+  worktree_sha256: 68de531aa68b4f83d1b7ce59a0c54d3740edf709fe7dc922d45e992e713bdf02
+  worktree_bytes: 25846
+  head_blob: d5dc5a4947da68075d3f7b19f4a5fb51c0b7238a
+  paper_scope_ids:
+  - SM-S55-01
+  - MT-T4
+  - MT-F6
+  - SM-FS6
+  - SM-FS7
+  - SM-TS6
+  parity_artifact: artifacts/final_reranker/hgbc_features_v2_eligible/feature_table_fixedk30_crossenc_v2.parquet
+  parity_artifact_sha256: 62eeae7a53dfacef10b445553379675303f647090cfeb8a956f97aedbf505e44
+  required_config:
+  - configs/paper/hgbc_protocol_v1.yaml
+  role: 'F1: fixed-K30 base feature assembly (bi-encoder top-20 U fuzzy top-10 union driver)'
+  divergence_note: 'Worktree version differs from HEAD (adds --hydration-policy); the worktree version
+    is authoritative. CORRECTED 2026-08-08: the earlier ledger claim that this file ''lacks the final-paper
+    split routing'' was WRONG. It defines no _CADSR_DERIVED_SPLITS of its own -- it imports build_hgbc_feature_table
+    as B and calls B._is_cadsr_derived(split), so it inherits the final routing from tracked source. See
+    the build_hgbc_feature_table.py entry.'
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: parity_reverified
+- src: scripts/build_hgbc_feature_table.py
+  dst: src/demap_repro/reranker/base_features.py
+  source_class: tracked
+  worktree_sha256: 1bb38ad3a96fe5dd8aefcd5444a44441476ac8cd3a1032b1cf1af9174a5dc6d6
+  worktree_bytes: 36055
+  head_blob: 60e15fa1d820b79e50be84ad8dfc4f8f933a624f
+  paper_scope_ids:
+  - SM-S55-01
+  - MT-T4
+  - MT-F6
+  - SM-FS6
+  - SM-FS7
+  - SM-TS6
+  parity_artifact: artifacts/final_reranker/hgbc_features_v2_eligible/feature_table_fixedk30_crossenc_v2.parquet
+  parity_artifact_sha256: 62eeae7a53dfacef10b445553379675303f647090cfeb8a956f97aedbf505e44
+  required_config:
+  - configs/paper/hgbc_protocol_v1.yaml
+  role: 'F1: THE HOST OF THE FINAL SPLIT ROUTING -- defines _CADSR_DERIVED_SPLITS, _is_cadsr_derived and
+    _apply_keyword_exact_control (the shared gold-scoped exact mask); imported as B by build_fixed_k_feature_table.py'
+  divergence_note: ADDED 2026-08-08 -- absent from the Slice-1 ledger, which is why stage F appeared to
+    depend on a runtime monkey patch. Tracked and clean vs HEAD. Since commit 8b06ad9 / 2026-07-10 its
+    _CADSR_DERIVED_SPLITS PERMANENTLY includes cctg/oid_alt/cdash (their keyword_v1 fuzzy tables were
+    generated at allow0.70, so they must be exact-controlled like caDSR splits AND route to the a0.70
+    fuzzy tables), while gdc_combined/cimac_v2 stay external at allow1.0. Imports the gated demap.features.cde_match_clone.ExactMatchControl
+    and demap.features.cdematch, so the DST port must isolate those behind an interface.
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: parity_reverified
+- src: .scratch/demap/paper_v13_scientific_audit/run_fixed_k_stepG_v2.py
+  dst: tests/tier1_invariants/test_split_routing.py
+  source_class: scratch
+  worktree_sha256: 49efac7deb638ca902bcd1fbbce31ae96324fe66d0835cb34ca152cc40c63bb1
+  worktree_bytes: 3238
+  head_blob: null
+  paper_scope_ids:
+  - SM-S55-01
+  - MT-T4
+  - MT-F6
+  parity_artifact: artifacts/final_reranker/hgbc_features_v2_eligible/feature_table_fixedk30_crossenc_v2.parquet
+  parity_artifact_sha256: 62eeae7a53dfacef10b445553379675303f647090cfeb8a956f97aedbf505e44
+  required_config:
+  - configs/paper/hgbc_protocol_v1.yaml
+  role: 'F1: executed assertion/driver harness for the fixed-K build; its asserts become DST regression
+    tests'
+  divergence_note: RECLASSIFIED 2026-08-08. This is NOT a runtime monkey patch and must not be migrated
+    as one. Its own docstring note (2026-07-10) records that the routing it originally patched became
+    permanent in repo source (build_hgbc_feature_table._CADSR_DERIVED_SPLITS, build_cde_match_candidates._CADSR_DERIVED_SPLITS,
+    candidate_union.DEFAULT_HYDRATION_POLICY). All it now does is assert that repo behaviour and call
+    F.main(). DST preserves the tracked final behaviour directly in split_routing.py/base_features.py
+    and ports these asserts to pytest.
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: .scratch/demap/paper_v13_scientific_audit/validate_stepG_v2.py
+  dst: tests/tier1_invariants/test_split_routing.py
+  source_class: scratch
+  worktree_sha256: f50ea5d49fddc93ef826cc74519dcb24f065bb2a52da2b76b93f378aa7a519be
+  worktree_bytes: 3851
+  head_blob: null
+  paper_scope_ids:
+  - SM-S55-01
+  - MT-T4
+  - MT-F6
+  parity_artifact: artifacts/final_reranker/hgbc_features_v2_eligible/feature_table_fixedk30_crossenc_v2.parquet
+  parity_artifact_sha256: 62eeae7a53dfacef10b445553379675303f647090cfeb8a956f97aedbf505e44
+  required_config: []
+  role: 'F1 validator: 8 splits, 6 crossenc_* columns, 100% CE coverage, no duplicate keys'
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: scripts/build_hgbc_feature_table_with_crossenc.py
+  dst: src/demap_repro/reranker/merge_crossenc_features.py
+  source_class: tracked
+  worktree_sha256: 3de755d298c2ee7316defbc274be9be0fbb9a2af0eeaebdbae29260efa0c103b
+  worktree_bytes: 9330
+  head_blob: cdd4b05eaadeca37f1ed49236dc7e189cdfff6a6
+  paper_scope_ids:
+  - SM-S55-01
+  - MT-T4
+  - MT-F6
+  parity_artifact: artifacts/final_reranker/hgbc_features_v2_eligible/feature_table_fixedk30_crossenc_v2.parquet
+  parity_artifact_sha256: 62eeae7a53dfacef10b445553379675303f647090cfeb8a956f97aedbf505e44
+  required_config: []
+  role: 'F1: merge the 6 crossenc_* features into the fixed-K table'
+  divergence_note: null
+  release_gate: medcpt_derivative_weights_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/features/biencoder.py
+  dst: src/demap_repro/reranker/features/biencoder.py
+  source_class: tracked
+  worktree_sha256: d0cf451bbce32f3b59a4adbe42ae551226d243cde3eb21d0f6cc9788a3ba834d
+  worktree_bytes: 7284
+  head_blob: 691611fdee285e01222fc704e2b12d56d4aa5bfe
+  paper_scope_ids:
+  - SM-S55-01
+  - MT-T4
+  - MT-F6
+  parity_artifact: artifacts/final_reranker/hgbc_features_v2_eligible/feature_table_fixedk30_crossenc_v2.parquet
+  parity_artifact_sha256: 62eeae7a53dfacef10b445553379675303f647090cfeb8a956f97aedbf505e44
+  required_config: []
+  role: bi-encoder rank/score/margin/z features
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/features/lexical_features.py
+  dst: src/demap_repro/reranker/features/lexical_features.py
+  source_class: tracked
+  worktree_sha256: 1a9e0fa8928b0d58248b22508b24b6cd7bc20c7a86058041d48363c5ccadcd0e
+  worktree_bytes: 7714
+  head_blob: e46d7e1a868f928f940ff86666c80248edb0b9ff
+  paper_scope_ids:
+  - SM-S55-01
+  - MT-T4
+  - MT-F6
+  parity_artifact: artifacts/final_reranker/hgbc_features_v2_eligible/feature_table_fixedk30_crossenc_v2.parquet
+  parity_artifact_sha256: 62eeae7a53dfacef10b445553379675303f647090cfeb8a956f97aedbf505e44
+  required_config: []
+  role: keyword rule-evidence features
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/features/text_features.py
+  dst: src/demap_repro/reranker/features/text_features.py
+  source_class: tracked
+  worktree_sha256: 7ff5c89fa479340594c6df8e1d55a9328515f4d7374a75036b4049d32a71f134
+  worktree_bytes: 10917
+  head_blob: d6d9f9df471c9f84222a5cedd8bb41d40e21493b
+  paper_scope_ids:
+  - SM-S55-01
+  - MT-T4
+  - MT-F6
+  parity_artifact: artifacts/final_reranker/hgbc_features_v2_eligible/feature_table_fixedk30_crossenc_v2.parquet
+  parity_artifact_sha256: 62eeae7a53dfacef10b445553379675303f647090cfeb8a956f97aedbf505e44
+  required_config: []
+  role: query/CDE text-surface features
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/features/categorical_vocab.py
+  dst: src/demap_repro/reranker/features/categorical_vocab.py
+  source_class: tracked
+  worktree_sha256: 92edbefccb1e98bd6cded4f827fe7276cfc5210d3704f092e82b8d6f9dd9eee0
+  worktree_bytes: 7664
+  head_blob: 959fb3066f8ae977f5f8fddc55556c4702b623d3
+  paper_scope_ids:
+  - SM-S55-01
+  - MT-T4
+  - MT-F6
+  parity_artifact: artifacts/final_reranker/hgbc_features_v2_eligible/feature_table_fixedk30_crossenc_v2.parquet
+  parity_artifact_sha256: 62eeae7a53dfacef10b445553379675303f647090cfeb8a956f97aedbf505e44
+  required_config: []
+  role: stable categorical encoding (inert in the final model)
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/features/pv_overlap.py
+  dst: src/demap_repro/reranker/features/pv_overlap.py
+  source_class: tracked
+  worktree_sha256: 3f3a0cf29ea35d46e51bc563c5f4c575c1cd668b527f98f11f69d393f670dc0f
+  worktree_bytes: 21726
+  head_blob: 8a991796b5c75f9ee2ff4bf670e4e7ec6ffcafce
+  paper_scope_ids:
+  - SM-S55-01
+  - MT-T4
+  - MT-F6
+  parity_artifact: artifacts/final_reranker/hgbc_features_v2_eligible/feature_table_fixedk30_crossenc_v2.parquet
+  parity_artifact_sha256: 62eeae7a53dfacef10b445553379675303f647090cfeb8a956f97aedbf505e44
+  required_config: []
+  role: query-side vs CDE-side PV overlap features for the candidate union (compute_pv_overlap_for_union);
+    distinct from the frozen Table S3 diagnostic
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/features/__init__.py
+  dst: src/demap_repro/reranker/features/__init__.py
+  source_class: tracked
+  worktree_sha256: 5baa1eebac09383392aafe78acc70ecde4bc4089532c27ed386a4b44c180eb19
+  worktree_bytes: 48
+  head_blob: 72cd0c33585aa7e22f063bd69cc94611296b3a6f
+  paper_scope_ids:
+  - SM-S55-01
+  - MT-T4
+  - MT-F6
+  parity_artifact: artifacts/final_reranker/hgbc_features_v2_eligible/feature_table_fixedk30_crossenc_v2.parquet
+  parity_artifact_sha256: 62eeae7a53dfacef10b445553379675303f647090cfeb8a956f97aedbf505e44
+  required_config: []
+  role: demap.features package init required by the feature imports
+  divergence_note: null
+  release_gate: null
+  nontrivial: false
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: scripts/train_hgbc_reranker.py
+  dst: src/demap_repro/reranker/train.py
+  source_class: tracked
+  worktree_sha256: 542e120c77e3185a2d4f6681759f9273378b6b1f26c4e9842beb0080c9bc5816
+  worktree_bytes: 34352
+  head_blob: f080c0199641c7ae45012be10aeb289bbbf8eb1b
+  paper_scope_ids:
+  - SM-S55-01
+  - MT-T4
+  - MT-F6
+  parity_artifact: artifacts/final_reranker/hgbc_reranker_v2_eligible/with_ce_noprov/hgbc_model.joblib
+  parity_artifact_sha256: 9241a3b6f5b6d7e4e3f3f2354ec247749dd0845e4dc39436ae22bdba4470ca0a
+  required_config:
+  - configs/paper/hgbc_protocol_v1.yaml
+  - configs/paper/features_117_noprov.json
+  role: 'F2/F3: HGBC training + the frozen 16-config val_dev selection grid'
+  divergence_note: The public path declares the final 117-feature no-provenance model directly. The A/B
+    provenance comparison that historically produced this choice is NOT migrated.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: parity_established
+- src: configs/hgbc_feature_sets/fixedk30_ablation_C_drop_final_rank_noprov.json
+  dst: configs/paper/features_117_noprov.json
+  source_class: tracked
+  worktree_sha256: b4bf4a6787bdea2f87164dbdc93f0678fe61fa2acfd95612ce86e00f7e35ff7b
+  worktree_bytes: 1071
+  head_blob: 83f5245a45ec2fa969f6a6084d93a859abe1f19b
+  paper_scope_ids:
+  - SM-S55-01
+  - MT-T4
+  - MT-F6
+  parity_artifact: artifacts/final_reranker/hgbc_reranker_v2_eligible/with_ce_noprov/feature_set.json
+  parity_artifact_sha256: 8e5b18c63f2f65ec3745e2132950510565f9f4f10a37a24b4e03d4c4da754573
+  required_config: []
+  role: the exactly-5 exclusion list yielding 117 features
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: configs/reranker/determinism_policy_v1.json
+  dst: configs/paper/determinism_policy_v1.json
+  source_class: tracked
+  worktree_sha256: 7ea888fe10746e6f7f6cc06a68cb47571b6625a9310f4b3d5566a5af4f4e0c90
+  worktree_bytes: 3855
+  head_blob: 99603efbc3601af46c3ce718be1cb11ac5c3c110
+  paper_scope_ids:
+  - SM-S55-01
+  - MT-T4
+  - MT-F6
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: deterministic ranking / tie-break policy
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: scripts/eval_hgbc_reachable_by_dataset.py
+  dst: src/demap_repro/evaluation/by_dataset.py
+  source_class: tracked
+  worktree_sha256: 2d75c729f7d64f20de25da18d5ee87bfca7b0fde0fb7d9f3b81828d44fe1f3b4
+  worktree_bytes: 6596
+  head_blob: 397d90e622786f35b8832e86ac3e91ace64847b9
+  paper_scope_ids:
+  - SM-S55-01
+  - MT-T4
+  - MT-F6
+  - MT-T4
+  - MT-P38-01
+  parity_artifact: artifacts/final_reranker/hgbc_reranker_v2_eligible/with_ce_noprov/hgbc_eval_by_split.csv
+  parity_artifact_sha256: 9b0c36b04b6351fd91da7b6823eb22216d05ad4b835f9fb571f547cb95b2dc94
+  required_config: []
+  role: query-level reachable-denominator metrics per dataset
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: tests/test_reranker_determinism.py
+  dst: tests/tier2_behavior/test_determinism.py
+  source_class: tracked
+  worktree_sha256: 13663ae25033c96b114ae798aa63d5e20c5e889d39cb509f16400fe8e1725983
+  worktree_bytes: 12799
+  head_blob: d9e5414e30404d21b42ff8a1123d9791ef4b9d80
+  paper_scope_ids:
+  - SM-S55-01
+  - MT-T4
+  - MT-F6
+  parity_artifact: configs/reranker/determinism_policy_v1.json
+  parity_artifact_sha256: 7ea888fe10746e6f7f6cc06a68cb47571b6625a9310f4b3d5566a5af4f4e0c90
+  required_config: []
+  role: 6-way determinism/invariance suite
+  divergence_note: References .scratch/demap/deterministic_reranker_fix/REPRO_REPORT.md; rewrite the pointer
+    in DST.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: .scratch/demap/paper_v13_scientific_audit/build_final_table4_v13.py
+  dst: src/demap_repro/reporting/table4.py
+  source_class: scratch
+  worktree_sha256: 28cf5583a94ba26a052b2341008814dd9fcae11df8091835bc6f455596787161
+  worktree_bytes: 4037
+  head_blob: null
+  paper_scope_ids:
+  - MT-T4
+  - MT-ABS-01
+  - MT-P38-01
+  parity_artifact: .scratch/demap/paper_v13_scientific_audit/final_table4_v13.csv
+  parity_artifact_sha256: 9f697e39c13f16742786de22a619770218fe1ddefd9f44c09986c9aaa0741b5b
+  required_config:
+  - configs/paper/results_provenance_v1.yaml
+  role: 'G: Table 4 assembly from machine-readable per-method artifacts'
+  divergence_note: Only implementation. Emits old_* comparison rows that are NOT part of the paper and
+    must be dropped in DST.
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: parity_established
+- src: .scratch/demap/final_reranker_stepI/build_final_report.py
+  dst: src/demap_repro/reporting/_reference_final_report.py
+  source_class: scratch
+  worktree_sha256: 5dcf96cfc0aca424c083772b42fb485b73295938888b21e64fe54312301f9698
+  worktree_bytes: 11950
+  head_blob: null
+  paper_scope_ids:
+  - MT-T4
+  parity_artifact: artifacts/final_reranker/final_report/FINAL_METHOD_COMPARISON.csv
+  parity_artifact_sha256: 5bc6273bb61e98abc1af459a947753cbc3f792fa18a63838d360da724cb63aa5
+  required_config: []
+  role: earlier six-method comparison builder; merge with table4.py in DST
+  divergence_note: Superseded by build_final_table4_v13.py; retained for cross-check only.
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: false
+  provenance_status: null
+  migration_state: not_migrated_by_decision
+  exclusion_reason: superseded by build_final_table4_v13.py (reporting/table4.py).
+- src: .scratch/demap/paper_v13_scientific_audit/build_table_s7_v13.py
+  dst: src/demap_repro/sensitivity/leakage.py
+  source_class: scratch
+  worktree_sha256: 866c46666efa1399feebe43933b1447e5a31430eac4d2967a75f641272b7d658
+  worktree_bytes: 5320
+  head_blob: null
+  paper_scope_ids:
+  - SM-TS5
+  - MT-P38-02
+  - SM-S15-01
+  parity_artifact: .scratch/demap/paper_v13_scientific_audit/table_s7_v13_with_hgbc.csv
+  parity_artifact_sha256: 6baeb2eec8f1b4698bcd1edc9bf303e635d8fa4b604b9ea2ce55eaf255343b9d
+  required_config:
+  - configs/paper/sensitivity_leakage_v1.yaml
+  role: 'H1: Table S5 leakage sensitivity by rescoring saved rankings on eval_canonical_v2'
+  divergence_note: Only implementation. Manuscript Table S5 = this file's 'table_s7' naming.
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: .scratch/v17_claude/J_allowance/scripts/J1_fuzzy_val.sbatch
+  dst: src/demap_repro/sensitivity/allowance/J1_fuzzy_val.sbatch
+  source_class: scratch
+  worktree_sha256: 7431a2a968cee753c12da1e5d12a40ba85278743fb7a8b0aa03efd84ff6f6d9f
+  worktree_bytes: 3146
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2 stage 1: regenerate CDE Match-Fuzzy candidates at each allowance'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: .scratch/v17_claude/J_allowance/scripts/J2_features_ce.sbatch
+  dst: src/demap_repro/sensitivity/allowance/J2_features_ce.sbatch
+  source_class: scratch
+  worktree_sha256: f753407765fab9fc4a2a9967eb64ce51eeea6b948e07ea3e3dbf2b23b1b61fac
+  worktree_bytes: 8136
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2 stage 2: rebuild pools + features + CE scores at each allowance'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: .scratch/v17_claude/J_allowance/scripts/J3_train_hgbc.sbatch
+  dst: src/demap_repro/sensitivity/allowance/J3_train_hgbc.sbatch
+  source_class: scratch
+  worktree_sha256: 6f02c9ee17e7514585f68803bba474cc0674bf9e3f38258331be36b70937767e
+  worktree_bytes: 2393
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2 stage 3: retrain the HGBC from scratch at each allowance'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: .scratch/v17_claude/J_allowance/scripts/J3b_train_hgbc_archivedft.sbatch
+  dst: src/demap_repro/sensitivity/allowance/J3b_train_hgbc_archivedft.sbatch
+  source_class: scratch
+  worktree_sha256: 3a92f769df9b99bb9d745fe707e1fc74a66563b886a11e453b2e380fcb569658
+  worktree_bytes: 3044
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2 stage 3b: retrain against the archived feature tables'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: .scratch/v17_claude/J_allowance/scripts/J4_aggregate.py
+  dst: src/demap_repro/sensitivity/allowance/aggregate_retrained.py
+  source_class: scratch
+  worktree_sha256: cb1d842b84be3902ceb89200611cd8978ea21e31ddd7411f98279badec9efe5e
+  worktree_bytes: 5593
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2: aggregate the retrained arm'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: .scratch/v17_claude/J_allowance/scripts/J5_make_figure.py
+  dst: src/demap_repro/sensitivity/allowance/J5_make_figure.py
+  source_class: scratch
+  worktree_sha256: 5276142670062b01e8bf3e6a278a591ece6c93e18c1cd1f8bba84edbdd2f798d
+  worktree_bytes: 4193
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2: draft allowance figure'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: .scratch/v17_claude/J_allowance/scripts/J6_validation_report.py
+  dst: src/demap_repro/sensitivity/allowance/J6_validation_report.py
+  source_class: scratch
+  worktree_sha256: d6091e6a89733e8003284b38a702eacbd39fa08a867b1abb584fe24558373a74
+  worktree_bytes: 6013
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2: validation report for the retrained arm'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: .scratch/v17_claude/J_allowance/scripts/parity_070_features.py
+  dst: src/demap_repro/sensitivity/allowance/parity_070_features.py
+  source_class: scratch
+  worktree_sha256: b8b9d9ead13ece62a17003c9d97613df0d6873709dcb1dbf613c9f531ee86481
+  worktree_bytes: 3808
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2: proves the 70% rebuild is bit-identical to the shipped pipeline'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: .scratch/v17_claude/J_allowance/scripts/pool_stats.py
+  dst: src/demap_repro/sensitivity/allowance/pool_stats.py
+  source_class: scratch
+  worktree_sha256: 544a71abd20ad96888bc0f01c51048811b18fac187b27f940a1f687d4b3f5508
+  worktree_bytes: 2120
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2: realized pool statistics per allowance'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: .scratch/v17_claude/J_allowance/scripts/post_metrics.py
+  dst: src/demap_repro/sensitivity/allowance/post_metrics.py
+  source_class: scratch
+  worktree_sha256: 476585c057f5995bc2e70681e4896a107b2c0a57b2ef7812cf77810fae2e577d
+  worktree_bytes: 4975
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2: per-rate metric computation'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: .scratch/v17_claude/J_allowance/scripts/verify_lexical_and_mask.py
+  dst: src/demap_repro/sensitivity/allowance/verify_lexical_and_mask.py
+  source_class: scratch
+  worktree_sha256: 656e35f79989ce54318682a97b669090ef2d4a252535e3680fbb3327952b94aa
+  worktree_bytes: 6062
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2: verifies mask nesting and lexical reproduction'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: .scratch/v17_claude/J_allowance/scripts/compare_fuzzy_070.py
+  dst: src/demap_repro/sensitivity/allowance/compare_fuzzy_070.py
+  source_class: scratch
+  worktree_sha256: 0c1b7c5c968a07b1886f4a23e5f5f8120cadf3ac90ff799cec24db435676be7d
+  worktree_bytes: 2521
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2: compares the rebuilt 70% fuzzy tables against the shipped ones'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: manuscript/v17_claude_reports/K_fixed070/scripts/K1_score_fixed070.py
+  dst: src/demap_repro/sensitivity/allowance/score_fixed_070.py
+  source_class: untracked
+  worktree_sha256: db743bbcfafce5ad024843b10f463a5ab009ae50ad22712619e4bb4d1116adf4
+  worktree_bytes: 13247
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS6
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  - MT-P38-03
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2: score the FIXED 70%-trained HGBC at each inference allowance'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: manuscript/v17_claude_reports/K_fixed070/scripts/K1_score_fixed070.sbatch
+  dst: src/demap_repro/sensitivity/allowance/K1_score_fixed070.sbatch
+  source_class: untracked
+  worktree_sha256: 22245168dc36e8c6ebb9927e74aae9602a0fc3ebdf246492d3de15c44435a578
+  worktree_bytes: 3017
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS6
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  - MT-P38-03
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2: Slurm driver for the fixed-model arm (array 26716780)'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: manuscript/v17_claude_reports/K_fixed070/scripts/K2_aggregate.py
+  dst: src/demap_repro/sensitivity/allowance/aggregate.py
+  source_class: untracked
+  worktree_sha256: 1c68c9a28f10657aa674562935287473a796a602e4261a3fffea26a72e2d5e71
+  worktree_bytes: 4378
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS6
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  - MT-P38-03
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2: builds allowance_sensitivity_four_methods.csv (the Fig S6/S7/Table S6 source)'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: manuscript/v17_claude_reports/K_fixed070/scripts/K3_validation_report.py
+  dst: src/demap_repro/sensitivity/allowance/K3_validation_report.py
+  source_class: untracked
+  worktree_sha256: a00260e68d765197d714f19dfadae4a7d4a2201b4563d7a8f602c0d6c63d0383
+  worktree_bytes: 13442
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS6
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  - MT-P38-03
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2: fixed-model validation report'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: manuscript/v17_claude_reports/K_fixed070/scripts/K4_make_figure.py
+  dst: src/demap_repro/sensitivity/allowance/K4_make_figure.py
+  source_class: untracked
+  worktree_sha256: 3d5af24d0181687a580865374170381a1896ad00ca3ac56e8302350200bc0517
+  worktree_bytes: 4899
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS6
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  - MT-P38-03
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2: draft figures for the fixed vs retrained comparison'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: manuscript/v17_claude_reports/K_fixed070/scripts/K5_make_table.py
+  dst: src/demap_repro/sensitivity/allowance/K5_make_table.py
+  source_class: untracked
+  worktree_sha256: b8cca6cda57cfc9789d5f2abbd8e5284a2e08273e2b92292de7e9c26bd397805
+  worktree_bytes: 3017
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS6
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  - MT-P38-03
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2: draft Table S6'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: manuscript/v17_claude_reports/K_fixed070/scripts/K6_make_tableS6_v19.py
+  dst: src/demap_repro/sensitivity/allowance/K6_make_tableS6_v19.py
+  source_class: untracked
+  worktree_sha256: 2b1503fdf3b60ca3a8cbec13e15b28626796becbc19789056593e8f8af54b7ab
+  worktree_bytes: 2562
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS6
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  - MT-P38-03
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2: the Table S6 build that reached the manuscript'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: manuscript/v17_claude_reports/K_fixed070/scripts/K7_validate_sensitivity_v19.py
+  dst: src/demap_repro/sensitivity/allowance/validate.py
+  source_class: untracked
+  worktree_sha256: cd09658cb76e4d8677f75cbb41afa5be20cbe1b753968f9bd231aad30b0a1502
+  worktree_bytes: 12909
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS6
+  - SM-FS7
+  - SM-TS6
+  - SM-S62-02
+  - MT-P38-03
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: 'H2: validation of the shipped Fig S6/S7 + Table S6'
+  divergence_note: null
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: .scratch/demap/paper_v13_scientific_audit/build_allowance_sensitivity_v13.py
+  dst: src/demap_repro/sensitivity/_reference_lexical_allowance_v13.py
+  source_class: scratch
+  worktree_sha256: ec2aae2eb999e32dfe08f9333584bbb6d90e46db16086774de2f2647ac5372b5
+  worktree_bytes: 4340
+  head_blob: null
+  paper_scope_ids:
+  - SM-TS6
+  parity_artifact: .scratch/demap/paper_v13_scientific_audit/allowance_sensitivity_v13.csv
+  parity_artifact_sha256: 33d8fa5805c5634d826279b971365e459fb5be3df0cd5be7f0b27b9a6d7553e5
+  required_config:
+  - configs/paper/sensitivity_allowance_v1.yaml
+  role: earlier two-method (lexical-only) allowance grid
+  divergence_note: 'SUPERSEDED for v21: the manuscript''s Figure S6 and Table S6 now carry three methods
+    and come from allowance_sensitivity_four_methods.csv. Retained for cross-check only.'
+  release_gate: cde_match_derivative_unresolved
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: false
+  provenance_status: null
+  migration_state: not_migrated_by_decision
+  exclusion_reason: lexical-only two-method grid; v21 reports the three/four-method aggregate instead.
+- src: notebooks/paper_figures/figure_representation_heatmaps_v12.ipynb
+  dst: src/demap_repro/reporting/figures/figure_representation_heatmaps_v12.py
+  source_class: untracked
+  worktree_sha256: 68fa76b51e32ac5c4ba7bb265496132be76a3d0863164a9da6d8600580f66f10
+  worktree_bytes: 480058
+  head_blob: null
+  paper_scope_ids:
+  - MT-F2
+  - SM-FS1
+  - SM-FS2
+  parity_artifact: .scratch/demap/paper_v10_revision/data/phase0_heatmaps.csv
+  parity_artifact_sha256: 7023f306b524fc7a269a7c234e71276450db63d62ea91ef67957656a160f16d9
+  required_config: []
+  role: Figures 2, S1, S2; convert notebook -> headless script in DST
+  divergence_note: UNTRACKED in SRC.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: notebooks/paper_figures/figure_repxloss_v10.ipynb
+  dst: src/demap_repro/reporting/figures/figure_repxloss_v10.py
+  source_class: untracked
+  worktree_sha256: 5a379644cef80b7d426a6d5bd8bdd3492b24578efae9264e69b723517bb6e139
+  worktree_bytes: 120618
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS3
+  parity_artifact: .scratch/demap/paper_v10_revision/data/section4_3_repxloss.csv
+  parity_artifact_sha256: 65f5f640f88fdf8a0f03aeab74ce97b53e17d4b88abafdaf25b947068397c103
+  required_config: []
+  role: Figure S3 (superseded by make_figureS3_repxloss_v21.py in v21); convert notebook -> headless script
+    in DST
+  divergence_note: UNTRACKED in SRC.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: notebooks/paper_figures/figure_stage_comparison_v10.ipynb
+  dst: src/demap_repro/reporting/figures/figure_stage_comparison_v10.py
+  source_class: untracked
+  worktree_sha256: 27b569ef1c7495410fbc7634205b00107415d89673af91799f2b1b4ab7c2050c
+  worktree_bytes: 110016
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS4
+  parity_artifact: .scratch/demap/paper_v10_revision/data/stage_comparison.csv
+  parity_artifact_sha256: ceb480b8101d44826c0b7528992145a3b2e50aa7802c2a8b6942c708497d9452
+  required_config: []
+  role: Figure S4; convert notebook -> headless script in DST
+  divergence_note: UNTRACKED in SRC.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: notebooks/paper_figures/figure_k_ceiling_v10.ipynb
+  dst: src/demap_repro/reporting/figures/figure_k_ceiling_v10.py
+  source_class: untracked
+  worktree_sha256: 226384eb2c9b3a43de54f9f221032fef14a5046893f5827c36fe1a20f03a9f4c
+  worktree_bytes: 159459
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS5
+  parity_artifact: notebooks/data/reranker_k_ceiling_recall5.csv
+  parity_artifact_sha256: 8585a2fedd96ec98005d48e84b69d14f25225888026d98bb63a8c9e44f8acfa2
+  required_config: []
+  role: Figure S5; convert notebook -> headless script in DST
+  divergence_note: UNTRACKED in SRC.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: not_copied
+- src: notebooks/paper_figures/paper_figure_style.py
+  dst: src/demap_repro/reporting/figures/style.py
+  source_class: untracked
+  worktree_sha256: f2a1fb5a8cffe03f524bacfda7cb7340989d42f066df20676d6644f0793633c3
+  worktree_bytes: 5740
+  head_blob: null
+  paper_scope_ids:
+  - MT-F2
+  - SM-FS1
+  - SM-FS2
+  - SM-FS3
+  - SM-FS4
+  - SM-FS5
+  parity_artifact: null
+  parity_artifact_sha256: null
+  required_config: []
+  role: shared figure style + save_figure() which writes the *_provenance.json sidecars
+  divergence_note: UNTRACKED in SRC; resolves REPO_ROOT to the /vf/... form.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: manuscript/figures/make_figure3_phase1_phase2_v19.py
+  dst: src/demap_repro/reporting/figures/make_figure3_phase1_phase2.py
+  source_class: untracked
+  worktree_sha256: 44d52a9eb9f0780fb5fff21e880ae6c55694659e8e4aa216c10b71690129391f
+  worktree_bytes: 4957
+  head_blob: null
+  paper_scope_ids:
+  - MT-F3
+  parity_artifact: .scratch/demap/paper_v10_revision/data/phase2_winners.csv
+  parity_artifact_sha256: 1ff85ced0cea7c0b1535b6bf8d903b429c403b6716f7b6bd612ef924cc460531
+  required_config: []
+  role: Figure 3 as embedded in v21
+  divergence_note: UNTRACKED in SRC.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: manuscript/figures/make_figure4_crossencoder.py
+  dst: src/demap_repro/reporting/figures/make_figure4_crossencoder.py
+  source_class: untracked
+  worktree_sha256: 36a7b38b756bf39f5d5b9d3798efb6cf969f342d9b16c8a52f1e8b2df757d38f
+  worktree_bytes: 3679
+  head_blob: null
+  paper_scope_ids:
+  - MT-F4
+  parity_artifact: .scratch/demap/paper_v10_revision/data2/crossencoder_finetuned.csv
+  parity_artifact_sha256: 0eb43e393c7821d819bb81d1ebaffc9e64bfce8784f7e882c42510dd27a85935
+  required_config: []
+  role: Figure 4 as embedded in v21
+  divergence_note: UNTRACKED in SRC.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: manuscript/figures/make_figure5_keyword.py
+  dst: src/demap_repro/reporting/figures/make_figure5_keyword.py
+  source_class: untracked
+  worktree_sha256: 02e02da9ff1f2ac8b91a55babb7d93460a36c468f59422d96ce7d97b39e5f77e
+  worktree_bytes: 8824
+  head_blob: null
+  paper_scope_ids:
+  - MT-F5
+  parity_artifact: .scratch/demap/paper_v10_revision/data2/keyword_fullset_recall5.csv
+  parity_artifact_sha256: 7599cd8061192824f5c615a0f3cdd38e05d04611ec28155d158b430bb9af4ae7
+  required_config: []
+  role: Figure 5 as embedded in v21
+  divergence_note: UNTRACKED in SRC.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: manuscript/figures/make_figureS3_repxloss_v21.py
+  dst: src/demap_repro/reporting/figures/make_figureS3_repxloss.py
+  source_class: untracked
+  worktree_sha256: 670447c7a524ad6df36f0b38de14d74d017cf3ff2661b071979d96e6bcd093c8
+  worktree_bytes: 6396
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS3
+  parity_artifact: .scratch/demap/paper_v10_revision/data/section4_3_repxloss.csv
+  parity_artifact_sha256: 65f5f640f88fdf8a0f03aeab74ce97b53e17d4b88abafdaf25b947068397c103
+  required_config: []
+  role: Figure S3 as embedded in v21
+  divergence_note: UNTRACKED in SRC.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: manuscript/figures/make_figureS6_S7_allowance.py
+  dst: src/demap_repro/reporting/figures/make_figureS6_S7_allowance.py
+  source_class: untracked
+  worktree_sha256: 7282a09d414cf753c52f95478d39c3c486da03ff885c2192cefddddb039d9e55
+  worktree_bytes: 5829
+  head_blob: null
+  paper_scope_ids:
+  - SM-FS6
+  - SM-FS7
+  parity_artifact: manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv
+  parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
+  required_config: []
+  role: Figures S6 and S7 as embedded in v21
+  divergence_note: UNTRACKED in SRC.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: manuscript/figures/make_figure1_workflow_v20.py
+  dst: src/demap_repro/reporting/schematics/_reference_figure1.py
+  source_class: untracked
+  worktree_sha256: 967025b0a993782f419e8b825409654be873546c79a40df51979365dfc9b2e03
+  worktree_bytes: 8858
+  head_blob: null
+  paper_scope_ids:
+  - MT-F1
+  parity_artifact: manuscript/figures/figure1_workflow_v20.png
+  parity_artifact_sha256: a009e6fefbbf5afb83d5201e2981668d545e1c5351a2277daf389e6df5842859
+  required_config: []
+  role: Figure 1 schematic generator; DST keeps it as REFERENCE and validates its claims
+  divergence_note: UNTRACKED in SRC. Manual schematic - not regenerated from experiment output.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: manuscript/figures/make_diagrams.py
+  dst: src/demap_repro/reporting/schematics/_reference_figure6.py
+  source_class: untracked
+  worktree_sha256: cd9640686859fcbdeaabd7af05f6ed7cf0e05916bb9797cbab05873fddd0fc16
+  worktree_bytes: 11178
+  head_blob: null
+  paper_scope_ids:
+  - MT-F6
+  parity_artifact: manuscript/figures/figure_reranker_architecture.png
+  parity_artifact_sha256: 65fb5f5c2d764f3392e4a7fc29e9478ea7b69ec2f667412b3cffaaf7e8d1b46f
+  required_config: []
+  role: Figure 6 schematic generator (build_architecture); DST validates its claims
+  divergence_note: UNTRACKED in SRC; carries the 119 -> 117 feature-count fix.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: src/demap/analysis/paper_publication_figures.py
+  dst: src/demap_repro/reporting/publication_figures.py
+  source_class: tracked_modified
+  worktree_sha256: 4a8abb63c04ec10a56ea6c1eb8e47de07d6bac1325560cb80d081168bfd0b7ea
+  worktree_bytes: 62957
+  head_blob: 44c808d46c7360acacaae3419cb7a4c0a9669b6f
+  paper_scope_ids:
+  - MT-F3
+  - SM-FS4
+  parity_artifact: .scratch/demap/paper_v10_revision/data/phase2_winners.csv
+  parity_artifact_sha256: 1ff85ced0cea7c0b1535b6bf8d903b429c403b6716f7b6bd612ef924cc460531
+  required_config: []
+  role: publication figure helpers
+  divergence_note: Worktree version differs from HEAD; the worktree version is authoritative.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+- src: .scratch/demap/paper_v16/validate_v16.py
+  dst: tests/tier3_regression/test_manuscript_assertions.py
+  source_class: scratch
+  worktree_sha256: 91eab823f32bd63b297b52bd894f8fb1321d73176a6ce9cc3b00fd66a926b104
+  worktree_bytes: 18164
+  head_blob: null
+  paper_scope_ids:
+  - MT-T4
+  - MT-F6
+  - SM-S55-01
+  - SM-TS5
+  parity_artifact: .scratch/demap/paper_v16/lineage_verified.json
+  parity_artifact_sha256: 2e434e2b7acb8002c70269e51a4e8989cc75299984dcc30d880342ab710d40fd
+  required_config: []
+  role: port the SCIENTIFIC assertions only (117-count, no-provenance, Table 4 <-> Table S5 cross-check,
+    stale-value scan); the DOCX machinery is not migrated
+  divergence_note: null
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: false
+  provenance_status: null
+  migration_state: not_migrated_by_decision
+  exclusion_reason: DOCX validation machinery; the scientific assertions were ported into tests/ instead.
+- src: .scratch/demap/paper_v10_revision/result_source_audit.csv
+  dst: configs/paper/results_provenance_v1.yaml
+  source_class: scratch
+  worktree_sha256: 8569c0d7313b8bac82acdee576fe879381b07927eb7b6cb36bdfeb94d924af9f
+  worktree_bytes: 18457
+  head_blob: null
+  paper_scope_ids:
+  - MT-T4
+  - SM-TS5
+  - SM-TS6
+  parity_artifact: .scratch/demap/paper_v13_scientific_audit/final_table4_v13.csv
+  parity_artifact_sha256: 9f697e39c13f16742786de22a619770218fe1ddefd9f44c09986c9aaa0741b5b
+  required_config: []
+  role: per-method provenance rows; restricted to paper_scope in DST
+  divergence_note: Points at some superseded artifacts; only paper_scope-linked rows are carried forward.
+  release_gate: null
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  provenance_status: null
+  migration_state: copied_verbatim
+gated_material:
+- src: scripts/cde_match/cdeMatch_matchFlow.sql
+  source_class: tracked
+  worktree_sha256: 4e812662644dbf1c84ac0572942f601a314aa1278d3850709fbb113fa52977be
+  worktree_bytes_or_filecount: 12390
+  digest_kind: file
+  role: 'NCI-supplied PL/SQL: spDSMatchFlow controller'
+  paper_scope_ids:
+  - MT-F5
+  - MT-T4
+  - SM-S52-01
+  release_gate: nci_cde_match_source
+  copied_to_dst: false
+  migration_state: not_copied
+- src: scripts/cde_match/cdeMatch_dynmcSqlQueryBuilder.sql
+  source_class: tracked
+  worktree_sha256: 2a2f10d4a043ca7e51a3e9b306b1f3261acd48e47a24d460b91c8cd49290fdcb
+  worktree_bytes_or_filecount: 11669
+  digest_kind: file
+  role: 'NCI-supplied PL/SQL: rules 1-15 (spDSSubDynmc)'
+  paper_scope_ids:
+  - MT-F5
+  - MT-T4
+  - SM-S52-01
+  release_gate: nci_cde_match_source
+  copied_to_dst: false
+  migration_state: not_copied
+- src: scripts/cde_match/cdeMatch_longestWordLogic.sql
+  source_class: tracked
+  worktree_sha256: 2cc57fafee47c482d1dbfbbff966564b85e99160630aa2671aba00db669fd85b
+  worktree_bytes_or_filecount: 3537
+  digest_kind: file
+  role: 'NCI-supplied PL/SQL: rules 16-18 longest word'
+  paper_scope_ids:
+  - MT-F5
+  - MT-T4
+  - SM-S52-01
+  release_gate: nci_cde_match_source
+  copied_to_dst: false
+  migration_state: not_copied
+- src: scripts/cde_match/cdeMatch_pvvmLogic.sql
+  source_class: tracked
+  worktree_sha256: 46cc1ba1ffd9c3190220f6756c91919c2cf19427b9946cb7c07a5a1994d5ab66
+  worktree_bytes_or_filecount: 7889
+  digest_kind: file
+  role: 'NCI-supplied PL/SQL: PV/VM qualification (spDSSubPVVM)'
+  paper_scope_ids:
+  - MT-F5
+  - MT-T4
+  - SM-S52-01
+  release_gate: nci_cde_match_source
+  copied_to_dst: false
+  migration_state: not_copied
+- src: scripts/cde_match/cdeMatch_tableViewDefinitions.sql
+  source_class: tracked
+  worktree_sha256: 0a73a6e0ad044e2724fc2bb8e642f092ebb9ddf44f03b312eeac27dcb76a2775
+  worktree_bytes_or_filecount: 40963
+  digest_kind: file
+  role: 'NCI-supplied PL/SQL: table/view definitions'
+  paper_scope_ids:
+  - SM-S52-01
+  release_gate: nci_cde_match_source
+  copied_to_dst: false
+  migration_state: not_copied
+- src: scripts/cde_match/S74_NCI_DS.sql
+  source_class: tracked
+  worktree_sha256: bc9df2f3f5417365ada623a340459404a3d82856c592e960a452eff1300a60a5
+  worktree_bytes_or_filecount: 249740
+  digest_kind: file
+  role: NCI-supplied production database script
+  paper_scope_ids:
+  - SM-S52-01
+  release_gate: nci_cde_match_source
+  copied_to_dst: false
+  migration_state: not_copied
+- src: scripts/cde_match/CDE_Match_Logic_04-13-2026.pdf
+  source_class: tracked
+  worktree_sha256: fc26cd2c4d71f8d0eaf5cd57651ff12fb74de2380b0d7c7f805db512f194c5e8
+  worktree_bytes_or_filecount: 68289
+  digest_kind: file
+  role: NCI-supplied CDE Match logic flow diagram
+  paper_scope_ids:
+  - SM-S52-01
+  release_gate: nci_cde_match_source
+  copied_to_dst: false
+  migration_state: not_copied
+- src: src/demap/features/cde_match_clone.py
+  source_class: tracked
+  worktree_sha256: ea6d5ce85655243635add5cd534cf5be3b683e6334fb3a05b1175241c105193d
+  worktree_bytes_or_filecount: 77884
+  digest_kind: file
+  role: Python approximation to NCI CDE Match; derivative of the supplied PL/SQL
+  paper_scope_ids:
+  - MT-T4
+  - MT-F5
+  - MT-P36-01
+  - SM-S52-01
+  - SM-TS5
+  - SM-TS6
+  - SM-FS6
+  - SM-FS7
+  release_gate: cde_match_derivative_unresolved
+  copied_to_dst: false
+  migration_state: not_copied
+- src: src/demap/features/keyword_retriever.py
+  source_class: tracked
+  worktree_sha256: da4e828a152cc831d8f95abd2f77d8aa05b2c461d946502a432916ee3ab4487a
+  worktree_bytes_or_filecount: 30316
+  digest_kind: file
+  role: fuzzy tier of CDE Match-Fuzzy; composed with cde_match_clone
+  paper_scope_ids:
+  - MT-F5
+  - MT-P36-01
+  - SM-S52-01
+  - SM-S53-01
+  - SM-S55-01
+  - MT-T4
+  release_gate: cde_match_derivative_unresolved
+  copied_to_dst: false
+  migration_state: not_copied
+- src: src/demap/features/cdematch.py
+  source_class: tracked
+  worktree_sha256: 2dccbce41fb036bd37120cf7172b67df28faaa9ffc2f1b136b409bff2818248c
+  worktree_bytes_or_filecount: 9075
+  digest_kind: file
+  role: CDE Match ranking/eval helpers
+  paper_scope_ids:
+  - MT-T4
+  - SM-S52-01
+  release_gate: cde_match_derivative_unresolved
+  copied_to_dst: false
+  migration_state: not_copied
+- src: scripts/build_cde_match_candidates.py
+  source_class: tracked
+  worktree_sha256: cd01bbcfce3d690ac95180c01ef33b094f0c01d1cd5aee5c482aaf5ca33e0f1a
+  worktree_bytes_or_filecount: 19773
+  digest_kind: file
+  role: entrypoint producing both the clone and CDE Match-Fuzzy candidate tables
+  paper_scope_ids:
+  - MT-F5
+  - MT-T4
+  - SM-S52-01
+  release_gate: cde_match_derivative_unresolved
+  copied_to_dst: false
+  migration_state: not_copied
+- src: artifacts/final_reranker/keyword_fuzzy_v2_eligible
+  source_class: untracked
+  worktree_sha256: a9830ff89478cc89160d4b095cc32dfb440516ccf2a9ed3a563e57b01de4ac78
+  worktree_bytes_or_filecount: 18
+  digest_kind: dir_tree_digest
+  role: CDE Match-Fuzzy candidate parquets for the six evaluation sets + val_train/val_dev
+  paper_scope_ids:
+  - MT-F5
+  - MT-T4
+  - SM-S52-01
+  - SM-S62-01
+  release_gate: cde_match_derived_artifacts
+  copied_to_dst: false
+  migration_state: not_copied
+- src: artifacts/final_reranker/cde_match_clone
+  source_class: untracked
+  worktree_sha256: b49b8c4be203a3732cf05e6ff1b2edc0ebbea9f0900184aec0ba733b6ff4ce65
+  worktree_bytes_or_filecount: 23
+  digest_kind: dir_tree_digest
+  role: Python-approximation candidate parquets
+  paper_scope_ids:
+  - MT-T4
+  - MT-F5
+  - SM-TS5
+  release_gate: cde_match_derived_artifacts
+  copied_to_dst: false
+  migration_state: not_copied
+- src: artifacts_v3_cdisc/cde_match_official/2026-06-18
+  source_class: untracked
+  worktree_sha256: 5dc1225c0cc5c584246d71501e4200ec8683c6526384435784e89d484c6d7839
+  worktree_bytes_or_filecount: 23
+  digest_kind: dir_tree_digest
+  role: official NCI CDE Match service output (GDC + CIMAC only)
+  paper_scope_ids:
+  - MT-ABS-01
+  - MT-P38-01
+  release_gate: official_nci_cde_match_frozen
+  copied_to_dst: false
+  migration_state: not_copied
+- src: data/raw/cimac/CIMAC-CIDC_Master_AppendixA_v2.xlsx
+  source_class: untracked
+  worktree_sha256: 6d657dfd3f7289e74137929836974f742136fea3d2cb753432499418a57c71a3
+  worktree_bytes_or_filecount: 43312
+  digest_kind: file
+  role: CIMAC source workbook for the canonical n=131 set (UNTRACKED in SRC)
+  paper_scope_ids:
+  - MT-T1
+  - MT-T4
+  - SM-TS1
+  - SM-TS4
+  release_gate: cimac_unresolved
+  copied_to_dst: false
+  migration_state: not_copied
+- src: data/processed/eval_canonical/cimac_v2.parquet
+  source_class: untracked
+  worktree_sha256: 1d0797330864cb8a73d277c1885fa5bba41a63d3a011cfaaa148e59c6dce4fe0
+  worktree_bytes_or_filecount: 26963
+  digest_kind: file
+  role: CIMAC canonical evaluation set (n = 131)
+  paper_scope_ids:
+  - MT-T1
+  - MT-T4
+  - SM-TS4
+  - MT-P38-02
+  release_gate: cimac_unresolved
+  copied_to_dst: false
+  migration_state: not_copied
+- src: data/processed/cadsr_xml_2026-06-18/cde_master_enriched_eval_production_cde_match.parquet
+  source_class: untracked
+  worktree_sha256: 2e360368307c7589325a43eebcbd6f6ec22090530ccf3521862cc1b9cb62a200
+  worktree_bytes_or_filecount: 15147443
+  digest_kind: file
+  role: June production catalog (62,976 records) - retrieval universe for every method
+  paper_scope_ids:
+  - SM-S14-01
+  - SM-S51-01
+  - SM-S52-01
+  - MT-T4
+  release_gate: cadsr_snapshot_unresolved
+  copied_to_dst: false
+  migration_state: not_copied
+- src: data/raw/cadsr_xml
+  source_class: untracked
+  worktree_sha256: 4acdcb26ce55d146a6c811fddd5de11bad4888e5009e16320f4edcff5c89396c
+  worktree_bytes_or_filecount: 15
+  digest_kind: dir_tree_digest
+  role: caDSR nightly XML export 2026-01-12 (benchmark construction)
+  paper_scope_ids:
+  - SM-S13-01
+  - SM-S14-01
+  release_gate: cadsr_snapshot_unresolved
+  copied_to_dst: false
+  migration_state: not_copied
+- src: artifacts/phase2_finetuning/all-mpnet-base-v2/runs/20260705_203956__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-6f14e0fbed/model
+  source_class: untracked
+  worktree_sha256: be0413496e131cc98c65812eca9bc6838a3530e8fdc43281585d68f86aa24d57
+  worktree_bytes_or_filecount: 9
+  digest_kind: dir_tree_digest
+  role: FT-MPNet final bi-encoder checkpoint (retained seed 1)
+  paper_scope_ids:
+  - MT-F3
+  - MT-T4
+  - SM-TS4
+  release_gate: finetuned_weights_unresolved
+  copied_to_dst: false
+  migration_state: not_copied
+- src: artifacts/final_reranker/crossencoder_fulltrain_v2_eligible/runs/ncbi_MedCPT-Cross-Encoder
+  source_class: untracked
+  worktree_sha256: 2fd1704de14a8265edcc452c29929ad25033195fe23e56861a0ff583846fb373
+  worktree_bytes_or_filecount: 9
+  digest_kind: dir_tree_digest
+  role: FT-MedCPT final cross-encoder checkpoint
+  paper_scope_ids:
+  - MT-F4
+  - MT-T4
+  - SM-S54-01
+  release_gate: medcpt_derivative_weights_unresolved
+  copied_to_dst: false
+  migration_state: not_copied

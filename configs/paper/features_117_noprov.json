@@ -1,0 +1,12 @@
+{
+  "name": "fixedk30_ablation_C_drop_final_rank_noprov",
+  "description": "Variant B (no provenance): the adopted ablation-C feature set (drop the three heuristic retrieval-rank features) MINUS the two query-provenance categorical features text_family and text_query_source. Use with scripts/train_hgbc_reranker.py --exclude-features-file. Companion to Variant A (same ablation-C set with the provenance features retained under --categorical-mode stable).",
+  "rationale": "text_family / text_query_source were table-relative pd.Categorical codes (batch-composition-dependent, not production-safe; see HANDOFF_2026-07-29_TRANSFER_AND_PRODUCTION_SAFE_RERANKER.md section 8). Variant B removes them entirely; Variant A re-encodes them with a fixed training-derived vocabulary (__MISSING__/__UNKNOWN__ reserved categories, sklearn-native categorical splits). Selection between A and B is on val_dev Recall@5 under the frozen Step H protocol.",
+  "drop": [
+    "keyword_rank",
+    "cdematch_rank",
+    "log1p_cdematch_rank",
+    "text_family",
+    "text_query_source"
+  ]
+}

@@ -1,0 +1,166 @@
+{
+  "created_at": "2026-05-13T14:42:30-0400",
+  "config": "configs/pipeline.yaml",
+  "repo_root": "/gpfs/gsfs12/users/nextgen2/james/tasks/cde_project/demap",
+  "python": "3.10.8 | packaged by conda-forge | (main, Nov 22 2022, 08:23:14) [GCC 10.4.0]",
+  "platform": "Linux-4.18.0-425.19.3a.el8.x86_64-x86_64-with-glibc2.28",
+  "git": {
+    "commit": "13821ac0bea810f04d0d24b597a6e7ae20f9714c",
+    "dirty": true,
+    "dirty_paths": 2
+  },
+  "inputs": {
+    "input_xml": "data/raw/cadsr_xml",
+    "input_type": "xml_dir",
+    "n_xml_listed": 14,
+    "xml_list": [
+      "data/raw/cadsr_xml/cde_xml_20260111204212_1.xml",
+      "data/raw/cadsr_xml/cde_xml_20260111210538_2.xml",
+      "data/raw/cadsr_xml/cde_xml_20260111212835_3.xml",
+      "data/raw/cadsr_xml/cde_xml_20260111215423_4.xml",
+      "data/raw/cadsr_xml/cde_xml_20260111221528_5.xml",
+      "data/raw/cadsr_xml/cde_xml_20260111223545_6.xml",
+      "data/raw/cadsr_xml/cde_xml_20260111225950_7.xml",
+      "data/raw/cadsr_xml/cde_xml_20260111232401_8.xml",
+      "data/raw/cadsr_xml/cde_xml_20260111234509_9.xml",
+      "data/raw/cadsr_xml/cde_xml_20260112000445_10.xml",
+      "data/raw/cadsr_xml/cde_xml_20260112002545_11.xml",
+      "data/raw/cadsr_xml/cde_xml_20260112004552_12.xml",
+      "data/raw/cadsr_xml/cde_xml_20260112010915_13.xml",
+      "data/raw/cadsr_xml/cde_xml_20260112012022_14.xml"
+    ]
+  },
+  "params": {
+    "force": false,
+    "start_at": "build-queries",
+    "stop_after": "split",
+    "language": "English",
+    "pv_max_n": 10,
+    "pv_summary_profile": "cadsr",
+    "pv_max_n_query": 8,
+    "pv_max_n_cde": 10,
+    "pv_center_fraction": 0.5,
+    "pv_min_n": 2,
+    "pv_size_jitter": 1,
+    "pv_generic_boost": 0.1,
+    "pv_generic_cap": 0.7,
+    "sde_generic_label_p": 0.3,
+    "pv_small_n_generic_threshold": 0.5,
+    "pv_max_resample_attempts": 3,
+    "pv_placeholder_token": "<MISSING_PV_SUMMARY>",
+    "pv_diagnostics_summary": "artifacts/summaries/pv_summary/pv_summary_diagnostics.json",
+    "pv_diagnostics_records": "artifacts/summaries/pv_summary/pv_summary_diagnostics.csv",
+    "split_seed": 1234,
+    "val_frac": 0.1,
+    "test_frac": 0.1,
+    "train_frac": null
+  },
+  "stages": {
+    "build-queries": {
+      "name": "build-queries",
+      "argv": [
+        "--alt-parquet",
+        "data/interim/cadsr_merged/cde_alternate_names.parquet",
+        "--ref-parquet",
+        "data/interim/cadsr_merged/cde_reference_documents.parquet",
+        "--out-dir",
+        "artifacts/summaries/inwild_strict",
+        "--out-parquet",
+        "data/processed/queries.parquet",
+        "--language",
+        "English",
+        "--pv-max-n",
+        "10",
+        "--pv-summary-profile",
+        "cadsr",
+        "--pv-center-fraction",
+        "0.5",
+        "--pv-min-n",
+        "2",
+        "--pv-size-jitter",
+        "1",
+        "--pv-generic-boost",
+        "0.1",
+        "--pv-generic-cap",
+        "0.7",
+        "--sde-generic-label-p",
+        "0.3",
+        "--pv-small-n-generic-threshold",
+        "0.5",
+        "--pv-max-resample-attempts",
+        "3",
+        "--pv-placeholder-token",
+        "<MISSING_PV_SUMMARY>",
+        "--pv-max-n-query",
+        "8",
+        "--pv-max-n-cde",
+        "10",
+        "--alt-allowlist",
+        "configs/allowlists/alt_allowlist_current.csv",
+        "--refdoc-allowlist",
+        "configs/allowlists/refdoc_allowlist_current.csv"
+      ],
+      "outputs": [
+        "data/processed/queries.parquet",
+        "artifacts/summaries/inwild_strict"
+      ],
+      "started_at": "2026-05-13T14:42:31-0400",
+      "status": "ran",
+      "ended_at": "2026-05-13T14:43:11-0400",
+      "elapsed_sec": 40.3627347946167,
+      "counts": {
+        "queries_rows": 69102
+      }
+    },
+    "build-pairs": {
+      "name": "build-pairs",
+      "argv": [
+        "--queries-parquet",
+        "data/processed/queries.parquet",
+        "--out-parquet",
+        "data/processed/pairs.parquet"
+      ],
+      "outputs": [
+        "data/processed/pairs.parquet"
+      ],
+      "started_at": "2026-05-13T14:43:11-0400",
+      "status": "ran",
+      "ended_at": "2026-05-13T14:43:11-0400",
+      "elapsed_sec": 0.39322805404663086,
+      "counts": {
+        "pairs_rows": 69102
+      }
+    },
+    "split": {
+      "name": "split",
+      "argv": [
+        "--pairs-parquet",
+        "data/processed/pairs.parquet",
+        "--out-dir",
+        "data/processed/splits",
+        "--seed",
+        "1234",
+        "--val-frac",
+        "0.1",
+        "--test-frac",
+        "0.1"
+      ],
+      "outputs": [
+        "data/processed/splits"
+      ],
+      "started_at": "2026-05-13T14:43:12-0400",
+      "status": "ran",
+      "ended_at": "2026-05-13T14:43:13-0400",
+      "elapsed_sec": 1.040727138519287,
+      "counts": {
+        "train_rows": 50920,
+        "val_rows": 6377,
+        "test_rows": 6328,
+        "holdout_org_rows": 3176,
+        "holdout_standard_rows": 1220,
+        "holdout_refslice_rows": 527,
+        "holdout_refslice_rows_note": "2026-06-18: filtered 638 -> 535 -> 527 rows (368 -> 331 -> 325 query_ids) in two leakage stages: 37 query_id overlaps with v2 train_natural_noleak, then 6 normalized-text+gold collisions with v3 train_noleak. Backups: data/processed/backups/refslice_pre_noleak_filter_20260618/ and refslice_pre_v3leak_filter_20260618_v2/."
+      }
+    }
+  }
+}

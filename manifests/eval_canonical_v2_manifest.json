@@ -1,0 +1,85 @@
+{
+  "rule": "Build data/processed/eval_canonical_v2/ : the 6 canonical eval datasets with\nTRAIN-contaminated queries removed.\n\nRule E (external-holdout disjointness), applied to the 5 EXTERNAL datasets only\n(`test` is in-distribution by design and is copied through unchanged):\n\n    exclude external query q  iff  EXISTS train pair t with\n        norm(q.query_text_raw) == norm(t.query_text_raw)\n        AND publicid(q.cde_publicid) == publicid(t.cde_publicid)\n      OR q.query_id in train.query_id\n\n    norm(x) = collapse_ws(re.sub(r'[^a-z0-9]+', ' ', lower(x)))\n    publicid(x) = x.split('::')[0]\n\nWhole-query removal (all rows of an excluded query_id go), matching the convention in\nscripts/build_reachable_eval_splits.py. NEVER overwrites data/processed/eval_canonical/.\n",
+  "train_reference": "/data/nextgen2/james/tasks/cde_project/demap/data/processed/splits/train.parquet",
+  "train_sha256": "182573c6f39eaa8d4c53ea21c8ba864ea9902bbdbc3b15b114118e19dcfb7b36",
+  "datasets": [
+    {
+      "dataset": "cctg",
+      "source": "/data/nextgen2/james/tasks/cde_project/demap/data/processed/eval_canonical/cctg.parquet",
+      "source_sha256": "920a9df69e382c7a747fdac2c9fd4e5b4e747f79ebc4373cd025844be98d1d72",
+      "v1_rows": 1159,
+      "v1_queries": 1097,
+      "removed_queries": 8,
+      "removed_rows": 8,
+      "v2_rows": 1151,
+      "v2_queries": 1089,
+      "rule": "Rule E",
+      "v2_sha256": "c32209e6659348c90798fc8cadd4ffc0875b929226f2c96dfa0dfa6e0f6b6628"
+    },
+    {
+      "dataset": "oid_alt",
+      "source": "/data/nextgen2/james/tasks/cde_project/demap/data/processed/eval_canonical/oid_alt.parquet",
+      "source_sha256": "809784a5ee4b0ef8c9878681595014aefae7252e1d8ddc4af2a02a4d3334d2a5",
+      "v1_rows": 1908,
+      "v1_queries": 1766,
+      "removed_queries": 7,
+      "removed_rows": 9,
+      "v2_rows": 1899,
+      "v2_queries": 1759,
+      "rule": "Rule E",
+      "v2_sha256": "3bff8f6abd356783c929bfb4696bf73f5a1b7ddf4663d58fa49cf9628135259a"
+    },
+    {
+      "dataset": "cdash",
+      "source": "/data/nextgen2/james/tasks/cde_project/demap/data/processed/eval_canonical/cdash.parquet",
+      "source_sha256": "b3dffb13dd1f98cb42a4fe57f1ee33c4d838f0dc5b030a9973ad33169b090dc6",
+      "v1_rows": 526,
+      "v1_queries": 324,
+      "removed_queries": 14,
+      "removed_rows": 21,
+      "v2_rows": 505,
+      "v2_queries": 310,
+      "rule": "Rule E",
+      "v2_sha256": "616ed121023ae2baba3776564eb1876bd1c54b76006630d25406b12a5c9a7185"
+    },
+    {
+      "dataset": "gdc_combined",
+      "source": "/data/nextgen2/james/tasks/cde_project/demap/data/processed/eval_canonical/gdc_combined.parquet",
+      "source_sha256": "289c4f5fc966748c54fc3d4c8c0edda28937b55910796a65db7834034bf86f21",
+      "v1_rows": 72,
+      "v1_queries": 72,
+      "removed_queries": 4,
+      "removed_rows": 4,
+      "v2_rows": 68,
+      "v2_queries": 68,
+      "rule": "Rule E",
+      "v2_sha256": "e8e40589e7977fa1d296f82c6f4e057ab4aedaf3a384bb94348fc04a1448b3ca"
+    },
+    {
+      "dataset": "cimac_v2",
+      "source": "/data/nextgen2/james/tasks/cde_project/demap/data/processed/eval_canonical/cimac_v2.parquet",
+      "source_sha256": "1d0797330864cb8a73d277c1885fa5bba41a63d3a011cfaaa148e59c6dce4fe0",
+      "v1_rows": 131,
+      "v1_queries": 131,
+      "removed_queries": 18,
+      "removed_rows": 18,
+      "v2_rows": 113,
+      "v2_queries": 113,
+      "rule": "Rule E",
+      "v2_sha256": "4189c1345f4fbb6fb6b5176d7b9ee38c6db95b38de95a6bfe8379422c5d7cb10"
+    },
+    {
+      "dataset": "test",
+      "source": "/data/nextgen2/james/tasks/cde_project/demap/data/processed/eval_canonical/test.parquet",
+      "source_sha256": "5890039fcef613587902a03ba06955ca8b81b62699542a30e99f08dd9f2946b2",
+      "v1_rows": 4258,
+      "v1_queries": 3959,
+      "removed_queries": 0,
+      "removed_rows": 0,
+      "v2_rows": 4258,
+      "v2_queries": 3959,
+      "rule": "passthrough (in-distribution)",
+      "v2_sha256": "5890039fcef613587902a03ba06955ca8b81b62699542a30e99f08dd9f2946b2"
+    }
+  ]
+}

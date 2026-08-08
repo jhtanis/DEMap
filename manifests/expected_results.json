@@ -1,0 +1,1126 @@
+{
+  "schema_version": 1,
+  "manifest_id": "expected_results_v1",
+  "generated_utc": "2026-08-08T16:49:41.861920+00:00",
+  "authoritative_manuscript": {
+    "path": "manuscript/cde_paper_v21.docx",
+    "sha256": "2df7895cd8657a7928be220c958aaa38a85c5b5199526f03979c4967b159eecd"
+  },
+  "scope_gate": "manifests/paper_scope.yaml",
+  "policy": "Only results represented in paper_scope.yaml appear here. No HGBC A/B or provenance-dropout experiment, no exact-match pinning, no Phase 2 curriculum arm, no historical wrong-band semihard runs, no SapBERT, no XGBoost, no non-paper feature ablation, no stale pre-correction results.",
+  "tolerance_policy": {
+    "level1_from_frozen_artifacts": 0.0005,
+    "level2_retrained": 0.01,
+    "level2_ordering": "method ordering must be preserved exactly",
+    "counts": "exact integer"
+  },
+  "results": {
+    "A_dataset_counts": {
+      "paper_scope_ids": [
+        "MT-T1",
+        "SM-S13-01",
+        "SM-S14-01",
+        "SM-S15-01"
+      ],
+      "source_artifact": "data/processed/eval_canonical",
+      "source_sha256": "219d40440836b3eec2681e65e12a1410121bdd3cd647e9e17b567a50d2326d8b",
+      "tolerance": "exact_integer",
+      "canonical_eval_query_counts": {
+        "test": 3959,
+        "cctg": 1097,
+        "oid_alt": 1766,
+        "cdash": 324,
+        "gdc_combined": 72,
+        "cimac_v2": 131
+      },
+      "leakage_filtered_query_counts": {
+        "test": 3959,
+        "cctg": 1089,
+        "oid_alt": 1759,
+        "cdash": 310,
+        "gdc_combined": 68,
+        "cimac_v2": 113
+      },
+      "production_catalog_rows": 62976,
+      "production_catalog_sha256": "2e360368307c7589325a43eebcbd6f6ec22090530ccf3521862cc1b9cb62a200",
+      "manuscript_stated": {
+        "constructed_pairs": 69102,
+        "analysis_ready_pairs": 68142,
+        "analysis_ready_queries": 62847,
+        "in_distribution_pairs": 64346,
+        "in_distribution_queries": 59484,
+        "train_queries": 47645,
+        "val_train_queries": 3946,
+        "val_dev_queries": 3934,
+        "january_catalog_records": 79479,
+        "january_catalog_unique_public_ids": 78533,
+        "january_catalog_retired": 15852,
+        "june_catalog_records": 62976,
+        "june_catalog_unique_public_ids": 62858,
+        "june_export_records": 79827,
+        "june_removed_retired": 16846,
+        "june_removed_admin": 21,
+        "june_removed_both": 16,
+        "training_pairs_removed_empty_text": 622,
+        "training_pairs_final": 50972,
+        "content_overlap": {
+          "cctg": [
+            8,
+            1097
+          ],
+          "oid_alt": [
+            7,
+            1766
+          ],
+          "cdash": [
+            14,
+            324
+          ],
+          "gdc_combined": [
+            4,
+            72
+          ],
+          "cimac_v2": [
+            18,
+            131
+          ]
+        },
+        "cdash_shared_query_ids_with_indistribution": 14
+      },
+      "lineage_artifact": ".scratch/demap/paper_v16/lineage_verified.json",
+      "lineage_sha256": "2e434e2b7acb8002c70269e51a4e8989cc75299984dcc30d880342ab710d40fd",
+      "lineage_recomputed": {
+        "constructed": 69102,
+        "indist_pairs": 64346,
+        "indist_queries": 59484,
+        "cctg_in_cadsr_pct": 100.0,
+        "oid_alt_in_cadsr_pct": 100.0,
+        "cdash_in_cadsr_pct": 100.0,
+        "gdc_combined_in_cadsr_pct": 0.0,
+        "cimac_v2_in_cadsr_pct": 0.0,
+        "cadsr_holdout_pairs": 3593,
+        "external_pairs": 203,
+        "analysis_pairs": 68142,
+        "analysis_queries": 62847,
+        "dedup": 68659,
+        "catalog": 62976,
+        "cdash_queries": 324,
+        "cdash_multi": 93,
+        "cdash_multi_pct": 29
+      },
+      "notes": "Query-level (distinct query_id) counts. Bi-encoder metrics use the PAIR-level val_dev denominator 4,234; every other family uses query-level 3,934."
+    },
+    "A_dataset_characterization": {
+      "paper_scope_ids": [
+        "SM-TS1",
+        "SM-TS2"
+      ],
+      "source_artifact": ".scratch/demap/paper_v13_scientific_audit/s4_provenance_shift_v13.csv",
+      "source_sha256": "d9b6ff4111bd0f88e5638b6938dc146aeff14b2fafc2c038ef73431fd99de2e2",
+      "companion_artifact": ".scratch/demap/paper_v13_scientific_audit/s4_style_shift_v13.csv",
+      "companion_sha256": "d5045da013e9b97f2d93528a66a9366eed32a57dfab9831d57786b22baa2903e",
+      "tolerance": 0.001,
+      "n_dataset_rows": 8,
+      "manuscript_alt_ref_mix": {
+        "train": [
+          40.5,
+          59.5
+        ],
+        "val_train": [
+          40.6,
+          59.4
+        ],
+        "val_dev": [
+          40.6,
+          59.4
+        ],
+        "test": [
+          40.7,
+          59.3
+        ],
+        "cctg": [
+          0.0,
+          100.0
+        ],
+        "oid_alt": [
+          100.0,
+          0.0
+        ],
+        "cdash": [
+          0.0,
+          100.0
+        ],
+        "gdc_combined": [
+          45.8,
+          54.2
+        ],
+        "cimac_v2": [
+          100.0,
+          0.0
+        ]
+      }
+    },
+    "A_pv_overlap": {
+      "paper_scope_ids": [
+        "SM-TS3"
+      ],
+      "source_artifact": "data/processed/pairs.parquet",
+      "source_sha256": "1664cc537b3aae4ebc14f874e425ffb7b0d97ba3b1a1373cda8197b8c3665751",
+      "source_n_pairs": 69102,
+      "tolerance": 0.0005,
+      "reported_groups": [
+        "overall",
+        "ENUM",
+        "BINARY_WITH_UNKNOWN",
+        "BINARY_WITH_NA"
+      ],
+      "expected_values": {
+        "overall": {
+          "n_rows_both_present": 38964,
+          "normalized_block_match_rate": 0.004029,
+          "query_shorter_than_cde_rate": 0.300534,
+          "mean_jaccard_overlap": 0.167501
+        },
+        "ENUM": {
+          "n_rows_both_present": 24158,
+          "normalized_block_match_rate": 0.004181,
+          "query_shorter_than_cde_rate": 0.452893,
+          "mean_jaccard_overlap": 0.152807
+        },
+        "BINARY_WITH_UNKNOWN": {
+          "n_rows_both_present": 3040,
+          "normalized_block_match_rate": 0.000987,
+          "query_shorter_than_cde_rate": 0.0,
+          "mean_jaccard_overlap": 0.333004
+        },
+        "BINARY_WITH_NA": {
+          "n_rows_both_present": 8815,
+          "normalized_block_match_rate": 0.000227,
+          "query_shorter_than_cde_rate": 0.000113,
+          "mean_jaccard_overlap": 0.122708
+        }
+      },
+      "manuscript_stated": {
+        "overall": {
+          "rows": 38964,
+          "block_match_pct": 0.4,
+          "query_shorter_pct": 30.1,
+          "mean_jaccard": 0.168
+        },
+        "ENUM": {
+          "rows": 24158,
+          "block_match_pct": 0.4,
+          "query_shorter_pct": 45.3,
+          "mean_jaccard": 0.153
+        },
+        "BINARY_WITH_UNKNOWN": {
+          "rows": 3040,
+          "block_match_pct": 0.1,
+          "query_shorter_pct": 0.0,
+          "mean_jaccard": 0.333
+        },
+        "BINARY_WITH_NA": {
+          "rows": 8815,
+          "block_match_pct": 0.0,
+          "query_shorter_pct": 0.0,
+          "mean_jaccard": 0.123
+        }
+      },
+      "manuscript_prose_denominator": 38964,
+      "provenance_status": "corrected_to_canonical_69102_pairs",
+      "correction": {
+        "date": "2026-08-08",
+        "authorized_by": "author",
+        "manuscript_edit": "v21 Table S3 row counts changed to 38,964 / 24,158 / 3,040 / 8,815; ENUM query-shorter 45.2% -> 45.3%; S3.5 prose denominator 39,391 -> 38,964. No other text changed.",
+        "rationale": "The printed values came from a superseded 69,844-row build of pairs.parquet. Every model stage and the \u00a73.1 / S1.3 pair count use the 69,102-row file, so Table S3 was internally inconsistent with the rest of the manuscript."
+      },
+      "superseded_artifact": {
+        "path": "artifacts/tables/table04_pv_overlap_query_vs_cde.csv",
+        "sha256": "1b0a552265b68f6a780242966423ec58c87a52e805fbf85470fe9644fd802d99",
+        "upstream_artifact": "artifacts/summaries/pv_frozen_diagnostics/query_cde_pv_pair_records.csv",
+        "upstream_sha256": "c944fd4a1967783421785dd52745bf722437847534a1d4cf1f5d9322c7d868a1",
+        "generated": "2026-04-23 15:48",
+        "input_pairs_parquet_rows": 69844,
+        "values": {
+          "overall": {
+            "n_rows_both_present": 39391,
+            "normalized_block_match_rate": 0.004,
+            "query_shorter_than_cde_rate": 0.3015,
+            "mean_jaccard_overlap": 0.1676
+          },
+          "ENUM": {
+            "n_rows_both_present": 24543,
+            "normalized_block_match_rate": 0.0042,
+            "query_shorter_than_cde_rate": 0.4524,
+            "mean_jaccard_overlap": 0.1529
+          },
+          "BINARY_WITH_UNKNOWN": {
+            "n_rows_both_present": 3074,
+            "normalized_block_match_rate": 0.001,
+            "query_shorter_than_cde_rate": 0.0,
+            "mean_jaccard_overlap": 0.333
+          },
+          "BINARY_WITH_NA": {
+            "n_rows_both_present": 8816,
+            "normalized_block_match_rate": 0.0002,
+            "query_shorter_than_cde_rate": 0.0001,
+            "mean_jaccard_overlap": 0.1227
+          }
+        },
+        "why_superseded": "Its input pairs.parquet (69,844 rows) was overwritten on 2026-05-13 14:43 by the paper-era 69,102-row build. 11 of 12 rate cells round identically; all four row counts differ. Retained to explain the historical discrepancy; never a parity target."
+      },
+      "pv_generation_audit": {
+        "date": "2026-08-07",
+        "row_level_parity_query_side": "46948/46948 exact (100%)",
+        "row_level_parity_cde_side": "46948/46948 exact (100%)",
+        "frozen_vs_regenerated_diagnostics": "identical to full float precision, all 6 groups",
+        "verdict": "no PV-code regression"
+      },
+      "notes": "Producer chain: data/processed/pairs.parquet -> src/demap/analysis/pv_frozen_diagnostics.py (CLI `demap pv-frozen-diagnostics`) -> query_cde_pv_pair_records.csv -> notebooks/07_dataset_statistics_tables_and_figure.ipynb cell 13 -> Table S3. The computation carries 6 groups; v21 reports 4 (BINARY_WITH_UNKNOWN_NA and BINARY are omitted). The DST reimplementation must reproduce expected_values from pairs.parquet directly."
+    },
+    "B1_representation_screen": {
+      "paper_scope_ids": [
+        "MT-F2",
+        "SM-FS1",
+        "SM-FS2"
+      ],
+      "source_artifact": ".scratch/demap/paper_v10_revision/data/phase0_heatmaps.csv",
+      "source_sha256": "7023f306b524fc7a269a7c234e71276450db63d62ea91ef67957656a160f16d9",
+      "tolerance": 1e-09,
+      "grid_cells_per_model": 40,
+      "models": 3,
+      "total_rows": 120,
+      "val_dev_pair_denominator": 4234,
+      "val_dev_query_denominator": 3934,
+      "structural_claims": {
+        "all_mpnet_best_cell": "raw query x PQT (rank 1); prespecified anchor ranked 2",
+        "anchor": "raw query + PV summary x SN + DEC + DEF + PQT + PV"
+      }
+    },
+    "B2_representation_x_loss": {
+      "paper_scope_ids": [
+        "MT-T2",
+        "MT-T3",
+        "SM-FS3"
+      ],
+      "source_artifact": ".scratch/demap/paper_v10_revision/data/section4_3_repxloss.csv",
+      "source_sha256": "65f5f640f88fdf8a0f03aeab74ce97b53e17d4b88abafdaf25b947068397c103",
+      "tolerance": 0.0005,
+      "n_rows": 12,
+      "manuscript_table2": {
+        "anchor_mnrl": [
+          0.8368,
+          0.0023
+        ],
+        "anchor_symmetric": [
+          0.8392,
+          0.0013
+        ],
+        "best_mnrl": [
+          0.6436,
+          0.004
+        ],
+        "best_symmetric": [
+          0.6503,
+          0.0042
+        ],
+        "selected": "anchor_symmetric"
+      },
+      "manuscript_table3": {
+        "all-MPNet": {
+          "query": "raw query + PV summary",
+          "cde": "SN + DEC + DEF + PQT + PV",
+          "loss": "Symmetric bidirectional",
+          "recall@5": 0.8392,
+          "sd": 0.0013
+        },
+        "BioSimCSE": {
+          "query": "prefixed query + PV summary",
+          "cde": "SN + LN + PQT + PV",
+          "loss": "Symmetric bidirectional",
+          "recall@5": 0.8344,
+          "sd": 0.0033
+        },
+        "PubMedBERT": {
+          "query": "raw query + PV summary",
+          "cde": "SN + DEC + DEF + PQT + PV",
+          "loss": "MNRL",
+          "recall@5": 0.8227,
+          "sd": 0.0175
+        }
+      }
+    },
+    "B3_B4_phase1_phase2": {
+      "paper_scope_ids": [
+        "MT-F3",
+        "MT-P34-01",
+        "MT-P39-01",
+        "SM-S43-01",
+        "SM-S44-01"
+      ],
+      "source_artifact": ".scratch/demap/paper_v10_revision/data/phase2_winners.csv",
+      "source_sha256": "1ff85ced0cea7c0b1535b6bf8d903b429c403b6716f7b6bd612ef924cc460531",
+      "companion_artifact": ".scratch/demap/paper_v10_revision/data/phase1_winners.csv",
+      "companion_sha256": "9846f564bf8ba38b772499f465626a077489b9b3206755f6368d2909c0a69f6a",
+      "winner_manifest": "configs/paper/phase2_winners_final_v3.yaml",
+      "winner_manifest_sha256": "3f8b875b9d8fe88641ff40b08e8206a3cf823a52942c874a60f6e919e821f074",
+      "phase1_manifest": "configs/paper/phase1_winners_final_v2.yaml",
+      "phase1_manifest_sha256": "b7f9df289aa39a21575daabdeb5fde85b32453d2089786e32ba8d1e902d19df3",
+      "tolerance": 1e-09,
+      "level2_retrain_tolerance": 0.01,
+      "val_dev_recall5_phase2_seed_mean": {
+        "all-MPNet": 0.901393481341521,
+        "BioSimCSE": 0.8940717997165801,
+        "PubMedBERT": 0.896551724137931
+      },
+      "val_dev_recall5_phase1_seed_mean": {
+        "all-MPNet": 0.8549834671705243,
+        "BioSimCSE": 0.8436466698157771,
+        "PubMedBERT": 0.8186112423240435
+      },
+      "selected_final_biencoder": "all-MPNet (FT-MPNet)",
+      "margins_over_all_mpnet": {
+        "PubMedBERT": 0.0048,
+        "BioSimCSE": 0.0073
+      },
+      "phase2_strategies_allowed": [
+        "none",
+        "hard_top25",
+        "semihard_1_50"
+      ],
+      "phase2_selected_strategy": {
+        "all-MPNet": "hard_top25",
+        "BioSimCSE": "hard_top25",
+        "PubMedBERT": "semihard_1_50"
+      },
+      "phase2_encoded_strings_per_step": 132,
+      "phase2_epochs": 1,
+      "phase2_seeds": 2,
+      "phase1_configs_per_model": 27,
+      "phase1_seeds": 2,
+      "phase1_truncated_queries_all_mpnet": 1,
+      "phase1_distinct_finetune_queries": 55525,
+      "selection_rule_id": "phase2_seed_mean_lexicographic_v1",
+      "selection_split": "val_dev",
+      "denominator_unit": "pair_level_4234"
+    },
+    "B5a_retained_biencoder_eval": {
+      "paper_scope_ids": [
+        "SM-TS4",
+        "SM-FS4"
+      ],
+      "source_artifact": ".scratch/demap/paper_v10_revision/data/s5_retained_biencoder_recall5.csv",
+      "source_sha256": "54cef2edac7e0833cda395831c892ebc8edc4be95167272868140c1df2356b5d",
+      "companion_artifact": ".scratch/demap/paper_v10_revision/data/stage_comparison.csv",
+      "companion_sha256": "ceb480b8101d44826c0b7528992145a3b2e50aa7802c2a8b6942c708497d9452",
+      "tolerance": 0.0005,
+      "n_rows": 18,
+      "manuscript_table_s4": {
+        "test": {
+          "all-MPNet": [
+            0.9089,
+            0.0038
+          ],
+          "BioSimCSE": [
+            0.8991,
+            0.0034
+          ],
+          "PubMedBERT": [
+            0.9059,
+            0.0005
+          ]
+        },
+        "cctg": {
+          "all-MPNet": [
+            0.7019,
+            0.0039
+          ],
+          "BioSimCSE": [
+            0.686,
+            0.0058
+          ],
+          "PubMedBERT": [
+            0.6878,
+            0.0032
+          ]
+        },
+        "oid_alt": {
+          "all-MPNet": [
+            0.4391,
+            0.0156
+          ],
+          "BioSimCSE": [
+            0.4108,
+            0.0052
+          ],
+          "PubMedBERT": [
+            0.3884,
+            0.0088
+          ]
+        },
+        "cdash": {
+          "all-MPNet": [
+            0.821,
+            0.0262
+          ],
+          "BioSimCSE": [
+            0.8133,
+            0.024
+          ],
+          "PubMedBERT": [
+            0.8272,
+            0.0
+          ]
+        },
+        "gdc_combined": {
+          "all-MPNet": [
+            0.8542,
+            0.0295
+          ],
+          "BioSimCSE": [
+            0.8333,
+            0.0196
+          ],
+          "PubMedBERT": [
+            0.8611,
+            0.0196
+          ]
+        },
+        "cimac_v2": {
+          "all-MPNet": [
+            0.5611,
+            0.0054
+          ],
+          "BioSimCSE": [
+            0.4809,
+            0.0324
+          ],
+          "PubMedBERT": [
+            0.5191,
+            0.0108
+          ]
+        },
+        "val_dev_phase2_selection": {
+          "all-MPNet": [
+            0.9014,
+            0.0008
+          ],
+          "BioSimCSE": [
+            0.8941,
+            0.0002
+          ],
+          "PubMedBERT": [
+            0.8966,
+            0.0
+          ]
+        }
+      },
+      "notes": "Canonical-dataset rows are query-level; the val_dev selection row is PAIR-level (n = 4,234). The BioSimCSE CIMAC cell comes from the Q2 rerun."
+    },
+    "C_keyword_selection": {
+      "paper_scope_ids": [
+        "MT-P36-01",
+        "MT-F5"
+      ],
+      "source_artifact": ".scratch/demap/paper_v13_scientific_audit/keyword_selection_val_dev_v13.json",
+      "source_sha256": "36b9e0e61397ad1d287b344d96cb87d6685cee587ba487ee96d37d9316c6af7f",
+      "tolerance": 1e-09,
+      "val_dev_recall5": {
+        "cde_match_fuzzy": 0.7819013726487036,
+        "python_cde_match_approx": 0.7275038129130655
+      },
+      "margin_recall5": 0.05439755973563809,
+      "n_queries": 3934,
+      "selected": "cde_match_fuzzy",
+      "figure5_panel_artifacts": {
+        "A": {
+          "path": ".scratch/demap/paper_v10_revision/data2/keyword_selection.csv",
+          "sha256": "74ee504419fdcbe2dbc7218ad3e7122987ed253a44497f8d5d613a90e960cf12"
+        },
+        "B": {
+          "path": ".scratch/demap/paper_v10_revision/data2/keyword_fullset_recall5.csv",
+          "sha256": "7599cd8061192824f5c615a0f3cdd38e05d04611ec28155d158b430bb9af4ae7"
+        },
+        "C": {
+          "path": ".scratch/demap/paper_v10_revision/data2/nonexact_subset_recall5.csv",
+          "sha256": "561cbe2f6d55c46fbd2928487756bebe40573f09e93bfc3a8337230f7e397794"
+        }
+      },
+      "release_gate": "cde_match_derivative_unresolved"
+    },
+    "C_cde_match_fuzzy_protocol": {
+      "paper_scope_ids": [
+        "SM-S52-01"
+      ],
+      "source_artifact": "artifacts/final_reranker/keyword_fuzzy_v2_eligible",
+      "source_sha256": "a9830ff89478cc89160d4b095cc32dfb440516ccf2a9ed3a563e57b01de4ac78",
+      "tolerance": "exact_integer_for_settings",
+      "per_rule_depth_eval": 500,
+      "per_rule_depth_val_dev_selection": 100,
+      "fuzzy_stage_top_n": 1000,
+      "merged_top_k": 10,
+      "depth100_vs_depth500_identical_top10_pct": 99.6,
+      "eligibility_mode": "production_cde_match",
+      "eligibility_universe_cdes": 62976,
+      "tie_break": "ascending CDE public identifier",
+      "release_gate": "cde_match_derivative_unresolved",
+      "notes": "Settings are recorded per split in cde_match_clone_summary_<split>__allow<rate>.json."
+    },
+    "I_manual_schematic_claims": {
+      "paper_scope_ids": [
+        "MT-F1",
+        "MT-F6"
+      ],
+      "source_artifact": ".scratch/demap/paper_v16/lineage_verified.json",
+      "source_sha256": "2e434e2b7acb8002c70269e51a4e8989cc75299984dcc30d880342ab710d40fd",
+      "tolerance": "exact_integer",
+      "validate_only": true,
+      "figure1_claims": {
+        "january_catalog_records": 79479,
+        "january_catalog_unique_public_ids": 78533,
+        "analysis_ready_pairs": 68142,
+        "june_catalog_records": 62976,
+        "june_catalog_unique_public_ids": 62858
+      },
+      "figure6_claims": {
+        "n_features": 117,
+        "biencoder_depth": 20,
+        "keyword_depth": 10,
+        "pool_max": 30,
+        "tie_break": "CDE public identifier",
+        "feature_families": [
+          "bi-encoder",
+          "keyword",
+          "FT-MedCPT cross-encoder"
+        ]
+      },
+      "notes": "Figures 1 and 6 are manually maintained schematics. The public repository validates these encoded claims against artifacts; it does not regenerate the figures from experiment output."
+    },
+    "C_bm25": {
+      "paper_scope_ids": [
+        "SM-S51-01"
+      ],
+      "source_artifact": "artifacts/bm25_canonical_v1/bm25_val_dev_selection.csv",
+      "source_sha256": "45f3fe651fa354805cd093a19ee1724a4061370f889d5d25242d695e58a1ad62",
+      "metrics_artifact": "artifacts/bm25_canonical_v1/bm25_canonical_metrics.csv",
+      "metrics_sha256": "556e1918e2bb939fe480b977834b599ff112dcd4d67d8d9533df61e0478197b4",
+      "tolerance": 1e-09,
+      "n_selection_rows": 40,
+      "k1": 1.2,
+      "b": 0.75,
+      "selected_query_variant": "Q3 (raw query + PV summary)",
+      "selected_cde_recipe": "SN + LN + PQT + PV",
+      "deterministic_single_run": true,
+      "release_gate": null
+    },
+    "D_candidate_pool_k": {
+      "paper_scope_ids": [
+        "SM-S53-01",
+        "SM-FS5"
+      ],
+      "source_artifact": "artifacts/final_reranker/k_selection/k_selection_grid.csv",
+      "source_sha256": "299385a2b77afb25dee17b451887814d088b0b76674631207e1d9f3f56fb8de2",
+      "tolerance": 0.0005,
+      "selected_k": 30,
+      "selected_branch": "kwfuzzy",
+      "keyword_depth": 10,
+      "selection_split": "val_train",
+      "confirmation_split": "val_dev",
+      "val_train_ceiling_recall5_by_se_k": {
+        "10": 0.9828,
+        "20": 0.9888,
+        "30": 0.9909,
+        "50": 0.9924
+      },
+      "val_train_mean_pool_size_by_se_k": {
+        "10": 18.1,
+        "20": 27.6,
+        "30": 37.4,
+        "50": 57.0
+      },
+      "manuscript_stated": {
+        "ceiling_k20": 0.9828,
+        "ceiling_k30": 0.9888,
+        "gain_k30_to_k60": 0.0036,
+        "mean_realized_pool_k30": 27.6,
+        "val_dev_ceiling_k30": 0.9888,
+        "pct_queries_below_30": "88-90"
+      },
+      "release_gate": "cde_match_derivative_unresolved"
+    },
+    "E_crossencoder": {
+      "paper_scope_ids": [
+        "MT-F4",
+        "SM-S54-01"
+      ],
+      "source_artifact": "artifacts/final_reranker/crossencoder_fulltrain_v2_eligible/comparison/BAKEOFF_ce_selection_val_dev.csv",
+      "source_sha256": "343c83ff11a63fad6f9c9466c8aced4f916c7a39b3473d9516e2e8c22ef04c36",
+      "winner_artifact": "artifacts/final_reranker/crossencoder_fulltrain_v2_eligible/CE_WINNER.json",
+      "winner_sha256": "40843baed8f06ebdf516f36394f7dd3ac3798ae2b2a870a2f6ca169a5817cfae",
+      "offtheshelf_artifact": ".scratch/demap/paper_v10_revision/data2/crossencoder_offtheshelf.csv",
+      "offtheshelf_sha256": "d9640047e6aad78a9fac9b09762fcd829c0e19d62174c9040cf0a3d6f99cb9d3",
+      "finetuned_artifact": ".scratch/demap/paper_v10_revision/data2/crossencoder_finetuned.csv",
+      "finetuned_sha256": "0eb43e393c7821d819bb81d1ebaffc9e64bfce8784f7e882c42510dd27a85935",
+      "tolerance": 1e-09,
+      "level2_retrain_tolerance": 0.01,
+      "val_dev_recall5_finetuned": {
+        "ncbi_MedCPT-Cross-Encoder": 0.9123029994916116,
+        "BAAI_bge-reranker-base": 0.9036603965429588,
+        "cross-encoder_ms-marco-MiniLM-L-6-v2": 0.8741738688357905
+      },
+      "required_ordering": [
+        "ncbi_MedCPT-Cross-Encoder",
+        "BAAI_bge-reranker-base",
+        "cross-encoder_ms-marco-MiniLM-L-6-v2"
+      ],
+      "selected": "ncbi_MedCPT-Cross-Encoder",
+      "n_queries": 3934,
+      "n_queries_with_gold_in_candidates": 3890,
+      "manuscript_rounded": {
+        "FT-MedCPT": 0.912,
+        "FT-BGE": 0.904,
+        "FT-MiniLM": 0.874
+      },
+      "offtheshelf_recall5": {
+        "MedCPT": 0.548805287239451,
+        "BGE": 0.6014234875444839,
+        "MiniLM": 0.6077783426537875
+      },
+      "training_protocol": {
+        "objective": "BCE pointwise",
+        "epochs": 2,
+        "lr": 2e-05,
+        "batch_size": 32,
+        "max_length": 512,
+        "seed": 20260527,
+        "split": "full train",
+        "pos_class_weight": "neg/pos ratio"
+      },
+      "train_pairs_rows": 1311461,
+      "train_pairs_positive": 50339,
+      "dev_pairs_rows": 108800,
+      "dev_pairs_positive": 4140,
+      "train_queries_removed_unobtainable_gold": 172,
+      "release_gate": "medcpt_derivative_weights_unresolved; cde_match_derivative_unresolved"
+    },
+    "F_hgbc_final_model": {
+      "paper_scope_ids": [
+        "SM-S55-01",
+        "MT-F6"
+      ],
+      "source_artifact": "artifacts/final_reranker/hgbc_reranker_v2_eligible/with_ce_noprov/feature_set.json",
+      "source_sha256": "8e5b18c63f2f65ec3745e2132950510565f9f4f10a37a24b4e03d4c4da754573",
+      "model_artifact": "artifacts/final_reranker/hgbc_reranker_v2_eligible/with_ce_noprov/hgbc_model.joblib",
+      "model_sha256": "9241a3b6f5b6d7e4e3f3f2354ec247749dd0845e4dc39436ae22bdba4470ca0a",
+      "feature_table": "artifacts/final_reranker/hgbc_features_v2_eligible/feature_table_fixedk30_crossenc_v2.parquet",
+      "feature_table_sha256": "62eeae7a53dfacef10b445553379675303f647090cfeb8a956f97aedbf505e44",
+      "tolerance": "exact_integer_for_counts; 1e-9 for scores",
+      "n_features": 117,
+      "n_excluded_features": 5,
+      "excluded_feature_names": [
+        "keyword_rank",
+        "cdematch_rank",
+        "log1p_cdematch_rank",
+        "text_family",
+        "text_query_source"
+      ],
+      "provenance_features_present": false,
+      "categorical_columns": 0,
+      "provenance_dropout_rate": 0.0,
+      "selected_hyperparameters": {
+        "max_iter": 200,
+        "max_depth": 3,
+        "learning_rate": 0.05,
+        "min_samples_leaf": 30,
+        "random_state": 42
+      },
+      "selected_hyperparameters_source": {
+        "grid_selection": "artifacts/final_reranker/hgbc_reranker_v2_eligible/with_ce_noprov/selected_hgbc_config.json",
+        "random_state": "read from the fitted estimator in hgbc_model.joblib (selected_hgbc_config.json does not record it)"
+      },
+      "hyperparameter_grid_size": 16,
+      "train_split": "val_train",
+      "selection_split": "val_dev",
+      "selection_metric": "recall@5",
+      "train_queries": 3946,
+      "train_pairs": 109141,
+      "train_positive_pairs": 4109,
+      "train_positive_fraction_pct": 3.7,
+      "pool_max_per_query": 30,
+      "pool_mean_per_query_approx": 28,
+      "tie_break": "ascending CDE public identifier",
+      "release_gate": "cde_match_derivative_unresolved"
+    },
+    "G_table4_final_comparison": {
+      "paper_scope_ids": [
+        "MT-T4",
+        "MT-ABS-01",
+        "MT-P38-01"
+      ],
+      "source_artifact": ".scratch/demap/paper_v13_scientific_audit/final_table4_v13.csv",
+      "source_sha256": "9f697e39c13f16742786de22a619770218fe1ddefd9f44c09986c9aaa0741b5b",
+      "final_reranker_eval_artifact": "artifacts/final_reranker/hgbc_reranker_v2_eligible/with_ce_noprov/hgbc_eval_by_split.csv",
+      "final_reranker_eval_sha256": "9b0c36b04b6351fd91da7b6823eb22216d05ad4b835f9fb571f547cb95b2dc94",
+      "tolerance": 0.0005,
+      "level2_retrain_tolerance": 0.01,
+      "methods": [
+        "final_reranker",
+        "ce_pool_rerank",
+        "ft_mpnet",
+        "cde_match_fuzzy",
+        "python_cde_match_approx",
+        "bm25"
+      ],
+      "n_cells": 36,
+      "recall_at_5": {
+        "Test": {
+          "final_reranker": 0.9714574387471584,
+          "ce_pool_rerank": 0.9138671381662036,
+          "ft_mpnet": 0.9116,
+          "cde_match_fuzzy": 0.7731750442030816,
+          "python_cde_match_approx": 0.7191,
+          "bm25": 0.3609
+        },
+        "CCTG": {
+          "final_reranker": 0.9088422971741112,
+          "ce_pool_rerank": 0.7183226982680037,
+          "ft_mpnet": 0.7046,
+          "cde_match_fuzzy": 0.780309936189608,
+          "python_cde_match_approx": 0.7393,
+          "bm25": 0.392
+        },
+        "OID ALT": {
+          "final_reranker": 0.8323895809739524,
+          "ce_pool_rerank": 0.5639864099660249,
+          "ft_mpnet": 0.4281,
+          "cde_match_fuzzy": 0.7021517553793885,
+          "python_cde_match_approx": 0.7695,
+          "bm25": 0.1755
+        },
+        "CDASH": {
+          "final_reranker": 0.9197530864197532,
+          "ce_pool_rerank": 0.8641975308641975,
+          "ft_mpnet": 0.8395,
+          "cde_match_fuzzy": 0.8302469135802469,
+          "python_cde_match_approx": 0.75,
+          "bm25": 0.7099
+        },
+        "GDC": {
+          "final_reranker": 0.9722222222222222,
+          "ce_pool_rerank": 0.9027777777777778,
+          "ft_mpnet": 0.8333,
+          "cde_match_fuzzy": 0.9722222222222222,
+          "python_cde_match_approx": 0.9861,
+          "bm25": 0.5417
+        },
+        "CIMAC": {
+          "final_reranker": 0.8015267175572519,
+          "ce_pool_rerank": 0.5954198473282443,
+          "ft_mpnet": 0.5649,
+          "cde_match_fuzzy": 0.7862595419847328,
+          "python_cde_match_approx": 0.6794,
+          "bm25": 0.1603
+        }
+      },
+      "excluded_rows_in_source_csv": [
+        "old_final_reranker",
+        "old_ce_pool_rerank",
+        "old_cde_match_fuzzy"
+      ],
+      "official_nci_cde_match": {
+        "status": "frozen_external_input_not_reproducible",
+        "gdc_combined_recall5": 0.986,
+        "cimac_v2_recall5": 0.679,
+        "gdc_hits": "71/72"
+      },
+      "final_reranker_gdc_hits": "70/72",
+      "required_ordering_claim": "final reranker highest Recall@5 on five of six datasets (GDC is the exception)",
+      "release_gate": "cde_match_derivative_unresolved; cimac_unresolved; official_nci_cde_match_frozen",
+      "eval_rows": 7
+    },
+    "H1_leakage_sensitivity": {
+      "paper_scope_ids": [
+        "SM-TS5",
+        "MT-P38-02",
+        "SM-S15-01"
+      ],
+      "source_artifact": ".scratch/demap/paper_v13_scientific_audit/table_s7_v13_with_hgbc.csv",
+      "source_sha256": "6baeb2eec8f1b4698bcd1edc9bf303e635d8fa4b604b9ea2ce55eaf255343b9d",
+      "tolerance": 0.0005,
+      "n_rows": 36,
+      "methods": [
+        "bm25",
+        "hgbc_corrected",
+        "python_cde_match_approx"
+      ],
+      "datasets": [
+        "cctg",
+        "cdash",
+        "cimac_v2",
+        "gdc_combined",
+        "oid_alt",
+        "test"
+      ],
+      "recall_at_5_by_dataset_method_evalset": {
+        "test": {
+          "python_cde_match_approx": {
+            "v1": 0.7191209901490275,
+            "v2": 0.7191209901490275
+          },
+          "bm25": {
+            "v1": 0.3609497347815105,
+            "v2": 0.3609497347815105
+          },
+          "hgbc_corrected": {
+            "v1": 0.9714574387471584,
+            "v2": 0.9714574387471584
+          }
+        },
+        "cctg": {
+          "python_cde_match_approx": {
+            "v1": 0.7392889699179581,
+            "v2": 0.7382920110192838
+          },
+          "bm25": {
+            "v1": 0.3919781221513218,
+            "v2": 0.3939393939393939
+          },
+          "hgbc_corrected": {
+            "v1": 0.9088422971741112,
+            "v2": 0.9090909090909092
+          }
+        },
+        "oid_alt": {
+          "python_cde_match_approx": {
+            "v1": 0.7695356738391846,
+            "v2": 0.7686185332575327
+          },
+          "bm25": {
+            "v1": 0.1755379388448471,
+            "v2": 0.175667993177942
+          },
+          "hgbc_corrected": {
+            "v1": 0.8323895809739524,
+            "v2": 0.831722569641842
+          }
+        },
+        "cdash": {
+          "python_cde_match_approx": {
+            "v1": 0.75,
+            "v2": 0.7483870967741936
+          },
+          "bm25": {
+            "v1": 0.7098765432098766,
+            "v2": 0.7290322580645161
+          },
+          "hgbc_corrected": {
+            "v1": 0.9197530864197532,
+            "v2": 0.9193548387096774
+          }
+        },
+        "gdc_combined": {
+          "python_cde_match_approx": {
+            "v1": 0.9861111111111112,
+            "v2": 0.9852941176470588
+          },
+          "bm25": {
+            "v1": 0.5416666666666666,
+            "v2": 0.5147058823529411
+          },
+          "hgbc_corrected": {
+            "v1": 0.9722222222222222,
+            "v2": 0.9705882352941176
+          }
+        },
+        "cimac_v2": {
+          "python_cde_match_approx": {
+            "v1": 0.6793893129770993,
+            "v2": 0.6371681415929203
+          },
+          "bm25": {
+            "v1": 0.1603053435114503,
+            "v2": 0.1504424778761062
+          },
+          "hgbc_corrected": {
+            "v1": 0.8015267175572519,
+            "v2": 0.7787610619469026
+          }
+        }
+      },
+      "manuscript_cimac_anchor": {
+        "final_reranker": [
+          0.802,
+          0.779
+        ],
+        "python_cde_match_approx": [
+          0.679,
+          0.637
+        ]
+      },
+      "ordering_preserved_claim": true,
+      "release_gate": "cde_match_derivative_unresolved; cimac_unresolved",
+      "leakage_filter": {
+        "producer": ".scratch/demap/paper_v11_validation/build_eval_canonical_v2.py",
+        "producer_sha256": "1c2c004a03576720520312ba4b8c90577bb83dfdc269bb77c0dda64e868bc6b3",
+        "manifest": "artifacts/manifests/eval_canonical_v2/eval_canonical_v2_manifest.json",
+        "manifest_sha256": "cbef8bccbdf69c381b5df38bf6fdcd11db20c9a2e1ca3da43170a5eafe914354",
+        "removed_queries_fixture": "artifacts/manifests/eval_canonical_v2/removed_queries.csv",
+        "removed_queries_fixture_sha256": "e99ff6d7cdd2ae94cb053681d11b9f83ecbf400bfa680083a79d482d4ddf46d9",
+        "rule": "exclude external query q iff EXISTS train pair t with norm(q.query_text_raw) == norm(t.query_text_raw) AND publicid(q.cde_publicid) == publicid(t.cde_publicid), OR q.query_id in train.query_id; norm(x) = collapse_ws(sub(r'[^a-z0-9]+',' ',lower(x))); publicid(x) = x.split('::')[0]; whole-query removal; test passes through",
+        "removed_queries": {
+          "cctg": 8,
+          "oid_alt": 7,
+          "cdash": 14,
+          "gdc_combined": 4,
+          "cimac_v2": 18,
+          "test": 0
+        },
+        "removal_clause_that_fired": "norm_text+gold_in_train for all 51 removals; the query_id_in_train clause never triggered",
+        "provenance_status": "resolved_slice1_5"
+      }
+    },
+    "H2_allowance_sensitivity": {
+      "paper_scope_ids": [
+        "SM-TS6",
+        "SM-FS6",
+        "SM-FS7",
+        "SM-S62-01",
+        "SM-S62-02",
+        "MT-P38-03"
+      ],
+      "source_artifact": "manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv",
+      "source_sha256": "01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e",
+      "tolerance": 0.0005,
+      "anchor_70pct_must_match_exactly": true,
+      "n_rows": 120,
+      "methods": [
+        "cde_match_fuzzy",
+        "hgbc_fixed_070",
+        "hgbc_retrained_per_rate",
+        "python_cde_match_approx"
+      ],
+      "datasets": [
+        "cctg",
+        "cdash",
+        "cimac_v2",
+        "gdc_combined",
+        "oid_alt",
+        "test",
+        "val_dev",
+        "val_train"
+      ],
+      "allowance_rates": [
+        0.0,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        1.0
+      ],
+      "recall_at_5_at_allowance_0.70": {
+        "cctg": {
+          "cde_match_fuzzy": 0.780309936189608,
+          "hgbc_fixed_070": 0.9088422971741112,
+          "hgbc_retrained_per_rate": 0.9088422971741112,
+          "python_cde_match_approx": 0.7392889699179581
+        },
+        "cdash": {
+          "cde_match_fuzzy": 0.8302469135802469,
+          "hgbc_fixed_070": 0.9197530864197532,
+          "hgbc_retrained_per_rate": 0.9197530864197532,
+          "python_cde_match_approx": 0.75
+        },
+        "cimac_v2": {
+          "hgbc_fixed_070": 0.8015267175572519
+        },
+        "gdc_combined": {
+          "hgbc_fixed_070": 0.9722222222222222
+        },
+        "oid_alt": {
+          "cde_match_fuzzy": 0.7021517553793885,
+          "hgbc_fixed_070": 0.8323895809739524,
+          "hgbc_retrained_per_rate": 0.8323895809739524,
+          "python_cde_match_approx": 0.7695356738391846
+        },
+        "test": {
+          "cde_match_fuzzy": 0.7731750442030816,
+          "hgbc_fixed_070": 0.9714574387471584,
+          "hgbc_retrained_per_rate": 0.9714574387471584,
+          "python_cde_match_approx": 0.7191209901490275
+        },
+        "val_dev": {
+          "hgbc_fixed_070": 0.9778851042196238
+        },
+        "val_train": {
+          "hgbc_fixed_070": 0.974911302584896
+        }
+      },
+      "recall_at_5_at_allowance_0.00": {
+        "cctg": {
+          "cde_match_fuzzy": 0.2807657247037374,
+          "hgbc_fixed_070": 0.7219690063810392,
+          "hgbc_retrained_per_rate": 0.7383773928896992,
+          "python_cde_match_approx": 0.1303555150410209
+        },
+        "cdash": {
+          "cde_match_fuzzy": 0.5555555555555556,
+          "hgbc_fixed_070": 0.8179012345679012,
+          "hgbc_retrained_per_rate": 0.8827160493827161,
+          "python_cde_match_approx": 0.2376543209876543
+        },
+        "cimac_v2": {
+          "hgbc_fixed_070": 0.8015267175572519
+        },
+        "gdc_combined": {
+          "hgbc_fixed_070": 0.9722222222222222
+        },
+        "oid_alt": {
+          "cde_match_fuzzy": 0.0396375990939977,
+          "hgbc_fixed_070": 0.4626274065685164,
+          "hgbc_retrained_per_rate": 0.4750849377123443,
+          "python_cde_match_approx": 0.2519818799546999
+        },
+        "test": {
+          "cde_match_fuzzy": 0.3250820914372316,
+          "hgbc_fixed_070": 0.919929275069462,
+          "hgbc_retrained_per_rate": 0.9259914119727204,
+          "python_cde_match_approx": 0.1513008335438242
+        },
+        "val_dev": {
+          "hgbc_fixed_070": 0.930859176410778
+        },
+        "val_train": {
+          "hgbc_fixed_070": 0.9229599594526102
+        }
+      },
+      "table_s6_reported_methods": [
+        "python_cde_match_approx",
+        "cde_match_fuzzy",
+        "hgbc_fixed_070"
+      ],
+      "figure_s7_methods": [
+        "hgbc_fixed_070",
+        "hgbc_retrained_per_rate"
+      ],
+      "mask": {
+        "hash": "SHA-1 of query identifier",
+        "seed": 42,
+        "nested": true,
+        "caDSR_derived_rate": 0.7,
+        "external_rate": 1.0,
+        "cimac_motivation": "92 of 131 (70.2%)"
+      },
+      "manuscript_stated_ranges": {
+        "hgbc_fixed_070_test_range": 0.075,
+        "hgbc_fixed_070_cdash_range": 0.164,
+        "lexical_range_min": 0.4,
+        "lexical_range_max": 0.96,
+        "hgbc_at_zero_test": 0.92,
+        "hgbc_at_zero_cdash": 0.818,
+        "lexical_at_zero_min": 0.151,
+        "lexical_at_zero_max": 0.556
+      },
+      "release_gate": "cde_match_derivative_unresolved"
+    }
+  }
+}

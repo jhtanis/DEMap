@@ -1,0 +1,188 @@
+schema_version: 1
+manifest_id: phase1_winners_final_v2
+supersedes: phase1_winners_for_phase2_v1 (extends it with all-MPNet; the two shared entries are copied
+  verbatim and v1 is unmodified)
+purpose: verified canonical Phase 1 parents for all three paper models, so the corrected Phase 2 `none`
+  arm can be run for every model on one route
+selection_rule:
+  rule_id: phase1_seed_mean_lexicographic_v1
+  checkpoint_selection_metric_within_run: val_dev_mrr@100
+  grouping: model + full hyperparameter identity, seed excluded
+  required_seeds:
+  - 0
+  - 1
+  configuration_ranking_metrics:
+  - mean_val_dev_recall@5
+  - mean_val_dev_recall@10
+  - mean_val_dev_mrr@100
+  metric_ordering: descending
+  tie_margin: none
+  exact_tie_handling: reported; broken by deterministic stable config key
+  retained_seed_rule: better seed WITHIN winning config by seed recall@5 -> recall@10 -> mrr@100
+  seed_aggregation: mean; SD sample (ddof=1)
+selection_rule_id: phase1_seed_mean_lexicographic_v1
+required_seeds:
+- 0
+- 1
+precision_note: BioSimCSE/PubMedBERT fp16_mixed (canonical Phase 1 v1); all-MPNet's historical grid predates
+  the recorded-precision contract
+created_utc: '2026-07-28T19:57:50.947335+00:00'
+code_commit: 84d66ad9d4e04dbb077375ba7943bba654b310f8
+source_runs_roots:
+  all-mpnet-base-v2: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase1_finetuning/all-mpnet-base-v2
+  kamalkraj/BioSimCSE-BioLinkBERT-BASE: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase1_canonical_v1
+  NeuML/pubmedbert-base-embeddings: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase1_canonical_v1
+source_runs_digests:
+  /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase1_finetuning/all-mpnet-base-v2:
+    n_runs: 54
+    digest_sha256: 9d621d9a04a1fbeffada64011fc17550a9fcdae29be606d082fa8b4fc67f3c69
+  /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase1_canonical_v1:
+    n_runs: 108
+    digest_sha256: b53e0f51ecf57e138b3fc1fdd4d9ced2512da53e09fd42937461a928eb97a7af
+source_hashes:
+  phase0_protocol_path: /vf/users/nextgen2/james/tasks/cde_project/demap/configs/paper/biencoder_protocol_v1.yaml
+  phase0_protocol_sha256: 4b09441745e5cbe42bbd8b86596139fb9f38f84602e7b92c5c5944694b7cdf28
+  section4_3_winner_manifest_path: /vf/users/nextgen2/james/tasks/cde_project/demap/configs/paper/section4_3_winners_v1.yaml
+  section4_3_winner_manifest_sha256: 121f3320ba01cb4a3435c7aa1f1a07cff2cafe059d3d112743d45bf3a55d0213
+  section4_3_results_csv: /vf/users/nextgen2/james/tasks/cde_project/demap/results/section4_3/section4_3_configuration_summary.csv
+  section4_3_results_sha256: 61d7930cf1ec5553861aee63524c43411b6afba29973d74e75a153a27298aea5
+  phase1_winners_v1_path: /data/nextgen2/james/tasks/cde_project/demap/configs/paper/phase1_winners_for_phase2_v1.yaml
+  phase1_winners_v1_sha256: 96159aa0a1ecd5c0e13fb3bd8d3d6ebad6bd9712df33c6e417ef51b4dc8994c8
+no_phase1_training_performed: true
+winners:
+- model_id: all-mpnet-base-v2
+  origin: historical_canonical_artifact
+  origin_note: all-MPNet's Phase 1 grid predates artifacts/phase1_canonical_v1 and lives at artifacts/phase1_finetuning/all-mpnet-base-v2
+    (54 runs, 27 configs x 2 seeds). The winner below was selected by re-running the SAME canonical rule
+    (phase1_seed_mean_lexicographic_v1) over that historical root; no Phase 1 training was performed and
+    no historical artifact was modified. The selected retained checkpoint reproduces exactly the Phase
+    2 parent already recorded in configs/paper/phase2_winners_final_v1.yaml, which is the independent
+    check that this registration changes nothing about the promoted model.
+  source_runs_root: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase1_finetuning/all-mpnet-base-v2
+  query_variant: Q3
+  recipe: v1_v6_v2b_v3_v5
+  cde_format: labeled
+  loss: symmetric_mnrl
+  lr: 0.0001
+  temperature: 0.04
+  epochs: 3
+  batch_size: 128
+  precision: fp32 (effective; this historical grid predates the recorded-precision contract -- see phase2_winners_final_v1.yaml
+    note_precision)
+  seed0_run_id: 20260703_142654__phase1_finetuning__ft__all-mpnet-base-v2__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr0.0001__bs128__t0.04__ep3__seed0
+  seed1_run_id: 20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr0.0001__bs128__t0.04__ep3__seed1
+  seed0_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase1_finetuning/all-mpnet-base-v2/runs/20260703_142654__phase1_finetuning__ft__all-mpnet-base-v2__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr0.0001__bs128__t0.04__ep3__seed0/model
+  seed1_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase1_finetuning/all-mpnet-base-v2/runs/20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr0.0001__bs128__t0.04__ep3__seed1/model
+  seed0_metrics:
+    run_id: 20260703_142654__phase1_finetuning__ft__all-mpnet-base-v2__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr0.0001__bs128__t0.04__ep3__seed0
+    recall@1: 0.591166745394426
+    recall@5: 0.8519130845536136
+    recall@10: 0.9048181388757676
+    mrr@100: 0.7057397365570068
+  seed1_metrics:
+    run_id: 20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr0.0001__bs128__t0.04__ep3__seed1
+    recall@1: 0.5956542276806802
+    recall@5: 0.858053849787435
+    recall@10: 0.910958904109589
+    mrr@100: 0.710261881351471
+  seed0_run_fingerprint: 6bb6a6ba802b3036dc64270fbe744d97905b2962fd9f06ec762bb45a7cc8c13e
+  seed1_run_fingerprint: d69f0babc6c2fa5e032477dcc53fc8826c281634a7e265292b34b26611223216
+  recall1_mean: 0.5934104865375531
+  recall1_sd: 0.0031731291550648384
+  recall5_mean: 0.8549834671705243
+  recall5_sd: 0.004342176738509745
+  recall10_mean: 0.9078885214926783
+  recall10_sd: 0.004342176738509745
+  mrr100_mean: 0.7080008089542389
+  mrr100_sd: 0.003197639249673019
+  retained_seed: 1
+  retained_run_id: 20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr0.0001__bs128__t0.04__ep3__seed1
+  retained_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase1_finetuning/all-mpnet-base-v2/runs/20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr0.0001__bs128__t0.04__ep3__seed1/model
+  exact_tie_at_top: false
+  selection_rule_id: phase1_seed_mean_lexicographic_v1
+- model_id: kamalkraj/BioSimCSE-BioLinkBERT-BASE
+  query_variant: Q2
+  recipe: v1_v2a_v3_v5
+  cde_format: labeled
+  loss: symmetric_mnrl
+  lr: 0.00015
+  temperature: 0.07
+  epochs: 3
+  batch_size: 128
+  precision: fp16_mixed
+  seed0_run_id: 20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft__kamalkraj__BioSimCSE-BioLinkBERT-BASE__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr0.00015__bs128__t0.07__ep3__seed0
+  seed1_run_id: 20260724_190033__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft__kamalkraj__BioSimCSE-BioLinkBERT-BASE__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr0.00015__bs128__t0.07__ep3__seed1
+  seed0_checkpoint: /vf/users/nextgen2/james/tasks/cde_project/demap/artifacts/phase1_canonical_v1/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/runs/20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft__kamalkraj__BioSimCSE-BioLinkBERT-BASE__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr0.00015__bs128__t0.07__ep3__seed0/model
+  seed1_checkpoint: /vf/users/nextgen2/james/tasks/cde_project/demap/artifacts/phase1_canonical_v1/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/runs/20260724_190033__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft__kamalkraj__BioSimCSE-BioLinkBERT-BASE__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr0.00015__bs128__t0.07__ep3__seed1/model
+  seed0_metrics:
+    run_id: 20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft__kamalkraj__BioSimCSE-BioLinkBERT-BASE__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr0.00015__bs128__t0.07__ep3__seed0
+    recall@1: 0.586679263108172
+    recall@5: 0.8448275862068966
+    recall@10: 0.8948984411903638
+    mrr@100: 0.6995357871055603
+  seed1_metrics:
+    run_id: 20260724_190033__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft__kamalkraj__BioSimCSE-BioLinkBERT-BASE__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr0.00015__bs128__t0.07__ep3__seed1
+    recall@1: 0.5819555975436939
+    recall@5: 0.8424657534246576
+    recall@10: 0.8944260746339159
+    mrr@100: 0.696601927280426
+  seed0_run_fingerprint: 37e913ac9ced34f0c3e77e0cf0d19a5e43ba6ba3e8ab4a6e3e7faee0481d9e71
+  seed1_run_fingerprint: e4a82ea3f57fc78e5b01772e89b511dbfa02d96cde91fc824db964ef5742c0ff
+  recall1_mean: 0.5843174303259329
+  recall1_sd: 0.003340135952699859
+  recall5_mean: 0.8436466698157771
+  recall5_sd: 0.00167006797634989
+  recall10_mean: 0.8946622579121398
+  recall10_sd: 0.0003340135952700408
+  mrr100_mean: 0.6980688571929932
+  mrr100_sd: 0.002074552177403226
+  retained_seed: 0
+  retained_run_id: 20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft__kamalkraj__BioSimCSE-BioLinkBERT-BASE__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr0.00015__bs128__t0.07__ep3__seed0
+  retained_checkpoint: /vf/users/nextgen2/james/tasks/cde_project/demap/artifacts/phase1_canonical_v1/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/runs/20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft__kamalkraj__BioSimCSE-BioLinkBERT-BASE__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr0.00015__bs128__t0.07__ep3__seed0/model
+  exact_tie_at_top: false
+  selection_rule_id: phase1_seed_mean_lexicographic_v1
+  origin: canonical_phase1_v1
+  source_runs_root: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase1_canonical_v1
+- model_id: NeuML/pubmedbert-base-embeddings
+  query_variant: Q3
+  recipe: v1_v6_v2b_v3_v5
+  cde_format: labeled
+  loss: mnrl
+  lr: 7.0e-05
+  temperature: 0.04
+  epochs: 3
+  batch_size: 128
+  precision: fp16_mixed
+  seed0_run_id: 20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuML__pubmedbert-base-embeddings__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr7e-05__bs128__t0.04__ep3__seed0
+  seed1_run_id: 20260724_191438__NeuML__pubmedbert-base-embeddings__ft__NeuML__pubmedbert-base-embeddings__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr7e-05__bs128__t0.04__ep3__seed1
+  seed0_checkpoint: /vf/users/nextgen2/james/tasks/cde_project/demap/artifacts/phase1_canonical_v1/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/runs/20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuML__pubmedbert-base-embeddings__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr7e-05__bs128__t0.04__ep3__seed0/model
+  seed1_checkpoint: /vf/users/nextgen2/james/tasks/cde_project/demap/artifacts/phase1_canonical_v1/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/runs/20260724_191438__NeuML__pubmedbert-base-embeddings__ft__NeuML__pubmedbert-base-embeddings__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr7e-05__bs128__t0.04__ep3__seed1/model
+  seed0_metrics:
+    run_id: 20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuML__pubmedbert-base-embeddings__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr7e-05__bs128__t0.04__ep3__seed0
+    recall@1: 0.5642418516769013
+    recall@5: 0.8346717052432687
+    recall@10: 0.891828058573453
+    mrr@100: 0.6831547617912292
+  seed1_metrics:
+    run_id: 20260724_191438__NeuML__pubmedbert-base-embeddings__ft__NeuML__pubmedbert-base-embeddings__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr7e-05__bs128__t0.04__ep3__seed1
+    recall@1: 0.5205479452054794
+    recall@5: 0.8025507794048181
+    recall@10: 0.8693906471421823
+    mrr@100: 0.6451618075370789
+  seed0_run_fingerprint: 431b2f1d92c614be3aab9fd742614cdb3a3e6ee603db17a0a6f6a734b0090816
+  seed1_run_fingerprint: 2696d216da1519d2c908205c531f186729bb1b116b7bbd2ae9b168a661f11179
+  recall1_mean: 0.5423948984411904
+  recall1_sd: 0.030896257562473203
+  recall5_mean: 0.8186112423240435
+  recall5_sd: 0.022712924478358616
+  recall10_mean: 0.8806093528578176
+  recall10_sd: 0.01586564577532411
+  mrr100_mean: 0.664158284664154
+  mrr100_sd: 0.02686507559042003
+  retained_seed: 0
+  retained_run_id: 20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuML__pubmedbert-base-embeddings__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr7e-05__bs128__t0.04__ep3__seed0
+  retained_checkpoint: /vf/users/nextgen2/james/tasks/cde_project/demap/artifacts/phase1_canonical_v1/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/runs/20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuML__pubmedbert-base-embeddings__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr7e-05__bs128__t0.04__ep3__seed0/model
+  exact_tie_at_top: false
+  selection_rule_id: phase1_seed_mean_lexicographic_v1
+  origin: canonical_phase1_v1
+  source_runs_root: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase1_canonical_v1

@@ -1,0 +1,25 @@
+# Defaults for the non-exact-subset evaluation (scripts/evaluate_non_exact_subset.py).
+#
+# Non-exact-under-policy (query-level): a query is non-exact iff the Python CDE-Match
+# clone's POST-POLICY output (under the dataset's allowrate) has NO allowed exact-to-gold
+# candidate. Intentionally includes 0.70-suppressed gold-exacts. keyword_v1 fuzzy is
+# evaluated under the SAME exact control (allow_rate, seed, scope=gold); FT-MPNet as-is.
+
+seed: 42                       # clone/keyword ExactMatchControl seed (gold-exact hash)
+
+# Dataset-specific clone allowrate policy that defines exact availability.
+datasets:
+  - {name: test,         allowrate: 0.70}
+  - {name: cctg,         allowrate: 0.70}
+  - {name: oid_alt,      allowrate: 0.70}
+  - {name: cdash,        allowrate: 0.70}
+  - {name: gdc_combined, allowrate: 1.0}
+  - {name: cimac_v2,     allowrate: 1.0}
+
+paths:   # repo-relative
+  clone_dir:          artifacts/final_reranker/cde_match_clone
+  keyword_dir:        artifacts/final_reranker/keyword_fuzzy
+  biencoder_rankings: artifacts/final_reranker/biencoder_deep/eval_canonical/biencoder_deep_rankings_top1000.parquet
+  eval_dir:           data/processed/eval_canonical
+
+out_root: artifacts/final_reranker/non_exact_subset_eval

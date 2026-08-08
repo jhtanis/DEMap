@@ -1,0 +1,184 @@
+# Canonical paper bi-encoder protocol (v1).
+#
+# Single source of truth for the corrected Phase 0 representation grid and the Phase 1
+# training/evaluation locks. The canonical generator (`demap paper biencoder`) fails closed
+# if any grid cell, recipe, split, catalog, precision, or provenance value differs from this
+# file. This is NOT a launcher config; it is the protocol the launcher validates against.
+schema_version: 1
+protocol_id: biencoder_protocol_v1
+
+# --------------------------------------------------------------------------------------
+# Shared data + provenance locks (both phases)
+# --------------------------------------------------------------------------------------
+data:
+  splits_dir: data/processed/splits
+  train_split: train
+  tuning_split: val_dev            # the ONLY split used for tuning/selection
+  excluded_from_tuning: [test]
+  val_dev_denominator: 4234
+  production_catalog: data/processed/cadsr_xml_2026-06-18/cde_master_enriched_eval_production_cde_match.parquet
+  production_catalog_rows: 62976
+  cde_format: labeled
+  # NOTE: this is the PHASE 1 (fine-tuning) sequence-length lock (verified: all Phase 1
+  # runs used 256). It does NOT describe the completed off-the-shelf Phase 0 sweep, which
+  # used checkpoint-NATIVE lengths (baseline-grid only reads the model's native value and
+  # never sets one). See phase0.effective_max_seq_length_by_model below.
+  max_seq_length: 256
+  fingerprints:
+    train_sha256: 182573c6f39eaa8d4c53ea21c8ba864ea9902bbdbc3b15b114118e19dcfb7b36
+    val_dev_sha256: 7231bad2cadeacef06771468f457c565bb42fadd54ab307e5d56ca3484d3c1b2
+    test_sha256: 5890039fcef613587902a03ba06955ca8b81b62699542a30e99f08dd9f2946b2
+    production_catalog_sha256: 2e360368307c7589325a43eebcbd6f6ec22090530ccf3521862cc1b9cb62a200
+
+# Query representations, in exact displayed order.
+query_representations:
+  - {id: Q1, name: RAW,       column: query_text_raw}
+  - {id: Q3, name: RAW_PV,    column: query_text_q3}
+  - {id: Q4, name: RAW_PV_PH, column: query_text_q4}
+  - {id: Q2, name: PREF_PV,   column: query_text}
+
+# CDE representations, in exact displayed order (id = recipe token, name = display label).
+cde_representations:
+  - {order: 1,  name: PQT,                 recipe: v3}
+  - {order: 2,  name: LN_DEF,              recipe: v2}
+  - {order: 3,  name: SN_PQT,              recipe: v1_v3}
+  - {order: 4,  name: SN_LN_DEF_PQT,       recipe: v1_v2a_v2b_v3}
+  - {order: 5,  name: SN_LN_DEF_PV,        recipe: v1_v2a_v2b_v5}
+  - {order: 6,  name: SN_LN_PQT_PV,        recipe: v1_v2a_v3_v5}
+  - {order: 7,  name: SN_LN_DEF_PQT_PV,    recipe: v1_v2a_v2b_v3_v5}
+  - {order: 8,  name: SN_DEC_DEF_PQT_PV,   recipe: v1_v6_v2b_v3_v5}
+  - {order: 9,  name: SN_LN_DEF_PQT_VD_PV, recipe: v1_v2a_v2b_v3_v4_v5}
+  - {order: 10, name: SN_LN_DEC_DEF_PQT_PV, recipe: v1_v2a_v6_v2b_v3_v5}
+
+anchor:
+  query_id: Q3
+  query_name: RAW_PV
+  recipe: v1_v6_v2b_v3_v5
+  cde_representation: SN_DEC_DEF_PQT_PV
+
+# --------------------------------------------------------------------------------------
+# Phase 0 (off-the-shelf representation screen) locks
+# --------------------------------------------------------------------------------------
+phase0:
+  models:
+    - sentence-transformers/all-mpnet-base-v2
+    - kamalkraj/BioSimCSE-BioLinkBERT-BASE
+    - NeuML/pubmedbert-base-embeddings
+  n_query_representations: 4
+  n_cde_representations: 10
+  n_cells_per_model: 40
+  eval_splits: [val_dev]
+  off_the_shelf: true
+  placeholder_policy: placeholder
+  # ACTUAL completed-sweep sequence lengths (job 25766871). The repo loader
+  # (demap.modeling.st_loader.load_sentence_transformer, min_max_seq_length=256) applies a
+  # FLOOR, not a native passthrough: effective = max(checkpoint_native, 256). baseline-grid
+  # records this as model_max_seq_length. Verified across all 40 runs/model. Phase 0 NOT rerun.
+  #   - all-MPNet:  native 384 -> effective 384  (floor does not bind)
+  #   - BioSimCSE:  native 128 -> effective 256  (RAISED by the loader floor; NOT native 256)
+  #   - PubMedBERT: native 512 -> effective 512  (floor does not bind)
+  # The Phase 1 lock of 256 (data.max_seq_length) is a DIFFERENT, explicit fine-tuning cap.
+  max_seq_length_policy: checkpoint_native_with_loader_floor_256
+  checkpoint_native_max_seq_length_by_model:
+    sentence-transformers/all-mpnet-base-v2: 384
+    kamalkraj/BioSimCSE-BioLinkBERT-BASE: 128
+    NeuML/pubmedbert-base-embeddings: 512
+  architectural_max_position_embeddings_by_model:
+    sentence-transformers/all-mpnet-base-v2: 514
+    kamalkraj/BioSimCSE-BioLinkBERT-BASE: 512
+    NeuML/pubmedbert-base-embeddings: 512
+  effective_max_seq_length_by_model:  # post-loader (max(native, 256))
+    sentence-transformers/all-mpnet-base-v2: 384
+    kamalkraj/BioSimCSE-BioLinkBERT-BASE: 256
+    NeuML/pubmedbert-base-embeddings: 512
+
+# --------------------------------------------------------------------------------------
+# Phase 1 (fine-tune) locks
+# --------------------------------------------------------------------------------------
+phase1:
+  trainer: modern_trainer                 # canonical: SentenceTransformerTrainer only
+  precision_default: fp16_mixed
+  allowed_precisions: [fp16_mixed, bf16_mixed, fp32]
+  eval_splits: [val_dev]
+  checkpoint_selection_metric: val_dev_mrr@100
+  configuration_ranking_metrics: [val_dev_recall@5, val_dev_recall@10, val_dev_mrr@100]
+  batch_size: 128
+  gradient_accumulation_steps: 1
+  optimizer: AdamW
+  weight_decay: 0.01                       # historical old_fit default; preserved
+  scheduler: WarmupLinear
+  warmup_ratio: 0.1
+  similarity_fn: cosine
+  # Historical per-model search space (recovered from resolved run_config.json; frozen).
+  search_space:
+    learning_rates: [7.0e-05, 1.0e-04, 1.5e-04]
+    temperatures: [0.04, 0.07, 0.1]
+    epochs: [1, 2, 3]
+    seeds: [0, 1]
+  runs_per_model: 54                       # 3 lr x 3 temp x 3 epoch x 2 seed
+
+# --------------------------------------------------------------------------------------
+# Phase 2 (hard-negative fine-tune from the Phase 1 winner) locks
+# --------------------------------------------------------------------------------------
+# Author-approved 2026-07-26. Phase 2 initialises from the RETAINED checkpoint of the
+# canonical Phase 1 winner manifest and inherits that model's query/CDE representation,
+# CDE format and LOSS. Nothing here may be overridden by a base config.
+phase2:
+  parent_source: configs/paper/phase1_winners_for_phase2_v1.yaml   # the ONLY parent source
+  loss_source: phase1_winner                # per-model inherited loss; NOT a fixed value
+  # Precision: deliberate honest FP32. This matches the effective precision of the
+  # completed all-MPNet Phase 2 experiment (which recorded bf16 but ran fp32 because
+  # FitMixin.fit defaults use_amp=False), keeping the new runs comparable to it.
+  precision_default: fp32
+  allowed_precisions: [fp32]
+  autocast: false
+  grad_scaler: false
+  param_dtype: torch.float32
+  eval_splits: [val_dev]                    # tuning NEVER sees test or val_train
+  checkpoint_selection_metric: val_dev_mrr@100
+  configuration_ranking_metrics: [val_dev_recall@5, val_dev_recall@10, val_dev_mrr@100]
+  selection_rule_id: phase2_seed_mean_lexicographic_v1
+  batch_size: 11                            # DEFAULT physical examples per step;
+                                            # strategies may override (see strategies:)
+  gradient_accumulation_steps: 1            # historical value 4 was never consumed; rejected
+  optimizer: AdamW
+  weight_decay: 0.01
+  scheduler: WarmupLinear
+  warmup_ratio: 0.1
+  similarity_fn: cosine
+  epochs: [1]
+  seeds: [0, 1]
+  # Encoded-text budget differs by strategy. `none` is the no-explicit-negative baseline:
+  # it is NOT padded with random negatives.
+  # Corrected 2026-07-28 (protocol v2): the arms are matched on ENCODED STRINGS per
+  # optimizer step (132), not on examples. `none` encodes 2 strings per example, so it
+  # needs 66 physical examples to spend the same encoder budget as the hard-negative
+  # arms (11 examples x 12 strings). v1 used 11 examples for `none` = 22 strings, which
+  # gave the no-negative baseline ~6x less encoder compute per step and made the
+  # strategy comparison unfair. `none` therefore also sees more distinct anchor-positive
+  # pairs per step -- that is the intended consequence of holding encoder cost fixed.
+  strategies:
+    - {id: none,           texts_per_example: 2,  max_texts_per_batch: 132, n_negatives: 0,  rank_band: null, batch_size: 66}
+    - {id: hard_top25,     texts_per_example: 12, max_texts_per_batch: 132, n_negatives: 10, rank_band: [1, 25], batch_size: 11}
+    - {id: semihard_1_50,  texts_per_example: 12, max_texts_per_batch: 132, n_negatives: 10, rank_band: [1, 50], batch_size: 11}
+  excluded_strategies: [hardcurr_1_50__1_25__1_15]   # deferred ablation; not on the paper route
+  # Phase 1 winner -> Phase 2 neighbourhood grids (3 x 3 per model).
+  lr_by_phase1_lr:
+    7.0e-05:  [3.0e-05, 5.0e-05, 7.0e-05]
+    1.0e-04:  [5.0e-05, 7.0e-05, 1.0e-04]
+    1.5e-04:  [7.0e-05, 1.0e-04, 1.5e-04]
+  temperature_by_phase1_temperature:
+    0.04: [0.03, 0.04, 0.05]
+    0.07: [0.04, 0.06, 0.08]
+    0.10: [0.07, 0.08, 0.10]              # corrected 2026-07-26 (was 0.06/0.08/0.10)
+  runs_per_model: 54                        # 3 lr x 3 temp x 3 strategy x 1 epoch x 2 seed
+  hardneg:
+    artifact_root: artifacts/phase2_hardneg_mining_v2   # NEW root; historical root untouched
+    mine_split: train                       # allow-list of exactly one split
+    allowed_mine_splits: [train]
+    top_k: 50
+    n_negatives: 10
+    similarity: cosine_on_l2_normalized_embeddings
+    insufficient_negatives_policy: deterministic_catalog_fill   # never a positive; recorded
+    exclude_all_accepted_golds: true
+    dedup_by_cde_id: true

@@ -1,0 +1,263 @@
+schema_version: 1
+manifest_id: phase2_winners_final_v3
+supersedes: phase2_winners_final_v2 (v1 and v2 unmodified)
+created_utc: '2026-07-29T15:05:35.694866+00:00'
+code_commit: 5fa829cc72398fb47829bb5989926f8df9e16f44
+what_changed: all-MPNet's semihard arm is now the canonical semihard_1_50 (rank band [1, 50]) grid trained
+  2026-07-28 (Slurm 26288163) from the registered Phase 1 parent. The historical all-MPNet 'semihard'
+  runs used band [1, 25] (same band as hard_top25) and are EXCLUDED from selection as non-canonical; they
+  remain on disk for provenance and must not be relabelled. Corrected `none` and existing hard_top25 arms
+  are unchanged from v2. BioSimCSE and PubMedBERT semihard_1_50 arms are the existing canonical [1, 50]
+  runs, unchanged.
+selection_rule_id: phase2_seed_mean_lexicographic_v1
+selection_rule:
+  rule_id: phase2_seed_mean_lexicographic_v1
+  checkpoint_selection_metric_within_run: val_dev_mrr@100
+  grouping: model + full hyperparameter identity INCLUDING negative strategy, seed excluded
+  required_seeds:
+  - 0
+  - 1
+  configuration_ranking_metrics:
+  - mean_val_dev_recall@5
+  - mean_val_dev_recall@10
+  - mean_val_dev_mrr@100
+  metric_ordering: descending
+  tie_margin: none
+  exact_tie_handling: reported; broken by deterministic stable config key
+  retained_seed_rule: better seed WITHIN winning config by seed recall@5 -> recall@10 -> mrr@100
+  seed_aggregation: mean; SD sample (ddof=1)
+  reporting_metrics:
+  - recall@1
+  - recall@5
+  - recall@10
+  - mrr@100
+selection_split: val_dev
+tie_breakers_triggered:
+  PubMedBERT: false
+  all-MPNet: false
+  BioSimCSE: false
+phase1_manifest: configs/paper/phase1_winners_final_v2.yaml
+protocol: configs/paper/biencoder_protocol_v2.yaml
+grid_validation:
+  models: 3
+  configurations_per_model: 27
+  runs_per_model: 54
+  seeds_per_configuration:
+  - 0
+  - 1
+  total_runs_considered: 162
+  excluded_non_canonical_runs:
+    all-mpnet-base-v2 semihard_(1, 25): 18
+source_roots:
+  none_corrected:
+  - /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_none_corrected_v2
+  - /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_none_corrected_v2_allmpnet
+  all_mpnet_semihard_1_50_canonical: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_semihard1_50_allmpnet_canonical_20260728
+  existing_arms:
+    all-mpnet-base-v2: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_finetuning/all-mpnet-base-v2
+    kamalkraj/BioSimCSE-BioLinkBERT-BASE: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1
+    NeuML/pubmedbert-base-embeddings: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1
+slurm_jobs:
+  biosimcse_pubmedbert_none: 26263415 (16/36) + 26269846 (20/36 resubmit)
+  all_mpnet_none: '26268563'
+  all_mpnet_hardneg_mining: '26267465'
+  all_mpnet_semihard_1_50_canonical: 26288163 (18/18 COMPLETED)
+gpu: NVIDIA A100-SXM4-80GB, CUDA 13.0; DEMAP_REQUIRE_GPU=1, no CPU fallback
+n_configurations_considered: 81
+known_deviations:
+  all_mpnet_historical_semihard_excluded: artifacts/phase2_finetuning/all-mpnet-base-v2 contains 18 'semihard'
+    runs with rank band [1, 25]; the canonical semihard_1_50 band is [1, 50]. Those 18 runs are excluded
+    from v3 selection, preserved unmodified for provenance, and must never be reported as canonical semihard_1_50.
+  historical_hard_top25_reused: hard_top25 arms were NOT rerun; they are reused unchanged from their existing
+    artifacts. Their band [1, 25] is the DEFINITION of hard_top25, so they are canonical.
+correction_effect_on_none_arm:
+  note: best mean val_dev Recall@5 of the `none` arm, before vs after the encoded-string correction (22
+    -> 132 strings per optimizer step)
+  all-mpnet-base-v2:
+    old: 0.817785
+    corrected: 0.853212
+    delta: 0.035427
+  kamalkraj/BioSimCSE-BioLinkBERT-BASE:
+    old: 0.795229
+    corrected: 0.839395
+    delta: 0.044166
+  NeuML/pubmedbert-base-embeddings:
+    old: 0.807156
+    corrected: 0.836561
+    delta: 0.029405
+  conclusion: The correction materially improves the no-explicit-negative baseline (+0.029 to +0.044 Recall@5),
+    so the previous comparison overstated the benefit of hard negatives by roughly that much. Even corrected,
+    `none` remains 0.048-0.060 Recall@5 below the best negative-mining arm for every model, so the qualitative
+    conclusion is unchanged and now rests on an equal encoder budget per optimizer step.
+winners:
+- model: all-MPNet
+  model_id: all-mpnet-base-v2
+  phase1_parent_manifest: configs/paper/phase1_winners_final_v2.yaml
+  negative_strategy: hard_top25
+  strategy_rank_band:
+  - 1
+  - 25
+  lr: 5.0e-05
+  temperature: 0.03
+  epochs: 1
+  batch_size: 11
+  encoded_strings_per_optimizer_step: 132
+  query_representation:
+    query_variant: Q3
+  cde_representation:
+    recipe: v1_v6_v2b_v3_v5
+    cde_format: labeled
+  loss: symmetric_mnrl
+  seed0_run_id: 20260705_203453__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-c3a18bb8e1
+  seed1_run_id: 20260705_203956__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-6f14e0fbed
+  seed0_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_finetuning/all-mpnet-base-v2/runs/20260705_203453__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-c3a18bb8e1/model
+  seed1_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_finetuning/all-mpnet-base-v2/runs/20260705_203956__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-6f14e0fbed/model
+  seed0_source_root: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_finetuning/all-mpnet-base-v2
+  seed1_source_root: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_finetuning/all-mpnet-base-v2
+  seed0_metrics:
+    split: val_dev
+    recall@1: 0.7243741143127067
+    recall@5: 0.9008030231459613
+    recall@10: 0.9329239489844119
+    mrr@100: 0.8037241101264954
+  seed1_metrics:
+    split: val_dev
+    recall@1: 0.7165800661313179
+    recall@5: 0.9019839395370808
+    recall@10: 0.9336324988190836
+    mrr@100: 0.7997820973396301
+  mean_metrics:
+    recall@1: 0.7204770902220123
+    recall@5: 0.901393481341521
+    recall@10: 0.9332782239017477
+    mrr@100: 0.8017531037330627
+  sample_sd:
+    recall@1: 0.0055112243219547314
+    recall@5: 0.000835033988174945
+    recall@10: 0.0005010203929049827
+    mrr@100: 0.0027874239731164874
+  retained_seed: 1
+  retained_run_id: 20260705_203956__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-6f14e0fbed
+  retained_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_finetuning/all-mpnet-base-v2/runs/20260705_203956__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-6f14e0fbed/model
+  retained_checkpoint_hash: model.safetensors:daf47701ef073342bd802f0a8fabe50c8c779bbe29df13091425b0fc65f41927
+  recall5_tie_required_tiebreakers: false
+  changed_vs_v2: false
+  v2_negative_strategy: hard_top25
+  v2_lr: 5.0e-05
+  v2_temperature: 0.03
+  v2_mean_recall@5: 0.901393481341521
+  v2_retained_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_finetuning/all-mpnet-base-v2/runs/20260705_203956__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-6f14e0fbed/model
+- model: BioSimCSE
+  model_id: kamalkraj/BioSimCSE-BioLinkBERT-BASE
+  phase1_parent_manifest: configs/paper/phase1_winners_final_v2.yaml
+  negative_strategy: hard_top25
+  strategy_rank_band:
+  - 1
+  - 25
+  lr: 7.0e-05
+  temperature: 0.04
+  epochs: 1
+  batch_size: 11
+  encoded_strings_per_optimizer_step: 132
+  query_representation:
+    query_variant: Q2
+  cde_representation:
+    recipe: v1_v2a_v3_v5
+    cde_format: labeled
+  loss: symmetric_mnrl
+  seed0_run_id: 20260726_083812__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft2__20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft-329d3059__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr7e-05__bs1-1dbea5ef78
+  seed1_run_id: 20260726_083815__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft2__20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft-329d3059__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr7e-05__bs1-3a78c65143
+  seed0_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/runs/20260726_083812__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft2__20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft-329d3059__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr7e-05__bs1-1dbea5ef78/model
+  seed1_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/runs/20260726_083815__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft2__20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft-329d3059__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr7e-05__bs1-3a78c65143/model
+  seed0_source_root: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1
+  seed1_source_root: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1
+  seed0_metrics:
+    split: val_dev
+    recall@1: 0.7073689182805858
+    recall@5: 0.894189891355692
+    recall@10: 0.9307982994803968
+    mrr@100: 0.7916621565818787
+  seed1_metrics:
+    split: val_dev
+    recall@1: 0.7102031176192726
+    recall@5: 0.8939537080774681
+    recall@10: 0.9270193670288144
+    mrr@100: 0.7928560972213745
+  mean_metrics:
+    recall@1: 0.7087860179499292
+    recall@5: 0.8940717997165801
+    recall@10: 0.9289088332546056
+    mrr@100: 0.7922591269016266
+  sample_sd:
+    recall@1: 0.002004081571619852
+    recall@5: 0.0001670067976350204
+    recall@10: 0.0026721087621598555
+    mrr@100: 0.0008442435225217183
+  retained_seed: 0
+  retained_run_id: 20260726_083812__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft2__20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft-329d3059__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr7e-05__bs1-1dbea5ef78
+  retained_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/runs/20260726_083812__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft2__20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft-329d3059__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr7e-05__bs1-1dbea5ef78/model
+  retained_checkpoint_hash: model.safetensors:cda4589a42d7982be7ff40ba521d3bad3c905c8614090a7dcabfd03209997592
+  recall5_tie_required_tiebreakers: false
+  changed_vs_v2: false
+  v2_negative_strategy: hard_top25
+  v2_lr: 7.0e-05
+  v2_temperature: 0.04
+  v2_mean_recall@5: 0.8940717997165801
+  v2_retained_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/kamalkraj__BioSimCSE-BioLinkBERT-BASE/runs/20260726_083812__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft2__20260724_190028__kamalkraj__BioSimCSE-BioLinkBERT-BASE__ft-329d3059__Q2__v1_v2a_v3_v5__labeled__R0__symmetric_mnrl__lr7e-05__bs1-1dbea5ef78/model
+- model: PubMedBERT
+  model_id: NeuML/pubmedbert-base-embeddings
+  phase1_parent_manifest: configs/paper/phase1_winners_final_v2.yaml
+  negative_strategy: semihard_1_50
+  strategy_rank_band:
+  - 1
+  - 50
+  lr: 3.0e-05
+  temperature: 0.04
+  epochs: 1
+  batch_size: 11
+  encoded_strings_per_optimizer_step: 132
+  query_representation:
+    query_variant: Q3
+  cde_representation:
+    recipe: v1_v6_v2b_v3_v5
+    cde_format: labeled
+  loss: mnrl
+  seed0_run_id: 20260726_135319__NeuML__pubmedbert-base-embeddings__ft2__20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuM-6f5820e5__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr3e-05__bs11__t0.04_-3882125ff7
+  seed1_run_id: 20260726_135304__NeuML__pubmedbert-base-embeddings__ft2__20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuM-6f5820e5__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr3e-05__bs11__t0.04_-bcd9faffa0
+  seed0_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/runs/20260726_135319__NeuML__pubmedbert-base-embeddings__ft2__20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuM-6f5820e5__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr3e-05__bs11__t0.04_-3882125ff7/model
+  seed1_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/runs/20260726_135304__NeuML__pubmedbert-base-embeddings__ft2__20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuM-6f5820e5__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr3e-05__bs11__t0.04_-bcd9faffa0/model
+  seed0_source_root: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1
+  seed1_source_root: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1
+  seed0_metrics:
+    split: val_dev
+    recall@1: 0.6901275389702409
+    recall@5: 0.896551724137931
+    recall@10: 0.9284364666981578
+    mrr@100: 0.7811900973320007
+  seed1_metrics:
+    split: val_dev
+    recall@1: 0.6924893717524799
+    recall@5: 0.896551724137931
+    recall@10: 0.9272555503070382
+    mrr@100: 0.7828428745269775
+  mean_metrics:
+    recall@1: 0.6913084553613604
+    recall@5: 0.896551724137931
+    recall@10: 0.927846008502598
+    mrr@100: 0.7820164859294891
+  sample_sd:
+    recall@1: 0.00167006797634989
+    recall@5: 0.0
+    recall@10: 0.0008350339881750235
+    mrr@100: 0.0011686899623585805
+  retained_seed: 0
+  retained_run_id: 20260726_135319__NeuML__pubmedbert-base-embeddings__ft2__20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuM-6f5820e5__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr3e-05__bs11__t0.04_-3882125ff7
+  retained_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/runs/20260726_135319__NeuML__pubmedbert-base-embeddings__ft2__20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuM-6f5820e5__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr3e-05__bs11__t0.04_-3882125ff7/model
+  retained_checkpoint_hash: model.safetensors:1e1d4b9cac53786447a8114d79270f51acccfe62c65959cc69705ccc1cc24659
+  recall5_tie_required_tiebreakers: false
+  changed_vs_v2: false
+  v2_negative_strategy: semihard_1_50
+  v2_lr: 3.0e-05
+  v2_temperature: 0.04
+  v2_mean_recall@5: 0.896551724137931
+  v2_retained_checkpoint: /data/nextgen2/james/tasks/cde_project/demap/artifacts/phase2_canonical_v1/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/NeuML__pubmedbert-base-embeddings/runs/20260726_135319__NeuML__pubmedbert-base-embeddings__ft2__20260724_191450__NeuML__pubmedbert-base-embeddings__ft__NeuM-6f5820e5__Q3__v1_v6_v2b_v3_v5__labeled__R0__mnrl__lr3e-05__bs11__t0.04_-3882125ff7/model

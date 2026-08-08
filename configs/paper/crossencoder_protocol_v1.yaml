@@ -1,0 +1,61 @@
+# LOCKED defaults for the final-reranker Step E cross-encoder bake-off.
+#
+# Decision date: 2026-07-10. Established after the full-train vs val_train diagnosis
+# (full canonical `train` beats the small `val_train` slice on every canonical split;
+# MedCPT wins the 3-backbone bake-off). Do NOT change these without running a new
+# bake-off and updating this file + HANDOFF.
+#
+# This file is the single source of truth for how future Step E CE training/eval is
+# configured. It is consumed by tests/test_stepE_ce_defaults.py (regression guard) and
+# is the reference for the runnable templates under
+# .scratch/demap/final_reranker_stepE_fulltrain/.
+
+# --- Training / selection splits ---------------------------------------------------
+train_split: train           # FULL canonical train (was the val_train slice). The
+                             # tracked builder scripts/build_ce_training_pairs.py
+                             # defaults TRAIN_SPLIT="train"; `--train-split val_train`
+                             # reproduces the legacy slice for diagnostics only.
+dev_split: val_dev           # held-out selection split; never used for training. Leak-free.
+selection_metric: recall@5   # selection is by dev_split (val_dev) Recall@5.
+selection_tiebreakers: [recall@10, mrr@100]
+
+# --- Reporting / eval datasets -----------------------------------------------------
+# val_dev (selection) + the 6 canonical reachability-filtered eval datasets.
+# The 6 canonical names MUST equal src/demap/evaluation/canonical_datasets.py
+# canonical_split_names(); the test asserts this so the two never drift.
+eval_splits:
+  - val_dev
+  - test
+  - cctg
+  - oid_alt
+  - cdash
+  - gdc_combined
+  - cimac_v2
+
+# --- Candidate pool ----------------------------------------------------------------
+candidate_pool:
+  branch: kwfuzzy_only       # all-MPNet top20 UNION keyword_v1 fuzzy top10
+  se_k: 20                   # bi-encoder (all-MPNet rep) top-20
+  kw_k: 10                   # keyword_v1 fuzzy top-10
+  use_clone: false           # NO Python CDE-Match clone candidates. The clone is the
+                             # benchmark comparator and must stay independent of DEMAP.
+  use_clone_or_fuzzy: false  # NO clone_or_fuzzy fallback either.
+  se_winner_id: phase2_allmpnet_rep_6f14e0fbed   # Phase 2 all-MPNet rep seed1 (t0.03)
+
+# --- Recipe / representation -------------------------------------------------------
+cde_text_recipe: SN_DEC_DEF_PQT_PV
+query_text_col: query_text_q3
+
+# --- Forbidden ---------------------------------------------------------------------
+forbidden_splits: [test, external_holdout_org, external_holdout_gdc_altnames,
+                   external_holdout_gdc_questiontext, cimac_appendix_a_eval]
+no_legacy_val: true          # the legacy `val` split must never be used anywhere.
+
+# --- Selected winner (carry-forward into Step G/H) ---------------------------------
+winner:
+  backbone: ncbi/MedCPT-Cross-Encoder
+  objective: pointwise_bce   # ep2, lr2e-5, bs32, max_len512, pos_weight~25
+  checkpoint: artifacts/final_reranker/crossencoder_fulltrain/runs/ncbi_MedCPT-Cross-Encoder/
+  scores: artifacts/final_reranker/crossencoder_fulltrain/scores/crossenc_scores_ncbi_MedCPT-Cross-Encoder.parquet
+  comparison: artifacts/final_reranker/crossencoder_fulltrain/comparison/BAKEOFF_ce_by_split_all_models.csv
+  selection_val_dev_recall_at_5: 0.9128
