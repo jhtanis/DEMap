@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "demap-repro"
+version = "1.0.0"
+description = "Reproduction code for the DEMAP CDE-mapping paper: benchmark construction, bi-encoder and cross-encoder training, lexical retrieval, and the final HGBC reranker."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "HHS/NIH collaborators" }]
+keywords = ["caDSR", "common data elements", "information retrieval", "biomedical NLP"]
+
+# Pinned to the versions the paper environment actually ran (Python 3.10.8).
+# Lower bounds are the tested versions; upper bounds guard the majors that
+# changed public APIs we depend on.
+dependencies = [
+  "pandas==2.3.3",
+  "numpy==2.2.6",
+  "scipy==1.15.3",
+  "scikit-learn==1.7.2",
+  "pyarrow==24.0.0",
+  "pyyaml==6.0.3",
+  "tqdm==4.67.3",
+  "joblib>=1.2",
+]
+
+[project.optional-dependencies]
+# Neural stages: bi-encoder screening/fine-tuning and cross-encoder training.
+# Not required to run the lexical baselines, the feature/reranker parity tests,
+# or any reporting stage that consumes precomputed artifacts.
+neural = [
+  "torch==2.11.0",
+  "transformers==5.6.2",
+  "sentence-transformers==5.4.1",
+  "accelerate==1.13.0",
+  "datasets==4.8.4",
+  "huggingface_hub==1.11.0",
+  "safetensors==0.7.0",
+]
+# Figure and table generation.
+figures = ["matplotlib==3.10.8"]
+# caDSR XML extraction.
+extract = ["lxml==6.1.0"]
+dev = ["pytest==9.0.3"]
+all = [
+  "demap-repro[neural]",
+  "demap-repro[figures]",
+  "demap-repro[extract]",
+  "demap-repro[dev]",
+]
+
+[project.scripts]
+demap-repro = "demap_repro.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+demap_repro = ["py.typed"]
