@@ -54,6 +54,15 @@ data/processed/
 *.npy
 *.npz
 
+# Rendered figures. These are build output: the generators live in
+# src/demap_repro/reporting/figures/ and the published copies live with the
+# manuscript. A few were committed by accident when migrating scripts whose
+# module bodies executed on import.
+*.pdf
+*.png
+*.svg
+*.eps
+
 # Large columnar/compressed formats anywhere outside the fixture directory.
 *.parquet
 *.feather

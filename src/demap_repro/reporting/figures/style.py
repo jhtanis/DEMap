@@ -23,14 +23,20 @@ import hashlib
 import json
 import subprocess
 from datetime import date
+import os
 from pathlib import Path
 from typing import Dict, Iterable, Optional
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-FIG_ROOT = REPO_ROOT / "notebooks" / "figures" / "paper_v10"
+REPO_ROOT = Path(__file__).resolve().parents[3]
+
+# Where rendered figures land. This is build output, not source, so it is
+# configurable and gitignored. In the research repository it was a fixed
+# notebooks/figures/ directory; here it defaults to ./figures under the working
+# directory and is overridden with DEMAP_FIGURE_DIR.
+FIG_ROOT = Path(os.environ.get("DEMAP_FIGURE_DIR", Path.cwd() / "figures"))
 
 # ---------------------------------------------------------------- style knobs
 # EDIT THESE to restyle every v10 figure at once.
@@ -123,6 +129,14 @@ def _git_head() -> str:
         return "unknown"
 
 
+def _rel(p: Path) -> str:
+    """Repo-relative when the path is inside the tree, absolute otherwise."""
+    try:
+        return str(p.relative_to(REPO_ROOT))
+    except ValueError:
+        return str(p)
+
+
 def save_figure(fig, name: str, sources: Iterable[Path],
                 notebook: str, description: str,
                 extra: Optional[Dict] = None) -> Dict[str, Path]:
@@ -142,8 +156,8 @@ def save_figure(fig, name: str, sources: Iterable[Path],
         "generated": str(date.today()),
         "git_head": _git_head(),
         "notebook": notebook,
-        "png": str(png.relative_to(REPO_ROOT)),
-        "pdf": str(pdf.relative_to(REPO_ROOT)),
+        "png": _rel(png),
+        "pdf": _rel(pdf),
         "figure_size_inches": list(fig.get_size_inches()),
         "font_standard_pt": {
             "panel_letter": PANEL_LETTER_PT, "title": TITLE_PT,
@@ -155,8 +169,7 @@ def save_figure(fig, name: str, sources: Iterable[Path],
     }
     for s in sources:
         s = Path(s)
-        rec = {"path": str(s.relative_to(REPO_ROOT)) if s.is_absolute() and
-               str(s).startswith(str(REPO_ROOT)) else str(s)}
+        rec = {"path": _rel(s) if s.is_absolute() else str(s)}
         if s.is_file():
             rec["sha256"] = sha256(s)
             rec["size_bytes"] = s.stat().st_size
