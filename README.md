@@ -126,9 +126,9 @@ each one, and none has ever entered this repository or its git history.
 **This does not block reproduction.** Stages that would call the gated keyword arm
 resolve it through a documented adapter
 (`src/demap_repro/lexical/cde_match_interface.py`) and accept a precomputed
-candidate artifact instead. BM25 is a fully released lexical baseline. And an
-unresolved *weights* gate does not prevent retraining: the base checkpoints are
-public and the protocols are specified.
+candidate artifact instead. BM25 is a lexical baseline with no such dependency and
+is included in full. And an unresolved *weights* gate does not prevent retraining:
+the base checkpoints are public and the protocols are specified.
 
 ---
 
@@ -150,6 +150,12 @@ Two consequences worth knowing when reading the code:
   cannot silently change behaviour.
 
 ---
+
+## License
+
+**To be determined.** No license has been chosen for this repository, and none is
+declared in `pyproject.toml`. Until the team decides, treat this code as
+all-rights-reserved: it is not open source and carries no grant of use.
 
 ## Citation
 
