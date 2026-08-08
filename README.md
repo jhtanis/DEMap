@@ -153,9 +153,8 @@ Two consequences worth knowing when reading the code:
 
 ## License
 
-**To be determined.** No license has been chosen for this repository, and none is
-declared in `pyproject.toml`. Until the team decides, treat this code as
-all-rights-reserved: it is not open source and carries no grant of use.
+To be determined. No license has been chosen for this repository, and none is
+declared in `pyproject.toml`.
 
 ## Citation
 

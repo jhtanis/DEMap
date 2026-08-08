@@ -10,11 +10,10 @@ and what each remaining gate actually rests on.
 
 ## 1. License
 
-**No license has been chosen.** `pyproject.toml` previously declared MIT; that was
+**License: to be determined.** `pyproject.toml` previously declared MIT; that was
 never a decision anyone made — it carried over from the research repository's
 packaging and has been removed. There is no `LICENSE` file, and none should be
-added until the team decides. Until then the code is all-rights-reserved by
-default.
+added until the team decides.
 
 ---
 
