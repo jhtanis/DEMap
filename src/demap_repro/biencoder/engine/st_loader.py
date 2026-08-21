@@ -67,11 +67,90 @@ def parse_st_model_spec(model_name_or_path: str) -> STModelSpec:
     return STModelSpec(original=s, base_model=MODEL_ID_ALIASES.get(s, s), variant="base")
 
 
+#: The per-mode booleans of the sentence-transformers <5 Pooling module.
+_LEGACY_POOLING_FLAGS = (
+    "pooling_mode_cls_token",
+    "pooling_mode_mean_tokens",
+    "pooling_mode_max_tokens",
+    "pooling_mode_mean_sqrt_len_tokens",
+    "pooling_mode_weightedmean_tokens",
+    "pooling_mode_lasttoken",
+)
+
+#: Legacy boolean -> the equivalent sentence-transformers >=5 ``pooling_mode``
+#: string, so :func:`effective_pooling` answers in one vocabulary either way.
+_LEGACY_FLAG_TO_MODE = {
+    "pooling_mode_cls_token": "cls",
+    "pooling_mode_mean_tokens": "mean",
+    "pooling_mode_max_tokens": "max",
+    "pooling_mode_mean_sqrt_len_tokens": "mean_sqrt_len_tokens",
+    "pooling_mode_weightedmean_tokens": "weightedmean",
+    "pooling_mode_lasttoken": "lasttoken",
+}
+
+#: Variant -> (legacy boolean, sentence-transformers >=5 ``pooling_mode`` string).
+_VARIANT_TO_POOLING = {
+    "cls": ("pooling_mode_cls_token", "cls"),
+    "mean": ("pooling_mode_mean_tokens", "mean"),
+}
+
+
+def _is_pooling_module(module) -> bool:
+    """True for a SentenceTransformers Pooling module of either generation.
+
+    sentence-transformers <5 exposes one boolean per mode; 5.x replaced them with
+    a single ``pooling_mode`` string. Duck-typing only the booleans meant that on
+    a modern install no Pooling module was ever found and ``__cls``/``__mean``
+    raised ``ValueError``.
+    """
+    if hasattr(module, "pooling_mode_cls_token") and hasattr(module, "pooling_mode_mean_tokens"):
+        return True
+    return isinstance(getattr(module, "pooling_mode", None), str)
+
+
+def effective_pooling(st_model) -> Optional[str]:
+    """The pooling mode actually in force, read back from the model.
+
+    Returns ``'cls'`` / ``'mean'`` / another mode name, or ``None`` if no Pooling
+    module is present. Reads whichever API the installed version uses, so a caller
+    can verify it got the pooling it asked for rather than assuming.
+    """
+    pool = _find_pooling_module(st_model)
+    if pool is None:
+        return None
+    mode = getattr(pool, "pooling_mode", None)
+    if isinstance(mode, str):
+        return mode
+    for flag in _LEGACY_POOLING_FLAGS:
+        if getattr(pool, flag, False):
+            return _LEGACY_FLAG_TO_MODE[flag]
+    return None
+
+
+def _find_pooling_module(st_model):
+    """First Pooling-like submodule, by ``._modules`` then by index."""
+    modules = getattr(st_model, "_modules", None)
+    if isinstance(modules, dict):
+        for m in modules.values():
+            if _is_pooling_module(m):
+                return m
+    try:
+        for i in range(0, 10):
+            m = st_model[i]  # type: ignore[index]
+            if _is_pooling_module(m):
+                return m
+    except Exception:
+        pass
+    return None
+
+
 def apply_pooling_variant(st_model, variant: STVariant) -> None:
     """Modify an in-memory SentenceTransformer to use a specific pooling mode.
 
-    The implementation searches for the first module that looks like a
-    SentenceTransformers Pooling module by duck-typing its attributes.
+    Supports both Pooling generations: the per-mode booleans of
+    sentence-transformers <5 and the single ``pooling_mode`` string of 5.x. The
+    two are never written together, so an inert legacy flag cannot end up
+    disagreeing with the mode actually in force.
 
     This function is intentionally import-light so unit tests can exercise it
     without requiring sentence-transformers to be installed.
@@ -80,53 +159,26 @@ def apply_pooling_variant(st_model, variant: STVariant) -> None:
     if variant == "base":
         return
 
-    # Find pooling-like module.
-    pool = None
-    # Prefer ._modules if present (torch.nn.Module)
-    modules = getattr(st_model, "_modules", None)
-    if isinstance(modules, dict):
-        for m in modules.values():
-            if hasattr(m, "pooling_mode_cls_token") and hasattr(m, "pooling_mode_mean_tokens"):
-                pool = m
-                break
+    if variant not in _VARIANT_TO_POOLING:
+        raise ValueError(f"Unknown pooling variant: {variant}")
 
-    # Fall back to index access if possible.
-    if pool is None:
-        try:
-            # SentenceTransformer supports indexing.
-            for i in range(0, 10):
-                m = st_model[i]  # type: ignore[index]
-                if hasattr(m, "pooling_mode_cls_token") and hasattr(m, "pooling_mode_mean_tokens"):
-                    pool = m
-                    break
-        except Exception:
-            pass
-
+    pool = _find_pooling_module(st_model)
     if pool is None:
         raise ValueError(
             "Could not locate a SentenceTransformers Pooling module to set pooling variant. "
-            "(Expected a module with pooling_mode_cls_token/pooling_mode_mean_tokens attributes.)"
+            "(Expected a module with pooling_mode_cls_token/pooling_mode_mean_tokens "
+            "attributes, or a sentence-transformers >=5 module with a pooling_mode string.)"
         )
 
-    # Reset all known pooling modes, then enable the desired one.
-    # These attribute names follow sentence-transformers' Pooling module.
-    for attr in [
-        "pooling_mode_cls_token",
-        "pooling_mode_mean_tokens",
-        "pooling_mode_max_tokens",
-        "pooling_mode_mean_sqrt_len_tokens",
-        "pooling_mode_weightedmean_tokens",
-        "pooling_mode_lasttoken",
-    ]:
-        if hasattr(pool, attr):
-            setattr(pool, attr, False)
+    legacy_flag, mode_string = _VARIANT_TO_POOLING[variant]
 
-    if variant == "cls":
-        pool.pooling_mode_cls_token = True
-    elif variant == "mean":
-        pool.pooling_mode_mean_tokens = True
+    if any(hasattr(pool, flag) for flag in _LEGACY_POOLING_FLAGS):
+        for flag in _LEGACY_POOLING_FLAGS:
+            if hasattr(pool, flag):
+                setattr(pool, flag, False)
+        setattr(pool, legacy_flag, True)
     else:
-        raise ValueError(f"Unknown pooling variant: {variant}")
+        pool.pooling_mode = mode_string
 
 
 def enforce_min_max_seq_length(st_model, min_max_seq_length: int) -> int:
