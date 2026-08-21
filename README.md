@@ -22,7 +22,7 @@ boundary, and every included component maps to an entry in
 
 ```bash
 pip install -e '.[all]'      # or: pip install -e .  for the lexical/reporting subset
-pytest                       # 484 tests, no data or network required
+pytest                       # 537 tests, no data or network required
 demap --list                 # the pipeline, in order
 ```
 

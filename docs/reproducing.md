@@ -12,7 +12,7 @@ pip install -e '.[dev]'
 pytest
 ```
 
-484 tests. No data, no weights, no network. They check:
+537 tests. No data, no weights, no network. They check:
 
 - every headline number against a committed fixture (Table 4, Table S5, Table S6,
   Figures 4/5/S5/S6/S7, the K selection, the cross-encoder bake-off, the final HGBC
