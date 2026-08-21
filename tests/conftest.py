@@ -52,3 +52,20 @@ def fixed_k_summary():
 def source_parity():
     """Committed AST hashes pinning migrated implementations."""
     return load_fixture("source_parity.json")
+
+
+@pytest.fixture(scope="session")
+def data_root():
+    """Root of the prepared data tree, or skip.
+
+    ``DEMAP_DATA_ROOT`` is the seam documented in ``demap_repro.utils.paths``.
+    The core-result revalidation (``tier3_regression/test_core_result_contract.py``)
+    needs it to recompute from upstream artifacts rather than reading a final CSV.
+    """
+    raw = os.environ.get("DEMAP_DATA_ROOT")
+    if not raw:
+        pytest.skip("DEMAP_DATA_ROOT is not set; the prepared data tree is unavailable")
+    root = Path(raw)
+    if not root.exists():
+        pytest.skip(f"DEMAP_DATA_ROOT={root} does not exist")
+    return root
