@@ -28,9 +28,12 @@ from pathlib import Path
 
 import pandas as pd
 
-REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "scripts"))
-sys.path.insert(0, str(REPO / "src"))
+from demap_repro.utils.paths import data_root
+
+#: Data tree (see demap_repro.utils.paths). Formerly ``parents[1]``, which after
+#: packaging resolves to ``src/demap_repro/data``. The two ``sys.path`` inserts
+#: that followed named directories inside the package and are gone.
+REPO = data_root()
 
 # PV enrichment source (capped fixed-tabs, PV_CAP=10) + legacy split dirs.
 DEF_ENR = REPO / ".scratch/demap/sapbert_pv_ceiling/cimac_pv_audit/cimac_pv_enriched_fixed_tabs.parquet"

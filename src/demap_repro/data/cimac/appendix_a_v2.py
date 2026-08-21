@@ -24,7 +24,11 @@ from pathlib import Path
 from typing import List, Optional
 import pandas as pd
 
-REPO = Path(__file__).resolve().parents[1]
+from demap_repro.utils.paths import data_root
+
+#: Data tree (see demap_repro.utils.paths). Formerly ``parents[1]``, which after
+#: packaging resolves to ``src/demap_repro/data``.
+REPO = data_root()
 RAW = REPO / "data/raw/cimac/CIMAC-CIDC_Master_AppendixA_v2.xlsx"
 CATALOG = REPO / "data/processed/cadsr_xml_2026-06-16/cde_master_enriched_eval.parquet"
 OUT = REPO / "data/processed/splits/cimac_appendix_a_v2.parquet"

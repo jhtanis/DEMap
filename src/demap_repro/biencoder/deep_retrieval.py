@@ -43,8 +43,14 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO_ROOT / "src"))
+from demap_repro.utils.paths import data_root
+
+#: Data and artifact tree. ``parents[1]`` was a script-era idiom that meant the
+#: repository root while this file lived in ``scripts/``; after packaging it
+#: resolves to ``src/demap_repro``, so every default below pointed into the
+#: source tree. The accompanying ``sys.path`` insert named ``src/demap_repro/src``
+#: and, worse, could shadow the installed package with another checkout.
+REPO_ROOT = data_root()
 
 from demap_repro.text.recipes import build_catalog  # noqa: E402
 from demap_repro.biencoder.engine.st_loader import load_sentence_transformer  # noqa: E402
@@ -61,7 +67,10 @@ DEFAULT_RUN_DIR = (REPO_ROOT / "artifacts_v3_cdisc/phase2/natural/sentence-trans
                    "20260525_105723__v3_phase2_natural__ft2__20260523_173356__v3_phase1_natural__ft__"
                    "sentence-transformer-c7df217f__Q3__v1_v2_v3_v5__labeled__R0__symmetric_mnrl__"
                    "lr7e-05__bs11__t0.06__ep1__seed-fd7dc27022")
-SPLITS_DIR = REPO_ROOT / "data/processed/splits_v3_cdisc"
+# ``splits_v3_cdisc`` is the superseded split scheme (test 3,986 against the
+# paper's 3,959) and had never resolved anywhere real. The corrected canonical
+# tree carries the same split names.
+SPLITS_DIR = REPO_ROOT / "data/processed/splits_v3_cdisc_reachable_2026-06-18_cimacpv"
 CDE_MASTER = REPO_ROOT / "data/processed/cde_master_enriched.parquet"
 OUT_DIR = REPO_ROOT / "artifacts_v3_cdisc/biencoder_deep_top1000"
 DEFAULT_SPLITS = ["val_train", "val_dev", "test", "external_holdout_org",

@@ -42,7 +42,11 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+from demap_repro.utils.paths import data_root
+
+#: Data and artifact tree (see demap_repro.utils.paths). Formerly
+#: ``parents[1]``, which after packaging resolves inside ``src/demap_repro``.
+REPO_ROOT = data_root()
 
 # The four bi-encoders (publication comparison set). Order is stable & load-bearing.
 MODELS: Dict[str, str] = {
