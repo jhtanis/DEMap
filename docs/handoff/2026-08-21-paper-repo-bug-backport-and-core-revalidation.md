@@ -111,11 +111,38 @@ No frozen fixture was edited to make anything green.
 `hgbc_eval_by_split.csv` and every manuscript-aligned fixture are untouched, and
 all pre-existing tier-3 regressions pass unchanged.
 
-One recorded discrepancy that is **not** a result change: `expected_results.json`
-pins the manuscript as `manuscript/cde_paper_v21.docx` (`sha256 2df7895c…`),
-while the file supplied is `cde_paper_20260806.docx` (`sha256 6295986f…`). Every
-value checked agrees, so they are content-consistent; the pin is stale. Deciding
-the canonical filename belongs with the manuscript task.
+### Manuscript provenance — the pin is correct, the supplied file is older
+
+`manifests/paper_scope.yaml:11` and `manifests/expected_results.json:5` pin the
+authoritative manuscript as `manuscript/cde_paper_v21.docx`
+(`sha256 2df7895c…`, 6,159,078 bytes). **That pin is valid.** The file exists at
+that path in the historical research checkout — which `paper_scope.yaml:16`
+declares `immutable_read_only` — and its digest and size match exactly. It was
+never meant to resolve inside this repository.
+
+The manuscript supplied for this session, `cde_paper_20260806.docx`
+(`sha256 6295986f…`), is **an earlier manuscript state, not an equivalent copy**.
+The two agree on 1,176 of 1,177 paragraphs with byte-identical figures, and
+differ in exactly one checked scientific value — the Section S3.5 PV-overlap
+denominator:
+
+| manuscript | S3.5 denominator |
+|---|---|
+| `cde_paper_v21.docx` — pinned, correct | **38,964** |
+| `cde_paper_20260806.docx` — supplied, August 6 | **39,391** |
+
+**39,391 is superseded** (generated 2026-04-23 from a 69,844-row `pairs.parquet`
+that was overwritten on 2026-05-13 by the paper-era 69,102-row build). The
+recomputation to 38,964 was author-approved on 2026-08-08, and **38,964 is this
+repository's regression target**: `test_table_s3_pv_overlap.py:38` asserts it and
+`tests/fixtures/table_s3_pv_overlap_SUPERSEDED.csv` marks the 39,391 values as
+provenance that must not be a parity target.
+
+**Do not repoint either pin at the August-6 manuscript** — that would make the
+authoritative manuscript carry a value this repository's own test asserts
+against. **This discrepancy does not affect Table 4, the abstract, or any
+final-system result**; it is confined to one supplementary prose denominator.
+Full detail in §5 of the backport audit.
 
 ## The revalidation plan, and what has already been run
 
@@ -221,8 +248,12 @@ To clear the two remaining skips: `pip install -e '.[documents]'`.
 
 ## Open items, deliberately not done here
 
-1. **The manuscript pin** in `expected_results.json` names a filename that no
-   longer exists. Needs a decision, not a fix.
+1. **The manuscript file discrepancy.** The pins in `paper_scope.yaml` and
+   `expected_results.json` are correct and need no change. What is open is
+   reconciling the supplied August-6 `cde_paper_20260806.docx`, which carries the
+   superseded S3.5 denominator 39,391 where the pinned `cde_paper_v21.docx`
+   carries the author-approved 38,964. That belongs to the manuscript task, and
+   nothing in this repository changes for it.
 2. **Entry 5 (PQT filler)** and the 1,352 real PQT rows discarded by
    `drop_duplicates(keep='first')` are representation-improvement candidates for
    a future DEMap. Both would invalidate frozen bi-encoder artifacts and neither

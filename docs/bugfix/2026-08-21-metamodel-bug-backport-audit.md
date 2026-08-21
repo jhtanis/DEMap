@@ -22,7 +22,10 @@ system this repository reproduces:
 The manuscript used as the claim contract is the non-metamodel August 6 paper,
 *Hybrid Semantic–Lexical Retrieval for Source-to-CDE Mapping in the NCI caDSR*.
 It was verified to be the non-metamodel version before use: it reports 117 HGBC
-features, the 62,976-record June catalog, and no SapBERT arm.
+features, the 62,976-record June catalog, and no SapBERT arm. It is **not** the
+manuscript the manifests pin as authoritative, and it is one author-approved
+correction older than that file; the difference is a single supplementary
+denominator and is set out in §5.2.
 
 Nothing metamodel-specific is imported. Not the SapBERT candidate arm, not the
 FT-MPNet top-15 + SapBERT top-5 pool, not the 127-feature contract, not the
@@ -491,18 +494,74 @@ values, with GDC going to the Python approximation exactly as reported.
 
 ## 5. Effect on the manuscript
 
-**None.** No manuscript value is known or suspected to change. Nothing in
-`cde_paper_20260806.docx` needs revision as a result of this session, and the
-document was not edited.
+**None.** No manuscript value is known or suspected to change as a result of the
+fixes in this session, and no manuscript was edited.
 
-*Recorded discrepancy, not a result change:* `manifests/expected_results.json`
-names the authoritative manuscript as `manuscript/cde_paper_v21.docx`
-(`sha256 2df7895c…`), whereas the file supplied here is `cde_paper_20260806.docx`
-(`sha256 6295986f…`). Every value checked against it — Table 4, the abstract
-claims, the S1 counts, the S5/S6 numbers — agrees with the committed fixtures, so
-the two are content-consistent and the difference is a filename and re-save. The
-pin is stale; correcting it needs a decision about which filename is canonical
-and is left for the manuscript task.
+### 5.1 The manuscript pin is correct — do not change it
+
+`manifests/paper_scope.yaml:11` and `manifests/expected_results.json:5` both pin
+the authoritative manuscript as:
+
+    manuscript/cde_paper_v21.docx
+    sha256 2df7895cd8657a7928be220c958aaa38a85c5b5199526f03979c4967b159eecd
+    size_bytes 6159078
+
+**That pin is valid and resolvable.** The file exists at
+`manuscript/cde_paper_v21.docx` inside the historical research checkout, which
+`paper_scope.yaml:16` declares as `source_repository … status:
+immutable_read_only`, and its digest and byte size match the pin exactly. The pin
+was never meant to resolve inside this repository — the 2026-08-08 handoff
+records the path as being "in the research checkout" — so its pointing outside
+the tree is by design, not decay.
+
+### 5.2 The supplied August-6 manuscript is an earlier state, not an equivalent copy
+
+The manuscript supplied for this session, `cde_paper_20260806.docx`
+(`sha256 6295986f…`), is **an earlier manuscript state**. It is not a rename, a
+re-save, or an equivalent copy of the pinned file.
+
+Compared paragraph by paragraph, the two documents agree on 1,176 of 1,177
+paragraphs and carry byte-identical embedded figures (13 media parts, matching
+CRCs). They differ in **exactly one checked scientific value**, the Section S3.5
+permissible-value overlap denominator:
+
+| manuscript | S3.5 PV-overlap denominator |
+|---|---|
+| `cde_paper_v21.docx` — pinned, correct | **38,964** |
+| `cde_paper_20260806.docx` — supplied, August 6 | **39,391** |
+
+**39,391 is the superseded value.** Per
+`docs/handoff/2026-08-07-slice1-provenance-pv-audit-handoff.md`, Table S3 was
+generated on 2026-04-23 from a `pairs.parquet` build of 69,844 rows
+(both-present 39,391). That file was overwritten on 2026-05-13 by the paper-era
+69,102-row build that every downstream stage consumed. The recomputation to
+38,964 was **author-approved on 2026-08-08** and is recorded in
+`expected_results.json`, `paper_scope.yaml:686` and
+`configs/paper/results_provenance_v1.yaml:332`.
+
+**38,964 is this repository's regression target.**
+`tests/tier3_regression/test_table_s3_pv_overlap.py:38` asserts `rows: 38964`,
+`tests/fixtures/table_s3_corrected.csv` carries it, and
+`tests/fixtures/table_s3_pv_overlap_SUPERSEDED.csv` holds the 39,391 values
+explicitly marked as historical provenance that "must not be used as a parity
+target".
+
+### 5.3 The pin must not be repointed at the August-6 manuscript
+
+Changing `paper_scope.yaml` or `expected_results.json` to name
+`cde_paper_20260806.docx` would make the authoritative manuscript carry a value
+this repository's own regression test asserts against, and would re-elevate an
+artifact the manifests label superseded. **Leave both pins as they are.**
+
+### 5.4 This discrepancy does not touch any headline result
+
+The difference is confined to the Section S3.5 prose denominator in a
+supplementary PV-overlap diagnostic. **It does not affect Table 4, the abstract,
+the final-system conclusions, or any number recomputed in §4** — Table 4
+regenerates bit-identically across all 54 cells, Test Recall@5 is 0.9715, the
+external range is 0.802–0.972, GDC is 70/72, and the final reranker is best on
+five of six datasets. Reconciling the manuscript file itself is a matter for the
+manuscript task; nothing in this repository needs to change for it.
 
 ## 6. Frozen artifacts
 
