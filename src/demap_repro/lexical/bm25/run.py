@@ -31,9 +31,15 @@ REPO = repo_root()
 
 
 def _metric_helper():
-    """The project's canonical metric helper — identical definitions to the neural methods."""
-    sys.path.insert(0, str(REPO / "scripts"))
-    import evaluate_non_exact_subset as N  # noqa: E402
+    """The project's canonical metric helper — identical definitions to the neural methods.
+
+    This used to put ``<repo>/scripts`` on ``sys.path`` and import
+    ``evaluate_non_exact_subset``, a research-repository script that was never
+    migrated: from a clean clone the import raised ``ModuleNotFoundError`` and
+    BM25 evaluation could not run at all. ``demap_repro.lexical.non_exact_subset``
+    is that script migrated, and carries a line-identical ``eval_method``.
+    """
+    from demap_repro.lexical import non_exact_subset as N
 
     return N
 

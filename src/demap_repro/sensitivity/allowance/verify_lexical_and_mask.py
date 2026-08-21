@@ -14,15 +14,18 @@ from __future__ import annotations
 
 import hashlib
 import json
-import sys
 from pathlib import Path
 
 import pandas as pd
 
-REPO = Path("/vf/users/nextgen2/james/tasks/cde_project/demap")
+from demap_repro.utils.paths import data_root
+
+#: Data and artifact tree. This was an absolute path into the research
+#: repository, which made the module unusable anywhere else; see
+#: ``demap_repro.utils.paths`` and ``DEMAP_DATA_ROOT``.
+REPO = data_root()
 J = REPO / ".scratch/v17_claude/J_allowance"
-sys.path.insert(0, str(REPO / "src"))
-from demap_repro.lexical.mask import query_allowed  # noqa: E402
+from demap_repro.lexical.mask import query_allowed
 
 DATASETS = ["test", "cctg", "oid_alt", "cdash"]
 RATES = ["0.0", "0.5", "0.6", "0.70", "0.8", "1.0"]

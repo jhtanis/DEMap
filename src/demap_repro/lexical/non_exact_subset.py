@@ -30,8 +30,12 @@ from pathlib import Path
 
 import pandas as pd
 
-REPO = Path("/vf/users/nextgen2/james/tasks/cde_project/demap")
-sys.path.insert(0, str(REPO / "src"))
+from demap_repro.utils.paths import data_root
+
+#: Data and artifact tree. This was an absolute path into the research
+#: repository, which made the module unusable anywhere else; see
+#: ``demap_repro.utils.paths`` and ``DEMAP_DATA_ROOT``.
+REPO = data_root()
 from demap_repro.lexical.cde_match_interface import exact_match_control
 
 SEED = 42
@@ -53,14 +57,25 @@ def _pub(s: pd.Series) -> pd.Series:
     return s.astype(str).str.split("::").str[0]
 
 
-def _gold_map(ds: str) -> dict:
-    e = pd.read_parquet(EVAL_DIR / f"{ds}.parquet", columns=["query_id", "cde_id"])
+def build_gold_map(eval_path) -> dict:
+    """query_id -> set of gold CDE public identifiers, from an evaluation parquet.
+
+    Public-identifier level, any-gold: the paper never matches version-exact, and
+    a query may carry more than one accepted gold CDE. Callers outside this module
+    (BM25 evaluation) pass a path; :func:`_gold_map` is the by-name convenience.
+    """
+    e = pd.read_parquet(eval_path, columns=["query_id", "cde_id"])
     e["query_id"] = e["query_id"].astype(str)
     e["pub"] = _pub(e["cde_id"])
     gm: dict = {}
     for q, p in zip(e["query_id"], e["pub"]):
         gm.setdefault(q, set()).add(p)
     return gm
+
+
+def _gold_map(ds: str) -> dict:
+    """Gold map for a canonical dataset by name."""
+    return build_gold_map(EVAL_DIR / f"{ds}.parquet")
 
 
 def eval_method(cands: pd.DataFrame, subset_qids: set, gold_map: dict) -> dict:

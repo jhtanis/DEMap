@@ -35,7 +35,12 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-REPO = Path("/vf/users/nextgen2/james/tasks/cde_project/demap")
+from demap_repro.utils.paths import data_root
+
+#: Data and artifact tree. This was an absolute path into the research
+#: repository, which made the module unusable anywhere else; see
+#: ``demap_repro.utils.paths`` and ``DEMAP_DATA_ROOT``.
+REPO = data_root()
 OUT = REPO / ".scratch/demap/paper_v13_scientific_audit"
 TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 CODE_RE = re.compile(r"^[A-Za-z0-9_.\-]+$")

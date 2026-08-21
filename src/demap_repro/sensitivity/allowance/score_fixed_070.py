@@ -38,7 +38,12 @@ import joblib
 import numpy as np
 import pandas as pd
 
-REPO = Path("/vf/users/nextgen2/james/tasks/cde_project/demap")
+from demap_repro.utils.paths import data_root
+
+#: Data and artifact tree. This was an absolute path into the research
+#: repository, which made the module unusable anywhere else; see
+#: ``demap_repro.utils.paths`` and ``DEMAP_DATA_ROOT``.
+REPO = data_root()
 WT = REPO / ".scratch/demap/paper_v13_scientific_audit/wt_hgbc_2903203"
 SHIPPED = REPO / "artifacts/final_reranker/hgbc_reranker_v2_eligible/with_ce_noprov"
 
@@ -54,10 +59,12 @@ DIAGNOSTIC_SPLITS = ["val_train", "val_dev"]
 
 MANUSCRIPT_R5 = {"test": 0.9715, "cctg": 0.9088, "oid_alt": 0.8324, "cdash": 0.9198}
 
-sys.path.insert(0, str(WT / "scripts"))
-sys.path.insert(0, str(WT / "src"))
-import train_hgbc_reranker as T  # noqa: E402  (pinned manuscript trainer)
-from demap_repro.reranker.features.categorical_vocab import CategoricalVocab  # noqa: E402
+# The pinned manuscript trainer. It used to be imported from a worktree copy of
+# ``scripts/train_hgbc_reranker.py`` in the research repository, put on sys.path
+# ahead of everything else; ``demap_repro.reranker.train`` is that file migrated,
+# with an identical ``prepare_features``.
+from demap_repro.reranker import train as T
+from demap_repro.reranker.features.categorical_vocab import CategoricalVocab
 
 
 def sha256(path: Path) -> str:

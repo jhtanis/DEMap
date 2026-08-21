@@ -16,7 +16,12 @@ from pathlib import Path
 
 import pandas as pd
 
-REPO = Path("/vf/users/nextgen2/james/tasks/cde_project/demap")
+from demap_repro.utils.paths import data_root
+
+#: Data and artifact tree. This was an absolute path into the research
+#: repository, which made the module unusable anywhere else; see
+#: ``demap_repro.utils.paths`` and ``DEMAP_DATA_ROOT``.
+REPO = data_root()
 OUT = REPO / ".scratch/demap/paper_v13_scientific_audit"
 DATASETS = ["test", "cctg", "oid_alt", "cdash", "gdc_combined", "cimac_v2"]
 DISPLAY = {"test": "Test", "cctg": "CCTG", "oid_alt": "OID ALT", "cdash": "CDASH",

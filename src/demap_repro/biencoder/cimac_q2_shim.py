@@ -32,10 +32,13 @@ from pathlib import Path
 
 import pandas as pd
 
-REPO = Path("/vf/users/nextgen2/james/tasks/cde_project/demap")
-sys.path.insert(0, str(REPO / "src"))
+from demap_repro.utils.paths import data_root
 
-from demap_repro.data.queries import normalize_query_text  # noqa: E402
+#: Data and artifact tree. This was an absolute path into the research
+#: repository, which made the module unusable anywhere else; see
+#: ``demap_repro.utils.paths`` and ``DEMAP_DATA_ROOT``.
+REPO = data_root()
+from demap_repro.data.queries import normalize_query_text
 
 SRC = REPO / "data/processed/eval_canonical/cimac_v2.parquet"
 OUT_DIR = REPO / ".scratch/v20_claude/rerun/_q2splits"

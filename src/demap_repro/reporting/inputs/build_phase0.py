@@ -10,7 +10,12 @@ from pathlib import Path
 
 import pandas as pd
 
-REPO = Path("/data/nextgen2/james/tasks/cde_project/demap")
+from demap_repro.utils.paths import data_root
+
+#: Data and artifact tree. This was an absolute path into the research
+#: repository, which made the module unusable anywhere else; see
+#: ``demap_repro.utils.paths`` and ``DEMAP_DATA_ROOT``.
+REPO = data_root()
 PHASE0_ROOT = REPO / "artifacts/phase0_representation_sweep_manuscript_v5"
 OUT = REPO / ".scratch/demap/paper_v10_revision/data"
 

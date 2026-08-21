@@ -23,18 +23,23 @@ Outputs vector PDF + 600 dpi PNG + provenance JSON into manuscript/figures/.
 """
 from __future__ import annotations
 
-import sys
 import textwrap
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-REPO = Path("/vf/users/nextgen2/james/tasks/cde_project/demap")  # same tree as /data/...
-sys.path.insert(0, str(REPO / "notebooks" / "paper_figures"))
-import paper_figure_style as S  # noqa: E402
+from demap_repro.utils.paths import data_root
 
-S.FIG_ROOT = REPO / "manuscript" / "figures"
+#: Data and artifact tree. This was an absolute path into the research
+#: repository, which made the module unusable anywhere else; see
+#: ``demap_repro.utils.paths`` and ``DEMAP_DATA_ROOT``.
+REPO = data_root()
+from demap_repro.reporting.figures import style as S
+
+# ``notebooks/paper_figures/paper_figure_style.py`` in the research repository;
+# migrated here symbol-for-symbol. ``style.FIG_ROOT`` already honours
+# DEMAP_FIGURE_DIR, so the output location no longer needs overriding.
 
 def main(argv=None) -> int:
     """Render Figure 5."""

@@ -13,9 +13,7 @@ import pandas as pd
 from demap_repro.utils.paths import data_root
 import yaml
 
-import sys
-sys.path.insert(0, "/data/nextgen2/james/tasks/cde_project/demap/src")
-from demap_repro.biencoder import select  # noqa: E402
+from demap_repro.biencoder import select
 
 REPO = data_root()
 OUT = REPO / ".scratch/demap/paper_v10_revision/data"
