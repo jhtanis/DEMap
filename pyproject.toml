@@ -44,11 +44,21 @@ neural = [
 figures = ["matplotlib==3.10.8"]
 # caDSR XML extraction.
 extract = ["lxml==6.1.0"]
+# Word/PowerPoint readers. Two modules import these at module level:
+# reporting/schematics/_reference_figure6.py (pptx) and
+# sensitivity/allowance/validate.py (docx). Unlike every other pin in this file
+# these were never installed in the paper environment, so no version can honestly
+# be claimed to have run; the bounds are minimums, not reproductions.
+documents = [
+  "python-pptx>=0.6.21",
+  "python-docx>=1.1.0",
+]
 dev = ["pytest==9.0.3"]
 all = [
   "DEMap[neural]",
   "DEMap[figures]",
   "DEMap[extract]",
+  "DEMap[documents]",
   "DEMap[dev]",
 ]
 
