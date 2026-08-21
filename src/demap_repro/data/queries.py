@@ -63,6 +63,23 @@ from demap_repro.text.pv_summary import build_pv_summary_table
 # Strict inclusion rules
 # -----------------------------------------------------------------------------
 
+# The three curator allowlists below are tracked build inputs: they encode which
+# caDSR metadata fields a curator judged suitable for constructing benchmark
+# queries, and ``manifests/dataset_build_manifest_paper_era.json`` records them as
+# arguments of the executed build. They were omitted when this repository was
+# assembled, so ``demap build-queries`` could not run from a clean clone and the
+# curator's inclusion rules could not be applied at all. Digests are pinned here
+# because these files decide the benchmark's composition — an edited allowlist is
+# a different dataset, not a different run.
+ALLOWLIST_SHA256 = {
+    "alt_allowlist_current.csv":
+        "45c5ae6a1d7f15ef7bf174dbd40127c7e9c52c6e7f198a5a9f97f601bf8f3f71",
+    "alt_query_recipes_current.csv":
+        "cde44916f122d52f2a0a93cc917422691ffddb5848c75a68a405d5b97993f633",
+    "refdoc_allowlist_current.csv":
+        "edf9062a47cc01b6f6aacb330208139cba1d5e851e24b36f8992be6636822edc",
+}
+
 # Alternate-name allowlist.
 #
 # This is a strict, curator-editable CSV of exact (alternate_name_type, context_name)

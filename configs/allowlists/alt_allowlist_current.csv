@@ -1,0 +1,14 @@
+alternate_name_type,context_name,family
+NMDP_FN,NHLBI,NMDP
+"OID, AMC",AMC,OID
+"OID, CCTG",CCTG,OID
+"OID, SWOG",SWOG,OID
+TCIA Alt Name,CIP,TCIA
+HTAN Alt Name,HTAN,HTAN
+OBIB,BBRB,OBIB
+C3DC Alt Name,Pediatric Cancer,C3DC
+CCDI Alt Name,Pediatric Cancer,CCDI
+CRDC Alt Name,CRDC,CRDC
+CRDC Alt Name,Theradex,CRDC
+CTDC Alt Name,CRDC,CTDC
+CTDC Alt Name,Pediatric Cancer,CTDC
