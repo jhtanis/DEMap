@@ -4,9 +4,9 @@
 Recomputes per-dataset Recall@K / MRR@100 from an existing
 ``hgbc_scored_rankings.parquet`` (written by ``train_hgbc_reranker.py``) — NO
 retrain, NO rescore. For each split the denominator is the *reachable* query set
-(``data/processed/splits_v3_cdisc_reachable_2026-06-18_cimacpv/<split>.parquet``);
-a query is a hit@k iff its gold (``is_label``) minimum ``hgbc_rank`` <= k, and
-queries with no gold candidate in the pool are misses (rank inf). Primary ranking
+(``data/processed/eval_canonical/<split>.parquet``); a query is a hit@k iff its
+gold (``is_label``) minimum ``hgbc_rank`` <= k, and queries with no gold candidate
+in the pool are misses (rank inf). Primary ranking
 is no-pin (uses ``hgbc_rank`` as written). MRR is MRR@100 to match
 ``train_hgbc_reranker.py``.
 
@@ -18,10 +18,30 @@ therefore unaffected by the CIMAC PV correction.
 This module is import-friendly: ``by_dataset()`` and ``cimac_strata()`` can be
 called directly (e.g. by ``build_medcpt_stage2_final_tables.py``).
 
-Defaults assume the corrected CIMAC-PV world:
-  * reachable splits dir: ``…_reachable_2026-06-18_cimacpv``
-  * the scored rankings you pass should already be on the corrected canonical
-    fixed-K base (``…_fixedk30_cimacpv``) for CIMAC.
+Denominators
+------------
+The default query set is ``data/processed/eval_canonical`` — the canonical
+evaluation population declared in ``configs/paper/eval_datasets_v1.yaml`` and the
+one the manuscript reports against (Test 3,959 / CCTG 1,097 / OID ALT 1,766 /
+CDASH 324 / GDC 72 / CIMAC 131).
+
+It used to default to ``splits_v3_cdisc_reachable_2026-06-18_cimacpv``, a
+pre-canonicalisation scheme that answers a different question, and the mismatch
+was silent in two ways. Its ``test`` split holds 3,968 queries, not 3,959, and it
+holds no ``cctg``, ``oid_alt``, ``cdash`` or ``gdc_combined`` parquet at all — it
+carries the legacy ``external_holdout_org`` / ``external_holdout_refslice`` /
+``external_holdout_gdc_*`` names those datasets were later carved from. Under the
+canonical split names a run therefore printed a wrong denominator for ``test`` and
+``val_dev`` and quietly *dropped four of the six* evaluation datasets.
+
+No published number came from here: ``hgbc_eval_by_split.csv`` is written by
+``demap_repro.reranker.train`` from the feature table, and reports the paper's
+denominators. This was a stale default, not a corrupted result. A missing split
+is now an error rather than a printed note, so the same mismatch cannot recur
+silently.
+
+The scored rankings you pass should already be on the corrected canonical fixed-K
+base (``…_fixedk30_cimacpv``) for CIMAC.
 
 Usage:
     PYTHONPATH=src python scripts/eval_hgbc_reachable_by_dataset.py \
@@ -43,8 +63,10 @@ from demap_repro.utils.paths import data_root
 
 REPO_ROOT = data_root()
 
-DEFAULT_REACH_DIR = REPO_ROOT / "data/processed/splits_v3_cdisc_reachable_2026-06-18_cimacpv"
+#: The canonical evaluation population — see the module docstring.
+DEFAULT_REACH_DIR = REPO_ROOT / "data/processed/eval_canonical"
 REQUIRED_COLS = ("split", "query_id", "cde_id", "hgbc_rank", "is_label")
+#: The paper's reporting depths (Table 4 quotes Recall@5; S5 quotes 1/5/10).
 KS = (1, 5, 10)
 CIMAC_STRATA_N = {"full_131": 131, "exact_92": 92, "non_exact_39": 39}
 
@@ -77,16 +99,34 @@ def _reachable_qids(reach_dir: Path, split: str):
     return set(pd.read_parquet(p, columns=["query_id"])["query_id"].astype(str))
 
 
-def by_dataset(scored: pd.DataFrame, reach_dir: Path, label: str) -> pd.DataFrame:
-    """Reachable by-dataset metrics for every split that has a reachable parquet."""
+def by_dataset(scored: pd.DataFrame, reach_dir: Path, label: str,
+               *, allow_missing: bool = False) -> pd.DataFrame:
+    """Reachable by-dataset metrics for every split in ``scored``.
+
+    A split present in ``scored`` with no query-set parquet under ``reach_dir``
+    is an error: it means the denominators come from a different population than
+    the rankings, and skipping it silently drops a whole evaluation dataset from
+    the output table. Pass ``allow_missing=True`` (``--allow-missing-splits``)
+    when that is genuinely intended, e.g. scoring ``val_train``/``val_dev``
+    against the canonical six.
+    """
     rows = []
+    missing = []
     for split in sorted(scored["split"].unique()):
         qset = _reachable_qids(reach_dir, split)
         if qset is None:
-            print(f"  (skip {split}: no reachable split parquet under {reach_dir})")
+            missing.append(split)
             continue
         sdf = scored[scored["split"] == split]
         rows.append({"split": split, "model": label, **_metrics(_rank_map(sdf), qset)})
+    if missing and not allow_missing:
+        raise FileNotFoundError(
+            f"no query-set parquet under {reach_dir} for split(s) {missing}; "
+            f"the denominators would come from a different population than the "
+            f"rankings. Point --reachable-splits-dir at the matching query sets, "
+            f"or pass --allow-missing-splits if the omission is intended.")
+    if missing:
+        print(f"  (skipped, no query-set parquet under {reach_dir}: {missing})")
     return pd.DataFrame(rows, columns=["split", "model", "n", "R@1", "R@5", "R@10",
                                        "MRR@100", "gold_in_pool"])
 
@@ -94,8 +134,21 @@ def by_dataset(scored: pd.DataFrame, reach_dir: Path, label: str) -> pd.DataFram
 def cimac_strata(scored: pd.DataFrame, label: str,
                  cde_master: Path = None, interim: Path = None,
                  cimac_split: Path = None) -> pd.DataFrame:
-    """CIMAC 131/92/39 strata metrics (gold-based membership; corrected ranks)."""
-    from eval_hgbc_cimac131 import _strata, DEF_ELIG, DEF_INTERIM, DEF_SPLIT
+    """CIMAC 131/92/39 strata metrics (gold-based membership; corrected ranks).
+
+    Requires ``eval_hgbc_cimac131``, a research-repository script that was not
+    migrated. :func:`by_dataset` — the function this module exists for — does not
+    need it.
+    """
+    try:
+        from eval_hgbc_cimac131 import _strata, DEF_ELIG, DEF_INTERIM, DEF_SPLIT
+    except ImportError as exc:  # pragma: no cover - exercised by the guard test
+        raise RuntimeError(
+            "cimac_strata() needs 'eval_hgbc_cimac131', a research-repository "
+            "script that was not migrated to this repository, so the CIMAC "
+            "131/92/39 strata cannot be computed here. by_dataset() does not "
+            "need it and is unaffected."
+        ) from exc
     full, exa, nex = _strata(Path(cde_master or DEF_ELIG),
                              Path(interim or DEF_INTERIM),
                              Path(cimac_split or DEF_SPLIT))
@@ -126,13 +179,16 @@ def main(argv=None) -> int:
     ap.add_argument("--scored-rankings", required=True)
     ap.add_argument("--reachable-splits-dir", default=str(DEFAULT_REACH_DIR))
     ap.add_argument("--label", default="hgbc")
+    ap.add_argument("--allow-missing-splits", action="store_true",
+                    help="skip splits with no query-set parquet instead of failing")
     ap.add_argument("--out-csv", required=True)
     ap.add_argument("--cimac-strata-out", default=None,
                     help="if set and cimac_v2 present, also write 131/92/39 strata metrics")
     args = ap.parse_args(argv)
 
     scored = load_scored(Path(args.scored_rankings))
-    bd = by_dataset(scored, Path(args.reachable_splits_dir), args.label)
+    bd = by_dataset(scored, Path(args.reachable_splits_dir), args.label,
+                    allow_missing=args.allow_missing_splits)
     Path(args.out_csv).parent.mkdir(parents=True, exist_ok=True)
     bd.to_csv(args.out_csv, index=False)
     pd.set_option("display.width", 200)
