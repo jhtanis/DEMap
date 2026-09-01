@@ -1,4 +1,4 @@
-"""Table 4, Table S5, the final HGBC configuration, and the BM25 baseline.
+"""Table 4, Table S6, the final HGBC configuration, and the BM25 baseline.
 
 These are the reported end-to-end results. Every value here is checked against
 the manuscript, so a rebuild that shifts a headline number fails loudly.
@@ -102,7 +102,7 @@ def test_leakage_table_covers_three_methods_and_five_external_sets(leakage):
     assert {"cctg", "oid_alt", "cdash", "gdc_combined", "cimac_v2"} <= set(leakage["dataset"])
 
 
-def test_ft_mpnet_is_not_a_table_s5_method(leakage):
+def test_ft_mpnet_is_not_a_table_s6_method(leakage):
     assert "ft_mpnet" not in set(leakage["method"])
 
 
@@ -273,3 +273,51 @@ def test_bm25_indexed_the_production_catalog():
     """S5.1: 'Retrieved from the same production catalog' — 62,976 CDEs."""
     sel = pd.read_csv(FIXTURES / "bm25_val_dev_selection.csv")
     assert set(sel["n_index_docs"]) == {62976}
+
+
+# ---------------------------------------------------------------------------
+# Table 4 display precision
+# ---------------------------------------------------------------------------
+
+#: Table 4 exactly as the manuscript prints it, at 3 dp.
+MANUSCRIPT_TABLE4_3DP = {
+    "Test":    {"final_reranker": "0.971", "python_cde_match_approx": "0.719", "bm25": "0.361",
+                "ft_mpnet": "0.912", "cde_match_fuzzy": "0.773", "ce_pool_rerank": "0.914"},
+    "CCTG":    {"final_reranker": "0.909", "python_cde_match_approx": "0.739", "bm25": "0.392",
+                "ft_mpnet": "0.705", "cde_match_fuzzy": "0.780", "ce_pool_rerank": "0.718"},
+    "OID ALT": {"final_reranker": "0.832", "python_cde_match_approx": "0.770", "bm25": "0.176",
+                "ft_mpnet": "0.428", "cde_match_fuzzy": "0.702", "ce_pool_rerank": "0.564"},
+    "CDASH":   {"final_reranker": "0.920", "python_cde_match_approx": "0.750", "bm25": "0.710",
+                "ft_mpnet": "0.840", "cde_match_fuzzy": "0.830", "ce_pool_rerank": "0.864"},
+    "GDC":     {"final_reranker": "0.972", "python_cde_match_approx": "0.986", "bm25": "0.542",
+                "ft_mpnet": "0.833", "cde_match_fuzzy": "0.972", "ce_pool_rerank": "0.903"},
+    "CIMAC":   {"final_reranker": "0.802", "python_cde_match_approx": "0.679", "bm25": "0.160",
+                "ft_mpnet": "0.565", "cde_match_fuzzy": "0.786", "ce_pool_rerank": "0.595"},
+}
+
+
+@pytest.mark.parametrize("dataset", sorted(MANUSCRIPT_TABLE4_3DP))
+def test_table4_renders_the_manuscript_at_three_decimals(table4, dataset):
+    """Rounding the fixture once must give the printed table, in all 36 cells."""
+    idx = table4.set_index(["dataset", "method"])["recall@5"]
+    for method, want in MANUSCRIPT_TABLE4_3DP[dataset].items():
+        got = f"{float(idx.loc[(dataset, method)]):.3f}"
+        assert got == want, f"{dataset}/{method}: fixture renders {got}, manuscript prints {want}"
+
+
+def test_table4_values_are_not_stored_pre_rounded(table4):
+    """The two cells that a 4-dp source would round the wrong way.
+
+    Both sit exactly on a 4-dp boundary whose float representation falls
+    marginally below it, so a value stored at 4 dp renders 0.769 / 0.175 while
+    the full-precision value renders 0.770 / 0.176. Table S7 always printed the
+    latter for the same two quantities. Storing either at 4 dp reintroduces the
+    disagreement, so assert the fixture carries more precision than 4 dp.
+    """
+    idx = table4.set_index(["dataset", "method"])["recall@5"]
+    for method, boundary in (("python_cde_match_approx", 0.7695), ("bm25", 0.1755)):
+        v = float(idx.loc[("OID ALT", method)])
+        assert abs(v - boundary) > 1e-9, (
+            f"OID ALT/{method} is stored as the pre-rounded {boundary}; "
+            f"Table 4 would render {boundary:.3f} instead of {v:.3f}")
+        assert f"{v:.3f}" == f"{round(boundary + 1e-4, 3):.3f}"

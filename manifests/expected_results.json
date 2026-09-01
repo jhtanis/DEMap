@@ -764,7 +764,6 @@
         "MT-P38-01"
       ],
       "source_artifact": ".scratch/demap/paper_v13_scientific_audit/final_table4_v13.csv",
-      "source_sha256": "9f697e39c13f16742786de22a619770218fe1ddefd9f44c09986c9aaa0741b5b",
       "final_reranker_eval_artifact": "artifacts/final_reranker/hgbc_reranker_v2_eligible/with_ce_noprov/hgbc_eval_by_split.csv",
       "final_reranker_eval_sha256": "9b0c36b04b6351fd91da7b6823eb22216d05ad4b835f9fb571f547cb95b2dc94",
       "tolerance": 0.0005,
@@ -782,50 +781,50 @@
         "Test": {
           "final_reranker": 0.9714574387471584,
           "ce_pool_rerank": 0.9138671381662036,
-          "ft_mpnet": 0.9116,
+          "ft_mpnet": 0.9115938368274816,
           "cde_match_fuzzy": 0.7731750442030816,
-          "python_cde_match_approx": 0.7191,
-          "bm25": 0.3609
+          "python_cde_match_approx": 0.7191209901490275,
+          "bm25": 0.3609497347815105
         },
         "CCTG": {
           "final_reranker": 0.9088422971741112,
           "ce_pool_rerank": 0.7183226982680037,
-          "ft_mpnet": 0.7046,
+          "ft_mpnet": 0.7046490428441203,
           "cde_match_fuzzy": 0.780309936189608,
-          "python_cde_match_approx": 0.7393,
-          "bm25": 0.392
+          "python_cde_match_approx": 0.7392889699179581,
+          "bm25": 0.3919781221513218
         },
         "OID ALT": {
           "final_reranker": 0.8323895809739524,
           "ce_pool_rerank": 0.5639864099660249,
-          "ft_mpnet": 0.4281,
+          "ft_mpnet": 0.4280860702151755,
           "cde_match_fuzzy": 0.7021517553793885,
-          "python_cde_match_approx": 0.7695,
-          "bm25": 0.1755
+          "python_cde_match_approx": 0.7695356738391846,
+          "bm25": 0.1755379388448471
         },
         "CDASH": {
           "final_reranker": 0.9197530864197532,
           "ce_pool_rerank": 0.8641975308641975,
-          "ft_mpnet": 0.8395,
+          "ft_mpnet": 0.8395061728395061,
           "cde_match_fuzzy": 0.8302469135802469,
           "python_cde_match_approx": 0.75,
-          "bm25": 0.7099
+          "bm25": 0.7098765432098766
         },
         "GDC": {
           "final_reranker": 0.9722222222222222,
           "ce_pool_rerank": 0.9027777777777778,
-          "ft_mpnet": 0.8333,
+          "ft_mpnet": 0.8333333333333334,
           "cde_match_fuzzy": 0.9722222222222222,
-          "python_cde_match_approx": 0.9861,
-          "bm25": 0.5417
+          "python_cde_match_approx": 0.9861111111111112,
+          "bm25": 0.5416666666666666
         },
         "CIMAC": {
           "final_reranker": 0.8015267175572519,
           "ce_pool_rerank": 0.5954198473282443,
-          "ft_mpnet": 0.5649,
+          "ft_mpnet": 0.5648854961832062,
           "cde_match_fuzzy": 0.7862595419847328,
-          "python_cde_match_approx": 0.6794,
-          "bm25": 0.1603
+          "python_cde_match_approx": 0.6793893129770993,
+          "bm25": 0.1603053435114503
         }
       },
       "excluded_rows_in_source_csv": [
@@ -842,7 +841,9 @@
       "final_reranker_gdc_hits": "70/72",
       "required_ordering_claim": "final reranker highest Recall@5 on five of six datasets (GDC is the exception)",
       "release_gate": "cde_match_derivative_unresolved; cimac_unresolved; official_nci_cde_match_frozen",
-      "eval_rows": 7
+      "eval_rows": 7,
+      "source_note": "Rebuilt at full precision 2026-09-01. python_cde_match_approx and bm25 now come from table_s7_v13_with_hgbc.csv (eval_set=v1) and ft_mpnet from the phase2 canonical_metrics.csv, replacing three artifacts that store recall pre-rounded to 4 dp. Only the OID ALT python_cde_match_approx (0.769->0.770) and bm25 (0.175->0.176) 3-dp renderings change; every value still equals its legacy 4-dp artifact when rounded to 4 dp.",
+      "source_sha256_superseded_prerounded": "9f697e39c13f16742786de22a619770218fe1ddefd9f44c09986c9aaa0741b5b"
     },
     "H1_leakage_sensitivity": {
       "paper_scope_ids": [
