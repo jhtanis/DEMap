@@ -96,9 +96,10 @@ splits, the 62,976-record catalog, the six evaluation sets and their
 denominators, the leakage filter. These are asserted as **exact integers**, not
 tolerances.
 
-One evaluation set cannot be rebuilt from public inputs: GDC must be supplied.
-CIMAC's source workbook is a public download, and its exact evaluation input
-ships in `data/frozen/`. The four caDSR-derived sets are unaffected.
+The two external evaluation sets are not rebuilt at this level — they ship in
+`data/frozen/` instead. CIMAC's source workbook is a public download whose
+queries and gold reproduce from it; GDC's gold is expert curation with no public
+upstream. The four caDSR-derived sets are unaffected.
 
 ---
 
@@ -164,6 +165,14 @@ pv-diagnostics` runs the same grouping code and reproduces the recomputation,
 which demonstrates the code did not drift — only the input it was originally run
 over is gone.
 
+**The GDC evaluation set.** Manually curated: a curator assigned, for each GDC
+property, the caDSR CDE it maps to, and that assignment is the benchmark label.
+The GDC Data Dictionary publishes properties and permissible values but no
+property→CDE linkage, so the gold mappings are not recoverable from a public
+GDC source. The 72-query evaluation set is shipped as
+`data/frozen/gdc_combined.parquet`; the raw curation submissions are not, being
+workflow metadata with no reproduction value.
+
 **The CIMAC evaluation set.** Its queries and gold CDE mappings come from NCI's
 public CIMAC-CIDC clinical-data-element template — template and data-element
 metadata, not patient-level study data — and the Appendix A workbook NCI serves
@@ -185,10 +194,6 @@ reports it for those two sets alone because the four caDSR-derived sets were
 built from the same alternate-name and question-text fields the service queries,
 which would make the comparison circular, and because the live service cannot be
 subjected to the query-level exact-match masking the controlled experiments use.
-
-**The GDC evaluation set.** A supplied input, not a download. It cannot be
-regenerated from a public GDC source: its `Preferred CDE ID` column is the
-curator's expert assignment, which is the benchmark label itself.
 
 **Fine-tuned weights.** Ours, but not distributed. Reproducible by retraining at
 level 4.

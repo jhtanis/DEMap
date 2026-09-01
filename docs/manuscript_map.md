@@ -108,18 +108,22 @@ described in [`reproducing.md`](reproducing.md).
 
 ## What is gated, and what that costs you
 
-Three inputs are not distributed. None of them blocks the tier they sit in:
+Two inputs are not distributed. Neither blocks the tier it sits in:
 
-| gate | affects | consequence |
+| not distributed | affects | consequence |
 |---|---|---|
-| GDC curation tables | Table 1, Table 4, Table S1/S2/S4/S5/S6, Figure S6, §S1.5 | one of six evaluation columns; the other five reproduce |
 | fine-tuned weights | Figure 3, Figure 4, Table S4 | retrain from the specified protocols, or use frozen artifacts |
 | official NCI CDE Match output | Table 4, §3.8 | not reproducible by anyone; reported as a frozen external number |
-| NCI-supplied PL/SQL and logic PDF | — | **nothing.** Our Python implementations ship and run |
 
-The keyword arm — the Python approximation to NCI CDE Match and CDE Match-Fuzzy
-— is included in full. Only NCI's own source material is withheld.
+Three things a reader might expect to be missing are **not**:
 
-CIMAC is **not** on this list. Its source workbook is a public NCI download,
-byte-identical to the study copy, and its exact evaluation input ships as
-`data/frozen/cimac_v2.parquet`.
+- **The keyword arm.** The Python approximation to NCI CDE Match and CDE
+  Match-Fuzzy ship in full and run. Only NCI's own supplied PL/SQL and its logic
+  PDF are withheld, and nothing depends on them.
+- **CIMAC.** Its source workbook is a public NCI download, byte-identical to the
+  study copy, and its exact evaluation input ships as
+  `data/frozen/cimac_v2.parquet`.
+- **GDC.** Its expert-curated evaluation set ships as
+  `data/frozen/gdc_combined.parquet`. The gold mappings have no public upstream,
+  which is exactly why the artifact is distributed rather than left to be
+  supplied.

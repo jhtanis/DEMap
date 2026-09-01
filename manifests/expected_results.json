@@ -1342,6 +1342,18 @@
       "why_frozen": "Queries and gold reproduce from the public NCI CIMAC-CIDC Appendix A workbook, which is byte-identical to the study copy. The PV-enriched query_text_q3 cannot be regenerated: its upstream permissible-value workbook is a live document that has since changed, with no dated archive. Shipped so every reported CIMAC result reproduces exactly.",
       "public_source": "https://storage.googleapis.com/cidc-prod2-public-documents/CIMAC-CIDC_Master_AppendixA.xlsx",
       "public_source_sha256": "6d657dfd3f7289e74137929836974f742136fea3d2cb753432499418a57c71a3"
+    },
+    "data/frozen/gdc_combined.parquet": {
+      "sha256": "289c4f5fc966748c54fc3d4c8c0edda28937b55910796a65db7834034bf86f21",
+      "bytes": 38833,
+      "rows": 72,
+      "composition": {
+        "GDC_QTXT": 39,
+        "GDC_ALT": 33
+      },
+      "why_frozen": "The gold CDE mappings were manually curated and are not recoverable from a public GDC source: the GDC Data Dictionary publishes properties and permissible values but no property-to-CDE linkage. Shipped so the reported GDC evaluation is reproducible.",
+      "public_source": null,
+      "raw_curation_submissions": "deliberately not distributed; workflow metadata, no reproduction value"
     }
   }
 }

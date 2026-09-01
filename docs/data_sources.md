@@ -128,28 +128,37 @@ not agree, and that disagreement is not a defect.
 
 ## The two external evaluation sets
 
-Neither was derived from the caDSR export. Both are small, and they differ in
-what you have to obtain: GDC must be supplied, while CIMAC's source workbook is
-a public download and its evaluation set ships here.
+Neither was derived from the caDSR export, and neither has to be obtained: both
+evaluation sets ship in [`data/frozen/`](../data/frozen/README.md). They are
+there for different reasons, and the difference is worth understanding.
 
-### GDC — must be supplied
-
-Two curated tables mapping GDC properties to their expert-assigned CDEs:
+### GDC — shipped, because its gold cannot be recovered publicly
 
 ```
-data/raw/gdc/gdc_alt_names.csv        60 queries
-data/raw/gdc/gdc_question_text.csv    60 queries
+data/frozen/gdc_combined.parquet    72 queries, 38,833 bytes
+                                    sha256 289c4f5fc966748c54fc3d4c8c0edda28937b55910796a65db7834034bf86f21
 ```
 
-They are caDSR **curation batch submissions**, not exports of a public GDC
-service. The `Entity` and `Perm Val` columns correspond to GDC Data Dictionary
-properties and values, which are public — but the `Preferred CDE ID` on every
-row is the curator's expert assignment, and *that mapping is the benchmark
-label*. No public GDC endpoint carries it, so **the GDC evaluation set cannot be
-regenerated from a public source.** It has to be supplied.
+GDC's mappings were **manually curated**: a curator assigned, for each GDC
+property, the caDSR CDE it maps to. That assignment is the benchmark label.
 
-`src/demap_repro/data/gdc.py` documents the schema it expects, so an
-equivalently-shaped table from your own curation will run through the same path.
+The GDC Data Dictionary is public and publishes the properties and their
+permissible values, so the *query* side has a public analogue. It publishes no
+property→CDE linkage and has no endpoint for one, so **the gold mappings are not
+independently recoverable from a public GDC API or data-dictionary export.**
+They exist because a curator made them.
+
+The evaluation set is therefore distributed here, and the raw curation
+submissions are not: those carry workflow metadata — submitting user, batch
+name, per-cell comments and tips, "do not use" flags — and repeat one row per
+permissible value, 1,822 rows for what is 120 curated queries. None of it
+reproduces anything.
+
+```
+manual expert curation  ──►  frozen gdc_combined.parquet  ──►  the manuscript's GDC results
+```
+
+See [`../data/frozen/README.md`](../data/frozen/README.md) for the schema.
 
 ### CIMAC — public, and partly shipped
 
@@ -228,17 +237,16 @@ CIMAC is **not** restricted and does not require private access.
 | curator allowlists | which alternate-name and reference-document types become queries | **in this repository**, `configs/allowlists/` |
 | pipeline config | the dataset build contract | **in this repository**, `configs/pipeline.yaml` |
 | protocol configs | bi-encoder, cross-encoder, BM25, HGBC settings | **in this repository**, `configs/paper/` |
-| GDC evaluation tables | 120 curated query→CDE rows | **must be supplied** (not public) |
 | CIMAC Appendix A workbook | source of the 131 CIMAC queries and their gold CDEs | **public download**, digest above |
 | CIMAC evaluation set | the exact PV-enriched 131-query input | **in this repository**, `data/frozen/cimac_v2.parquet` |
+| GDC evaluation set | the 72-query curated input | **in this repository**, `data/frozen/gdc_combined.parquet` |
 | base model checkpoints | all-MPNet, BioSimCSE, PubMedBERT, MedCPT, BGE, MiniLM | **public**, from HuggingFace; see [`environment.md`](environment.md) |
 | fine-tuned weights | our trained bi-encoder and cross-encoder | **not distributed**; retrain from the specified protocols |
 | official NCI CDE Match output | the live service's saved results | **not reproducible by anyone**; reported as a frozen external number |
 
-Only three rows are not obtainable by downloading: the GDC tables, the
-fine-tuned weights, and the official-service output. Of those, the weights are
-reproducible by retraining, and the official-service column is a single reported
-comparison rather than an input to the system.
+Only two rows are neither downloadable nor shipped: the fine-tuned weights,
+which are reproducible by retraining, and the official-service output, which is
+a single reported comparison rather than an input to the system.
 
 ---
 

@@ -87,7 +87,7 @@ deterministic.
 | `src/demap_repro/sensitivity/` | leakage and exact-match-allowance sensitivity analyses |
 | `src/demap_repro/reporting/` | tables, figure inputs, figure generators |
 | `configs/` | the dataset pipeline contract, curator allowlists, and the frozen protocols |
-| `data/frozen/` | the one frozen study input distributed here: the CIMAC evaluation set |
+| `data/frozen/` | the two frozen evaluation sets distributed here: CIMAC and GDC |
 | `manifests/` | paper scope, source migration ledger, expected results |
 | `workflows/` | optional Slurm drivers |
 | `tests/` | invariants, behaviour, and regression against the published results |
@@ -103,7 +103,8 @@ Four levels, in increasing cost — full detail in
 2. **From frozen artifacts.** The paper's central result recomputes from the
    trained model in about four seconds on one CPU core.
 3. **Rebuild the data.** Both caDSR snapshots are publicly downloadable with
-   verified digests; the structural counts reproduce exactly.
+   verified digests; the structural counts reproduce exactly. The two external
+   evaluation sets ship in `data/frozen/`.
 4. **Retrain.** Protocols are fully specified and start from public checkpoints.
    Acceptance is 0.01 Recall@5 **and** unchanged method ordering.
 
@@ -124,8 +125,13 @@ exact PV-enriched evaluation set ships in
 [`data/frozen/`](data/frozen/README.md), because the separate permissible-value
 workbook it drew on has since changed upstream.
 
-Only the GDC curation tables must be supplied: their gold CDE assignments are a
-curator's expert judgement and no public GDC endpoint carries them.
+GDC's evaluation set ships in `data/frozen/` too, for the opposite reason: its
+gold CDE assignments are a curator's expert judgement and no public GDC endpoint
+carries them, so distributing the derived set is the only thing that makes the
+reported GDC evaluation reproducible. The raw curation submissions are not
+included — they are workflow metadata with no reproduction value.
+
+**Nothing here requires private access.**
 
 The data tree itself is far too large to version and is not included.
 

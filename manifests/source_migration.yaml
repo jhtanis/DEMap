@@ -3845,6 +3845,50 @@ entries:
     intermediates, and their only output that anything downstream needs is data/frozen/cimac_v2.parquet,
     which is shipped. Migrating them would add a path that cannot be run to a correct result from public
     inputs, since the PV workbook they read has changed upstream.'
+- src: data/processed/eval_canonical/gdc_combined.parquet
+  dst: data/frozen/gdc_combined.parquet
+  source_class: untracked
+  worktree_sha256: 289c4f5fc966748c54fc3d4c8c0edda28937b55910796a65db7834034bf86f21
+  worktree_bytes: 38833
+  paper_scope_ids:
+  - MT-T1
+  - MT-T4
+  - MT-P38-01
+  - SM-TS1
+  - SM-TS2
+  - SM-TS4
+  - SM-TS5
+  - SM-TS6
+  - SM-FS6
+  - SM-S15-01
+  role: 'GDC canonical evaluation set (72 queries: 39 question-text, 33 alternate-name)'
+  release_gate: null
+  nontrivial: false
+  classification: frozen_input
+  copy_verbatim: true
+  migration_state: copied_verbatim
+  divergence_note: null
+  provenance_status: Manually curated. The cde_id column is a curator expert assignment and IS the benchmark
+    label; it is not recoverable from any public GDC source. The GDC Data Dictionary publishes properties
+    and permissible values but no property-to-CDE linkage. Shipped because without it the GDC column of
+    every reported table is unreproducible. See data/frozen/README.md.
+- src: data/raw/gdc/gdc_alt_names.csv, data/raw/gdc/gdc_question_text.csv
+  dst: null
+  source_class: tracked
+  worktree_sha256: null
+  worktree_bytes: null
+  paper_scope_ids: []
+  release_gate: null
+  nontrivial: false
+  role: raw caDSR curation submissions behind the GDC evaluation set
+  classification: not_migrated
+  copy_verbatim: false
+  migration_state: not_migrated_by_decision
+  exclusion_reason: 'superseded_by_derived_artifact: they carry curation workflow metadata - submitting
+    user, batch name, per-cell comments and tips, "do not use" flags - and repeat one row per permissible
+    value, 1,822 rows for what is 120 curated queries. None of that reproduces anything. The compact derived
+    set the manuscript workflow actually consumes is shipped as data/frozen/gdc_combined.parquet instead.
+    These CSVs have never been in this repository or its git history.'
 gated_material:
 - src: scripts/cde_match/cdeMatch_matchFlow.sql
   source_class: tracked

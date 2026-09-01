@@ -124,9 +124,19 @@ machine-learning splits.
 
 ## 3. Add the two external evaluation sets
 
-Neither is built from the caDSR export. GDC must be supplied; CIMAC's source
-workbook is a public NCI download and its exact evaluation set ships here (see
-[`data_sources.md`](data_sources.md)).
+Neither is built from the caDSR export. Both ship in
+[`data/frozen/`](../data/frozen/README.md), so this step is a copy:
+
+```bash
+cp data/frozen/cimac_v2.parquet     "$DEMAP_DATA_ROOT/data/processed/eval_canonical/cimac_v2.parquet"
+cp data/frozen/gdc_combined.parquet "$DEMAP_DATA_ROOT/data/processed/eval_canonical/gdc_combined.parquet"
+```
+
+Why each is frozen rather than rebuilt is in
+[`data_sources.md`](data_sources.md): CIMAC's permissible-value workbook changed
+upstream, and GDC's gold mappings are expert curation with no public source.
+
+The importers remain available if you hold the raw inputs yourself:
 
 ```bash
 demap import-gdc --help          # the two curated GDC tables -> split parquet schema
@@ -137,21 +147,9 @@ GDC arrives as two curation tables (ALT-name and question-text batches) that
 repeat one row per permissible value; the importer collapses them to one row per
 query and resolves the CDE version from the catalog.
 
-**CIMAC needs one extra step.** `demap import-cimac` reads the public Appendix A
-workbook and reproduces the CIMAC query identities and gold CDEs — but not the
-permissible-value enrichment, whose upstream workbook has since changed. Use the
-frozen evaluation set instead:
-
-```bash
-cp data/frozen/cimac_v2.parquet \
-   "$DEMAP_DATA_ROOT/data/processed/eval_canonical/cimac_v2.parquet"
-```
-
-That file is the exact PV-enriched input the manuscript used; see
-[`../data/frozen/README.md`](../data/frozen/README.md).
-
-If you cannot supply GDC, everything else still runs — it is 1 of the 6
-evaluation sets, and the others are unaffected.
+`demap import-cimac` reads the public Appendix A workbook and reproduces the
+CIMAC query identities and gold CDEs — but not the permissible-value
+enrichment, which is why the frozen set above is what evaluation uses.
 
 ---
 
