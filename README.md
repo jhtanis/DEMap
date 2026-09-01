@@ -43,6 +43,7 @@ tests that check the fixtures against the full-size originals.
 | `src/demap_repro/data/` | benchmark construction: caDSR extraction, query and pair building, splits, reachability, leakage filtering, PV summaries |
 | `src/demap_repro/biencoder/` | representation screening, Phase 1 and Phase 2 fine-tuning, selection, deep retrieval |
 | `src/demap_repro/lexical/` | BM25 baseline, the exact-match allowance mask, the non-exact subset evaluation |
+| `src/demap_repro/lexical/cde_match/` | the Python approximation to NCI CDE Match, the CDE Match-Fuzzy retriever, and the candidate builder that runs either |
 | `src/demap_repro/pool/` | candidate-pool union and the selection of K |
 | `src/demap_repro/crossencoder/` | pool and pair construction, training, scoring, selection |
 | `src/demap_repro/reranker/` | fixed-K feature assembly, split routing, HGBC training and ranking |
@@ -117,19 +118,24 @@ rights rather than about the data:
 
 | not included | why |
 |---|---|
-| the Python approximation to NCI CDE Match, and CDE Match-Fuzzy built on it | derivative of Oracle PL/SQL supplied to us by NCI; redistribution unresolved |
+| the Oracle PL/SQL supplied to us by NCI, and the CDE Match logic PDF | NCI-supplied source material; redistribution unresolved |
 | fine-tuned bi-encoder and cross-encoder weights | our own weights, but redistribution not yet determined |
 | saved output of the live NCI CDE Match service | a third-party service result, never reproducible by anyone |
+| the CIMAC source workbook and its derived evaluation set | redistribution unresolved |
 
 These are recorded in `manifests/source_migration.yaml` with the gate that blocks
 each one, and none has ever entered this repository or its git history.
 
-**This does not block reproduction.** Stages that would call the gated keyword arm
-resolve it through a documented adapter
-(`src/demap_repro/lexical/cde_match_interface.py`) and accept a precomputed
-candidate artifact instead. BM25 is a lexical baseline with no such dependency and
-is included in full. And an unresolved *weights* gate does not prevent retraining:
-the base checkpoints are public and the protocols are specified.
+**The keyword arm itself is included.** The Python approximation to NCI CDE Match
+and the CDE Match-Fuzzy retriever built on it ship in
+`src/demap_repro/lexical/cde_match/`, and `demap cdematch-candidates` runs either.
+Only NCI's own source material is withheld, which does not affect running them.
+
+**The remaining gates do not block reproduction.** An unresolved *weights* gate
+does not prevent retraining: the base checkpoints are public and the protocols
+are specified. The live-service column of Table 4 is reported as a frozen
+external number, as it must be. CIMAC is one of six evaluation sets; the other
+five are unaffected.
 
 ---
 

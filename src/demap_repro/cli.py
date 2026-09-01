@@ -7,8 +7,9 @@ the pipeline reads as an ordered list rather than a directory of scripts::
     demap select-k --grid artifacts/final_reranker/k_selection/k_selection_grid.csv
     demap leakage-filter --dry-run
 
-Stages that need components with unresolved redistribution status say so when they
-run, rather than failing with an import error. See ``docs/provenance.md``.
+No stage is currently gated: every algorithm the paper workflow runs ships here.
+The mechanism is retained because some inputs remain undistributed - see
+``docs/provenance.md`` and ``manifests/source_migration.yaml``.
 """
 from __future__ import annotations
 
@@ -52,9 +53,11 @@ STAGES: List[Stage] = [
 
     # C — lexical
     Stage("bm25", "demap_repro.lexical.bm25.cli", "C. Lexical",
-          "BM25 baseline (no CDE Match derivation; fully released)"),
+          "BM25 baseline"),
+    Stage("cdematch-candidates", "demap_repro.lexical.cde_match.build_candidates", "C. Lexical",
+          "Python CDE Match approximation, or CDE Match-Fuzzy with --fuzzy-fallback"),
     Stage("non-exact-eval", "demap_repro.lexical.non_exact_subset", "C. Lexical",
-          "Recall on queries with no exact-match evidence (Figure 5C)", gated=True),
+          "Recall on queries with no exact-match evidence (Figure 5C)"),
 
     # D — candidate pool
     Stage("select-k", "demap_repro.pool.select_k", "D. Candidate pool",
@@ -62,11 +65,11 @@ STAGES: List[Stage] = [
 
     # E — cross-encoder
     Stage("ce-pool-train", "demap_repro.crossencoder.pool_train", "E. Cross-encoder",
-          "corrected training pool, including the 172-query exclusion", gated=True),
+          "corrected training pool, including the 172-query exclusion"),
     Stage("ce-pool-eval", "demap_repro.crossencoder.pool_eval", "E. Cross-encoder",
-          "corrected evaluation pool", gated=True),
+          "corrected evaluation pool"),
     Stage("ce-pairs", "demap_repro.crossencoder.pairs", "E. Cross-encoder",
-          "cross-encoder training pairs", gated=True),
+          "cross-encoder training pairs"),
     Stage("ce-train", "demap_repro.crossencoder.train", "E. Cross-encoder",
           "fine-tune one backbone under the frozen protocol"),
     Stage("ce-score", "demap_repro.crossencoder.score", "E. Cross-encoder",
@@ -78,7 +81,7 @@ STAGES: List[Stage] = [
 
     # F — reranker
     Stage("fixed-k-features", "demap_repro.reranker.fixed_k_features", "F. Reranker",
-          "assemble the fixed-K (K=30) candidate feature table", gated=True),
+          "assemble the fixed-K (K=30) candidate feature table"),
     Stage("merge-ce-features", "demap_repro.reranker.merge_crossenc_features", "F. Reranker",
           "merge the six crossenc_* features into the feature table"),
     Stage("train-hgbc", "demap_repro.reranker.train", "F. Reranker",
@@ -108,8 +111,9 @@ def _print_stages() -> None:
             print(f"\n{group}")
         mark = " [gated]" if stage.gated else ""
         print(f"  {stage.name:22s} {stage.summary}{mark}")
-    print("\n[gated] needs a component whose redistribution status is unresolved; "
-          "see docs/provenance.md")
+    if any(s.gated for s in STAGES):
+        print("\n[gated] needs a component whose redistribution status is unresolved; "
+              "see docs/provenance.md")
 
 
 def main(argv=None) -> int:

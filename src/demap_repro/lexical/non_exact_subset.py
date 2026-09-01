@@ -36,7 +36,7 @@ from demap_repro.utils.paths import data_root
 #: repository, which made the module unusable anywhere else; see
 #: ``demap_repro.utils.paths`` and ``DEMAP_DATA_ROOT``.
 REPO = data_root()
-from demap_repro.lexical.cde_match_interface import exact_match_control
+from demap_repro.lexical.cde_match.clone import ExactMatchControl
 
 SEED = 42
 DATASETS = {  # dataset -> allowrate
@@ -126,7 +126,7 @@ def main(argv=None) -> int:
         non_exact_qids = all_qids - exact_qids
 
         # hash "blocked region" among non-exact (informative; suppression happens here)
-        ctrl = exact_match_control(allow_rate=rate, seed=SEED)
+        ctrl = ExactMatchControl(allow_rate=rate, seed=SEED)
         n_blocked_region = sum(1 for q in non_exact_qids if not ctrl.query_allowed(q))
 
         summary_rows.append({

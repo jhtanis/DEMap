@@ -25,6 +25,9 @@ dependencies = [
   "pyyaml==6.0.3",
   "tqdm==4.67.3",
   "joblib>=1.2",
+  # Used by the CDE Match-Fuzzy retriever for its Unicode-property patterns;
+  # the stdlib re module does not support them.
+  "regex==2026.4.4",
 ]
 
 [project.optional-dependencies]

@@ -17,14 +17,19 @@
           "source_normalized_ast_sha256": "53e7089d798680024c3052cbe6e9c7aae78ed1ef733428270606ad2250dd62d2"
         },
         "keyword_provenance": {
-          "ast_sha256": "9986e06316f3956a4bc35289010bac8f9193b57ffbffc7471a6df7cfd6a8f1b2",
+          "ast_sha256": "d55da820013c5764c3d6217fd08166aa36359fd1b56dc29857fdcbc42ea25bad",
           "migrated_from": {
             "path": "scripts/build_hgbc_feature_table.py",
             "function": "_keyword_provenance"
           },
           "identical_to_source": true,
-          "normalized_ast_sha256": "639838961af5881bf456019c3b2623a5330e375b1fb82df281e57711e1a4dd8c",
-          "source_normalized_ast_sha256": "639838961af5881bf456019c3b2623a5330e375b1fb82df281e57711e1a4dd8c"
+          "normalized_ast_sha256": "d55da820013c5764c3d6217fd08166aa36359fd1b56dc29857fdcbc42ea25bad",
+          "source_normalized_ast_sha256": "d55da820013c5764c3d6217fd08166aa36359fd1b56dc29857fdcbc42ea25bad",
+          "repin": {
+            "date": "2026-09-01",
+            "previous_ast_sha256": "9986e06316f3956a4bc35289010bac8f9193b57ffbffc7471a6df7cfd6a8f1b2",
+            "reason": "The previous pin captured the adapter form. While the CDE Match retriever's redistribution was unresolved, this function called it through lexical/cde_match_interface.py, which hoisted a module-level indirection where the source had a lazy in-function import. The retriever now ships here, so the call was restored to the source's own structure: `from demap_repro.lexical.cde_match import keyword_retriever as kr` inside the function - the import is deferred because it pulls in sklearn - then `kr.generate_candidates(...)`. The AST hash now equals the research source's exactly, so this re-pin removes a migration divergence rather than accepting a new one. Verified by computing function_ast_hash over scripts/build_hgbc_feature_table.py::_keyword_provenance."
+          }
         },
         "apply_keyword_exact_control": {
           "ast_sha256": "da241b74a012d0e7a7791d5990b503542d374391a9d5e4ccdcc093eb054b1830",

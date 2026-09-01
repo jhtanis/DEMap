@@ -32,44 +32,34 @@ release_gates:
       question.
     copy_policy: NEVER copy into DST. Read from immutable SRC only, if ever needed for parity.
   cde_match_derivative_unresolved:
-    description: Python approximation to NCI CDE Match (cde_match_clone.py) and the CDE Match-Fuzzy keyword
-      retriever built on it. Both are derivative works of the supplied PL/SQL, and CDE Match-Fuzzy is
-      one of the two candidate sources for the final system.
-    status: unresolved
-    affects_stages:
-    - C
-    - D
-    - E
-    - F
-    - G
-    - H2
-    decision_needed: Whether the Python derivative may be published. If not, stages D-H consume released
-      precomputed candidate/pool artifacts instead.
+    description: RETIRED 2026-09-01. The Python approximation to NCI CDE Match (cde_match_clone.py) and
+      the CDE Match-Fuzzy keyword retriever built on it.
+    status: resolved
+    resolution: Cleared for public release by the author. Both implementations now ship as src/demap_repro/lexical/cde_match/{clone,keyword_retriever}.py,
+      with their entry point build_candidates.py. The runtime adapter that stood in for them (lexical/cde_match_interface.py)
+      is deleted; callers import them directly. This clearance covers OUR implementations only. It does
+      not extend to the NCI-supplied PL/SQL they were developed from, to the CDE Match logic PDF, or to
+      saved output of the live service - see nci_cde_match_source and official_nci_cde_match_frozen, both
+      still open.
+    affects_stages: []
     dimension: code_redistributable
     blocks_reproducible_by_retraining: false
-    dimension_note: Redistribution of OUR derivative implementation. The method has no learned parameters,
-      so 'reproducible_by_retraining' is not_applicable; downstream stages can instead consume a user-supplied
-      or precomputed candidate artifact.
-    copy_policy: Do not copy into DST until cleared.
   cde_match_derived_artifacts:
-    description: Candidate/result parquets produced by the clone and by CDE Match-Fuzzy, and the official
-      NCI CDE Match service outputs.
-    status: unresolved
+    description: 'Candidate tables and keyword indexes produced BY the CDE Match implementations: keyword_fuzzy_v2_eligible/
+      and cde_match_clone/.'
+    status: not_distributed_by_size
+    resolution: No longer a rights question - the code that produces these is public as of 2026-09-01.
+      They are excluded because they are large regenerable derived artifacts, the same policy applied
+      to every other artifact tree. Regenerate with `demap cdematch-candidates`; see docs/reproducing.md.
     affects_stages:
     - C
     - D
     - E
     - F
     - G
-    - H1
     - H2
-    decision_needed: Whether derived outputs may be released even if the implementation may not.
-    dimension: data_redistributable
+    dimension: artifact_size
     blocks_reproducible_by_retraining: false
-    dimension_note: 'Redistribution of the candidate/result parquets. Independent of whether the implementation
-      may be published: releasing the artifacts alone would keep every downstream stage runnable in precomputed
-      mode.'
-    copy_policy: Do not copy into DST until cleared.
   official_nci_cde_match_frozen:
     description: Saved output of the live NCI CDE Match production service (GDC and CIMAC only).
     status: unresolved
@@ -536,8 +526,8 @@ entries:
     PV_DIAG_DIR resolves to artifacts/summaries/pv_frozen_diagnostics (NOT the _with_gdc variant).'
   divergence_note: 'Cell 13 (the Table S3 grouping) ported to a module. AUDIT 2026-08-08: the earlier
     reason claimed tests covered it, but no DST code performed the grouping. The full chain pairs.parquet
-    -> pv_frozen_diagnostics -> this module reproduces, from the surviving 69,102-row benchmark, (38,964 / 24,158 / 3,040
-    / 8,815) end to end; the other notebook cells build tables not reported in v21.'
+    -> pv_frozen_diagnostics -> this module reproduces, from the surviving 69,102-row benchmark, (38,964
+    / 24,158 / 3,040 / 8,815) end to end; the other notebook cells build tables not reported in v21.'
   release_gate: null
   nontrivial: true
   classification: migration_candidate
@@ -3604,6 +3594,69 @@ entries:
     the function is retriever-agnostic. The only CDE Match-specific constant is CDEMATCH_SCORE_MAX = 100.0,
     an observed property of the upstream score scale, not algorithm internals. The genuinely derivative
     components (cde_match_clone.py, keyword_retriever.py, the NCI PL/SQL) remain gated and uncopied.'
+- src: src/demap/features/cde_match_clone.py
+  dst: src/demap_repro/lexical/cde_match/clone.py
+  source_class: tracked
+  worktree_sha256: ea6d5ce85655243635add5cd534cf5be3b683e6334fb3a05b1175241c105193d
+  worktree_bytes: 77884
+  paper_scope_ids:
+  - MT-T4
+  - MT-F5
+  - MT-P36-01
+  - SM-S52-01
+  - SM-TS6
+  - SM-TS7
+  - SM-FS7
+  - SM-FS8
+  role: Python approximation to NCI CDE Match; also defines FuzzyFallback and ExactMatchControl
+  release_gate: null
+  divergence_note: 'Copied verbatim 2026-09-01 (bytes match worktree_sha256), then imports repointed to
+    this package and the sys.path insertions removed. No logic changed. Post-migration sha256: cf99f8b18f007440f1097aebaf1aa400e912455fda1284c4a67b63d00a27822f'
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  migration_state: parity_established
+  provenance_status: Previously gated under cde_match_derivative_unresolved and reached through lexical/cde_match_interface.py.
+    Cleared for release 2026-09-01; the adapter is deleted.
+- src: src/demap/features/keyword_retriever.py
+  dst: src/demap_repro/lexical/cde_match/keyword_retriever.py
+  source_class: tracked
+  worktree_sha256: da4e828a152cc831d8f95abd2f77d8aa05b2c461d946502a432916ee3ab4487a
+  worktree_bytes: 30316
+  paper_scope_ids:
+  - MT-T4
+  - MT-F5
+  - MT-P36-01
+  - SM-S52-01
+  role: 'CDE Match-Fuzzy fuzzy stage: char-ngram, word-ngram, token-overlap and PV evidence'
+  release_gate: null
+  divergence_note: 'Copied verbatim 2026-09-01 (bytes match worktree_sha256), then imports repointed to
+    this package and the sys.path insertions removed. No logic changed. Post-migration sha256: e9c43ca69bf58b968fb349ca0af93f83d312f9c9a4733d32cfae04b1081d38e9'
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  migration_state: parity_established
+  provenance_status: Previously gated under cde_match_derivative_unresolved and reached through lexical/cde_match_interface.py.
+    Cleared for release 2026-09-01; the adapter is deleted.
+- src: scripts/build_cde_match_candidates.py
+  dst: src/demap_repro/lexical/cde_match/build_candidates.py
+  source_class: tracked
+  worktree_sha256: cd01bbcfce3d690ac95180c01ef33b094f0c01d1cd5aee5c482aaf5ca33e0f1a
+  worktree_bytes: 19773
+  paper_scope_ids:
+  - MT-T4
+  - MT-F5
+  - SM-S52-01
+  role: 'entry point: runs either keyword arm over a split and writes the candidate parquet'
+  release_gate: null
+  divergence_note: 'Copied verbatim 2026-09-01 (bytes match worktree_sha256), then imports repointed to
+    this package and the sys.path insertions removed. No logic changed. Post-migration sha256: 8f6d080ebb530832e8e099a452e46130266a3ecd7771ba0197d695b4fcbd1098'
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: true
+  migration_state: parity_established
+  provenance_status: Previously gated under cde_match_derivative_unresolved and reached through lexical/cde_match_interface.py.
+    Cleared for release 2026-09-01; the adapter is deleted.
 gated_material:
 - src: scripts/cde_match/cdeMatch_matchFlow.sql
   source_class: tracked
@@ -3688,53 +3741,6 @@ gated_material:
   paper_scope_ids:
   - SM-S52-01
   release_gate: nci_cde_match_source
-  copied_to_dst: false
-  migration_state: not_copied
-- src: src/demap/features/cde_match_clone.py
-  source_class: tracked
-  worktree_sha256: ea6d5ce85655243635add5cd534cf5be3b683e6334fb3a05b1175241c105193d
-  worktree_bytes_or_filecount: 77884
-  digest_kind: file
-  role: Python approximation to NCI CDE Match; derivative of the supplied PL/SQL
-  paper_scope_ids:
-  - MT-T4
-  - MT-F5
-  - MT-P36-01
-  - SM-S52-01
-  - SM-TS5
-  - SM-TS6
-  - SM-FS6
-  - SM-FS7
-  release_gate: cde_match_derivative_unresolved
-  copied_to_dst: false
-  migration_state: not_copied
-- src: src/demap/features/keyword_retriever.py
-  source_class: tracked
-  worktree_sha256: da4e828a152cc831d8f95abd2f77d8aa05b2c461d946502a432916ee3ab4487a
-  worktree_bytes_or_filecount: 30316
-  digest_kind: file
-  role: fuzzy tier of CDE Match-Fuzzy; composed with cde_match_clone
-  paper_scope_ids:
-  - MT-F5
-  - MT-P36-01
-  - SM-S52-01
-  - SM-S53-01
-  - SM-S55-01
-  - MT-T4
-  release_gate: cde_match_derivative_unresolved
-  copied_to_dst: false
-  migration_state: not_copied
-- src: scripts/build_cde_match_candidates.py
-  source_class: tracked
-  worktree_sha256: cd01bbcfce3d690ac95180c01ef33b094f0c01d1cd5aee5c482aaf5ca33e0f1a
-  worktree_bytes_or_filecount: 19773
-  digest_kind: file
-  role: entrypoint producing both the clone and CDE Match-Fuzzy candidate tables
-  paper_scope_ids:
-  - MT-F5
-  - MT-T4
-  - SM-S52-01
-  release_gate: cde_match_derivative_unresolved
   copied_to_dst: false
   migration_state: not_copied
 - src: artifacts/final_reranker/keyword_fuzzy_v2_eligible

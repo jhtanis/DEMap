@@ -296,7 +296,7 @@ items:
     required_config:
       - "configs/paper/crossencoder_protocol_v1.yaml"
     public_runnable: "yes"
-    release_gate: "medcpt_derivative_weights_unresolved; cde_match_derivative_unresolved"
+    release_gate: "medcpt_derivative_weights_unresolved"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -323,7 +323,7 @@ items:
     required_config:
       - "configs/paper/keyword_protocol_v1.yaml"
     public_runnable: "gated"
-    release_gate: "cde_match_derivative_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "unknown"
       data_redistributable: "unknown"
@@ -353,7 +353,7 @@ items:
       - "configs/paper/keyword_protocol_v1.yaml"
       - "configs/paper/non_exact_eval_defaults.yaml"
     public_runnable: "gated"
-    release_gate: "cde_match_derivative_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "unknown"
       data_redistributable: "unknown"
@@ -409,7 +409,7 @@ items:
       - "configs/paper/results_provenance_v1.yaml"
       - "configs/paper/eval_datasets_v1.yaml"
     public_runnable: "partial"
-    release_gate: "cde_match_derivative_unresolved; cimac_unresolved"
+    release_gate: "cimac_unresolved"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -464,7 +464,7 @@ items:
     required_config:
       - "configs/paper/sensitivity_leakage_v1.yaml"
     public_runnable: "partial"
-    release_gate: "cimac_unresolved; cde_match_derivative_unresolved"
+    release_gate: "cimac_unresolved"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -491,7 +491,7 @@ items:
     required_config:
       - "configs/paper/sensitivity_allowance_v1.yaml"
     public_runnable: "gated"
-    release_gate: "cde_match_derivative_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -935,7 +935,7 @@ items:
     required_config:
       - "configs/paper/keyword_protocol_v1.yaml"
     public_runnable: "gated"
-    release_gate: "cde_match_derivative_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "unknown"
       data_redistributable: "unknown"
@@ -963,7 +963,7 @@ items:
     required_config:
       - "configs/paper/pool_protocol_v1.yaml"
     public_runnable: "gated"
-    release_gate: "cde_match_derivative_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -991,7 +991,7 @@ items:
     required_config:
       - "configs/paper/pool_protocol_v1.yaml"
     public_runnable: "gated"
-    release_gate: "cde_match_derivative_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -1021,7 +1021,7 @@ items:
     required_config:
       - "configs/paper/crossencoder_protocol_v1.yaml"
     public_runnable: "gated"
-    release_gate: "medcpt_derivative_weights_unresolved; cde_match_derivative_unresolved"
+    release_gate: "medcpt_derivative_weights_unresolved"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -1052,7 +1052,7 @@ items:
       - "configs/paper/features_117_noprov.json"
       - "configs/paper/determinism_policy_v1.json"
     public_runnable: "gated"
-    release_gate: "cde_match_derivative_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -1080,7 +1080,7 @@ items:
     required_config:
       - "configs/paper/sensitivity_leakage_v1.yaml"
     public_runnable: "partial"
-    release_gate: "cde_match_derivative_unresolved; cimac_unresolved"
+    release_gate: "cimac_unresolved"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -1135,7 +1135,7 @@ items:
     required_config:
       - "configs/paper/sensitivity_allowance_v1.yaml"
     public_runnable: "gated"
-    release_gate: "cde_match_derivative_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -1163,7 +1163,7 @@ items:
     required_config:
       - "configs/paper/sensitivity_allowance_v1.yaml"
     public_runnable: "gated"
-    release_gate: "cde_match_derivative_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -1190,7 +1190,7 @@ items:
     required_config:
       - "configs/paper/sensitivity_allowance_v1.yaml"
     public_runnable: "gated"
-    release_gate: "cde_match_derivative_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -1218,7 +1218,7 @@ items:
     required_config:
       - "configs/paper/sensitivity_allowance_v1.yaml"
     public_runnable: "gated"
-    release_gate: "cde_match_derivative_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"

@@ -18,11 +18,13 @@ Function bodies below are unchanged from the source. The differences are:
   actual interface;
 * ``from demap.features.cde_match_clone import ExactMatchControl`` is dropped —
   it was imported but never referenced;
-* the keyword-provenance generator, which remains gated, is resolved through
-  :mod:`demap_repro.lexical.cde_match_interface` instead of imported directly.
-  ``compute_cdematch_features`` was reclassified as independent on 2026-08-08 (it
-  is generic rank/score arithmetic over an already-produced candidate list) and is
-  imported normally.
+* the keyword-provenance generator is imported inside ``keyword_provenance``
+  from :mod:`demap_repro.lexical.cde_match.keyword_retriever`, exactly as the
+  source did - the import is deferred because it pulls in sklearn. It was
+  reached through a runtime adapter while its redistribution was unresolved;
+  that gate is retired and the retriever ships here. ``compute_cdematch_features`` was
+  reclassified as independent on 2026-08-08 (it is generic rank/score arithmetic
+  over an already-produced candidate list) and was always imported normally.
 
 ``tests/tier3_regression/test_stage_f_source_parity.py`` pins the abstract syntax
 tree of every function here against the hash it had in the source, so a later
@@ -35,7 +37,6 @@ from typing import Dict
 import numpy as np
 import pandas as pd
 
-from demap_repro.lexical import cde_match_interface
 from demap_repro.lexical import mask as emm
 from demap_repro.pool.candidate_union import FORBIDDEN_LEAKAGE_COLUMNS
 from demap_repro.reranker.features.biencoder import compute_biencoder_features
@@ -119,11 +120,12 @@ def keyword_provenance(queries: pd.DataFrame, keyword_index, *, top_k_per_rule: 
     set (not the collapsed keyword_rankings.parquet). Deployment-safe: the
     retriever fits only on the public CDE index; no gold is read.
 
-    Requires the gated CDE Match-Fuzzy retriever; see
-    :mod:`demap_repro.lexical.cde_match_interface`.
+    Uses the CDE Match-Fuzzy retriever in
+    :mod:`demap_repro.lexical.cde_match.keyword_retriever`.
     """
+    from demap_repro.lexical.cde_match import keyword_retriever as kr  # heavy sklearn import
     qcol = query_col if query_col in queries.columns else "query_text_q3"
-    return cde_match_interface.generate_candidates(
+    return kr.generate_candidates(
         queries, keyword_index,
         top_k_per_rule=top_k_per_rule,
         query_text_col=qcol,
