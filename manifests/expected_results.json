@@ -846,7 +846,7 @@
     },
     "H1_leakage_sensitivity": {
       "paper_scope_ids": [
-        "SM-TS5",
+        "SM-TS6",
         "MT-P38-02",
         "SM-S15-01"
       ],
@@ -987,9 +987,9 @@
     },
     "H2_allowance_sensitivity": {
       "paper_scope_ids": [
-        "SM-TS6",
-        "SM-FS6",
+        "SM-TS7",
         "SM-FS7",
+        "SM-FS8",
         "SM-S62-01",
         "SM-S62-02",
         "MT-P38-03"

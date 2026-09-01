@@ -17,7 +17,7 @@ registry, resolved against the source tree.
 
 **Only the paper population counts.** ``eval_canonical_v2`` is the Rule-E
 train-decontaminated derivative retained for the S6.1 leakage sensitivity
-analysis (Table S5). It is a paper artifact, but it is *not* the reporting
+analysis (Table S6). It is a paper artifact, but it is *not* the reporting
 population, and reading it through this loader would silently swap the
 denominators in Table 4. :func:`assert_paper_evaluation_population` rejects it,
 along with the superseded ``splits_v3_cdisc`` scheme and any dataset name outside

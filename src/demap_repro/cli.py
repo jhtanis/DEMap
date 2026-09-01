@@ -90,7 +90,7 @@ STAGES: List[Stage] = [
     Stage("table4", "demap_repro.reporting.table4", "G. Reporting",
           "assemble Table 4, the six-method comparison"),
     Stage("leakage-sensitivity", "demap_repro.sensitivity.leakage", "H. Sensitivity",
-          "Table S5: rescore saved rankings on the filtered query lists"),
+          "Table S6: rescore saved rankings on the filtered query lists"),
     Stage("figure4-inputs", "demap_repro.reporting.inputs.build_crossencoder", "G. Reporting",
           "Figure 4 input tables from the corrected roots"),
     Stage("figure5-inputs", "demap_repro.reporting.inputs.build_keyword", "G. Reporting",

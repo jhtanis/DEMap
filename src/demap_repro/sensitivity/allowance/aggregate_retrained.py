@@ -7,7 +7,7 @@ into machine-readable deliverables:
   results/allowance_sensitivity_with_hgbc.csv   -- 3 methods x 4 datasets x 6 rates
   results/pool_stats_by_rate.csv                -- ceiling + pool-size stats
   results/hgbc_training_summary.csv             -- selected config + val_dev R@5 per rate
-  tables/table_S6_proposed.csv / .md            -- proposed updated Table S6
+  tables/allowance_sensitivity_proposed.csv / .md -- proposed manuscript Table S7
 """
 from __future__ import annotations
 
@@ -86,7 +86,7 @@ def main() -> None:
         J / "results/pool_stats_by_rate.csv", index=False)
     pd.DataFrame(train_rows).to_csv(J / "results/hgbc_training_summary.csv", index=False)
 
-    # ---- proposed Table S6 ----
+    # ---- proposed manuscript Table S7 ----
     name_map = {"python_cde_match_approx": "Python approximation to NCI CDE Match",
                 "cde_match_fuzzy": "CDE Match-Fuzzy",
                 HGBC_LABEL: "Final reranker (HGBC, retrained per allowance)"}
@@ -102,8 +102,8 @@ def main() -> None:
         columns={"recall@1": "Recall@1", "recall@5": "Recall@5",
                  "recall@10": "Recall@10", "mrr@100": "MRR@100"})
     tab = tab.sort_values(["Dataset", "Allowance (%)", "Method"])
-    tab.to_csv(J / "tables/table_S6_proposed.csv", index=False)
-    with open(J / "tables/table_S6_proposed.md", "w") as fh:
+    tab.to_csv(J / "tables/allowance_sensitivity_proposed.csv", index=False)
+    with open(J / "tables/allowance_sensitivity_proposed.md", "w") as fh:
         fh.write("# Proposed updated Table S6 - exact-match allowance sensitivity\n\n"
                  "All three methods, four caDSR-derived evaluation sets, allowance "
                  "rates 0/50/60/70/80/100% (shared nested SHA-1 seed-42 query mask).\n"
@@ -113,7 +113,7 @@ def main() -> None:
         fh.write(to_md(tab))
         fh.write("\n")
     print(f"wrote {J/'results/allowance_sensitivity_with_hgbc.csv'} ({len(comb)} rows)")
-    print(f"wrote {J/'tables/table_S6_proposed.csv'}")
+    print(f"wrote {J/'tables/allowance_sensitivity_proposed.csv'}")
 
 
 if __name__ == "__main__":

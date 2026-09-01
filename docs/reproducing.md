@@ -14,8 +14,8 @@ pytest
 
 537 tests. No data, no weights, no network. They check:
 
-- every headline number against a committed fixture (Table 4, Table S5, Table S6,
-  Figures 4/5/S5/S6/S7, the K selection, the cross-encoder bake-off, the final HGBC
+- every headline number against a committed fixture (Table 4, Table S6, Table S7,
+  Figures 4/5/S5/S7/S8, the K selection, the cross-encoder bake-off, the final HGBC
   configuration and hyperparameter grid);
 - the pipeline invariants the paper depends on (split routing, allowance masking,
   the 172-query cross-encoder exclusion, leakage-filter counts);

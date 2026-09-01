@@ -39,7 +39,7 @@ from demap_repro.sensitivity.allowance.report import (
     figure_s7_series,
     load_sensitivity,
     robustness_summary,
-    table_s6,
+    allowance_sensitivity_table,
 )
 
 pytestmark = [pytest.mark.tier3, pytest.mark.parity]
@@ -133,16 +133,16 @@ def test_external_sets_are_carried_as_a_control(sensitivity):
 # Table S6
 # --------------------------------------------------------------------------
 
-def test_table_s6_is_72_rows_of_three_methods(sensitivity):
+def test_allowance_sensitivity_table_is_72_rows_of_three_methods(sensitivity):
     """'72 reported rows = 3 methods x 4 datasets x 6 rates.'"""
-    t = table_s6(sensitivity)
+    t = allowance_sensitivity_table(sensitivity)
     assert len(t) == 72
     assert set(t["method"]) == set(TABLE_S6_METHODS)
     assert ARM_RETRAINED not in set(t["method"]), "the retrained arm is Figure S7 only"
 
 
-def test_table_s6_carries_all_four_metrics(sensitivity):
-    t = table_s6(sensitivity)
+def test_allowance_sensitivity_table_carries_all_four_metrics(sensitivity):
+    t = allowance_sensitivity_table(sensitivity)
     for col in ("recall@1", "recall@5", "recall@10", "mrr@100"):
         assert col in t.columns
         assert t[col].notna().all()

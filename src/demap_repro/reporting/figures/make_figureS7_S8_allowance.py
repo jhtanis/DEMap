@@ -1,12 +1,23 @@
 #!/usr/bin/env python3
-"""Figures S6 and S7 — exact-match allowance sensitivity.
+"""Figures S7 and S8 — exact-match allowance sensitivity.
 
-Figure S6 (primary, production-oriented): Recall@5 for the Python approximation
+Figure S7 (primary, production-oriented): Recall@5 for the Python approximation
 to NCI CDE Match, CDE Match-Fuzzy, and the FIXED HGBC trained at the 70%
 allowance, across six inference allowances on the four caDSR-derived sets.
 
-Figure S7 (incremental effect of retraining): the same fixed HGBC against HGBC
+Figure S8 (incremental effect of retraining): the same fixed HGBC against HGBC
 models RETRAINED separately at each matching allowance. No lexical methods.
+
+Numbering note. These two figures were Figures S6 and S7 up to manuscript v21.
+The v22-v24 revision inserted the candidate-pool coverage table and the broad
+evidence-family ablation into the supplement, which pushed them to S7 and S8.
+
+The OUTPUT STEMS below still read `figureS6_...` and `figureS7_...`, and are
+deliberately left that way: those stems name the exact PNG/PDF bytes embedded
+in the manuscript and recorded in the figure provenance JSON. Renaming them
+would break the correspondence between this generator and the files a reader
+can check it against. The stem is a historical artifact name; the caption and
+the module name carry the current numbering.
 
 Both read the single validated grid
 `manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv`,
@@ -100,6 +111,8 @@ def main(argv=None) -> int:
                    fontsize=pfs.LEGEND_PT, frameon=False,
                    bbox_to_anchor=(0.5, -0.02 - 0.030 * len(series)))
         fig.tight_layout(rect=(0, 0.02, 1, 1))
+        # The recorded producer path is the historical one, so the provenance
+        # JSON keeps matching the figures already embedded in the manuscript.
         paths = pfs.save_figure(fig, name, sources=[CSV],
                                 notebook="manuscript/figures/make_figureS6_S7_allowance.py",
                                 description=description)
@@ -112,8 +125,8 @@ def main(argv=None) -> int:
          ("cde_match_fuzzy", C_FUZZY, "CDE Match-Fuzzy", "o", "-"),
          ("python_cde_match_approx", C_CLONE,
           "Python approximation to NCI CDE Match", "o", "-")],
-        "figureS6_allowance_fixed_hgbc_v19",
-        "Figure S6: Recall@5 vs exact-match allowance on the four caDSR-derived "
+        "figureS6_allowance_fixed_hgbc_v19",          # manuscript Figure S7
+        "Figure S7: Recall@5 vs exact-match allowance on the four caDSR-derived "
         "evaluation sets, for the Python approximation to NCI CDE Match, CDE "
         "Match-Fuzzy, and the unchanged HGBC trained at the 70% allowance. At each "
         "inference allowance the CDE Match-Fuzzy candidates, merged pools and "
@@ -123,8 +136,8 @@ def main(argv=None) -> int:
     build(
         [("hgbc_fixed_070", C_FIXED, LBL_FIXED, "s", "-"),
          ("hgbc_retrained_per_rate", C_RETRAIN, LBL_RETRAIN, "^", "--")],
-        "figureS7_allowance_fixed_vs_retrained_v19",
-        "Figure S7: Recall@5 for the fixed HGBC trained at the 70% allowance versus "
+        "figureS7_allowance_fixed_vs_retrained_v19",  # manuscript Figure S8
+        "Figure S8: Recall@5 for the fixed HGBC trained at the 70% allowance versus "
         "HGBC models retrained separately at each allowance, on the four "
         "caDSR-derived evaluation sets. Candidate pools and allowance-dependent "
         "features were generated at the indicated allowance for both analyses; "

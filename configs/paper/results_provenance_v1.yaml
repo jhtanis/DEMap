@@ -233,7 +233,7 @@ results:
     candidate_pool_context: "regenerated at each allowance"
     authoritative_artifact: "manuscript/v17_claude_reports/K_fixed070/allowance_sensitivity_four_methods.csv"
     authoritative_artifact_sha256: "01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e"
-    notes: "120 rows = 4 methods x 4 datasets x 6 rates. Table S6 reports 72 (3 methods). The 0.70 condition reproduces the shipped pipeline bit-identically."
+    notes: "120 rows = 4 methods x 4 datasets x 6 rates. Table S7 reports 72 (3 methods). The 0.70 condition reproduces the shipped pipeline bit-identically."
   - id: "RP-14"
     paper_scope_ids:
       - "SM-TS1"

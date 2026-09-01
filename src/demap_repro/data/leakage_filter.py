@@ -4,7 +4,7 @@
 S1.5 reports two kinds of train/evaluation overlap. Query-identifier overlap is
 almost nil. The one that matters is **content** overlap: an evaluation query whose
 normalized text already appears in Train mapped to the same gold CDE. Such a query
-tests memorization rather than generalization, so S6.1 and Table S5 re-report every
+tests memorization rather than generalization, so S6.1 and Table S6 re-report every
 external result with those queries removed.
 
 The rule
@@ -66,7 +66,7 @@ EXTERNAL_DATASETS = ("cctg", "oid_alt", "cdash", "gdc_combined", "cimac_v2")
 #: In-distribution split copied through unchanged.
 PASSTHROUGH_DATASETS = ("test",)
 
-#: Query counts before and after filtering, as reported in S1.5 / Table S5.
+#: Query counts before and after filtering, as reported in S1.5 / Table S6.
 PAPER_COUNTS = {
     "cctg": (1097, 8, 1089),
     "oid_alt": (1766, 7, 1759),

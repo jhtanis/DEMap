@@ -2768,8 +2768,8 @@ entries:
   parity_artifact_sha256: 6baeb2eec8f1b4698bcd1edc9bf303e635d8fa4b604b9ea2ce55eaf255343b9d
   required_config:
   - configs/paper/sensitivity_leakage_v1.yaml
-  role: 'H1: Table S5 leakage sensitivity by rescoring saved rankings on eval_canonical_v2'
-  divergence_note: Only implementation. Manuscript Table S5 = this file's 'table_s7' naming.
+  role: 'H1: Table S6 (Table S5 up to v21) leakage sensitivity by rescoring saved rankings on eval_canonical_v2'
+  divergence_note: Only implementation. Manuscript Table S6 (S5 up to v21) = this file's 'table_s7' naming.
   release_gate: cde_match_derivative_unresolved
   nontrivial: true
   classification: migration_candidate
@@ -3108,7 +3108,7 @@ entries:
   parity_artifact_sha256: 01dd46c86ef70312c2afda9d0c0cff23e083eca3ea82c2aa44a5c2759c70b46e
   required_config:
   - configs/paper/sensitivity_allowance_v1.yaml
-  role: 'H2: builds allowance_sensitivity_four_methods.csv (the Fig S6/S7/Table S6 source)'
+  role: 'H2: builds allowance_sensitivity_four_methods.csv (the Fig S7/S8 + Table S7 source)'
   divergence_note: null
   release_gate: cde_match_derivative_unresolved
   nontrivial: true

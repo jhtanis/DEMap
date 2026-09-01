@@ -45,8 +45,8 @@ FIGURE_GENERATORS = {
     "Figure S3": "make_figureS3_repxloss.py",
     "Figure S4": "make_figureS4_stage_comparison.py",
     "Figure S5": "make_figureS5_k_ceiling.py",
-    "Figure S6": "make_figureS6_S7_allowance.py",
-    "Figure S7": "make_figureS6_S7_allowance.py",
+    "Figure S7": "make_figureS7_S8_allowance.py",
+    "Figure S8": "make_figureS7_S8_allowance.py",
 }
 
 #: Manually maintained schematics. These are validated, not regenerated.
@@ -62,8 +62,9 @@ TABLE_BUILDERS = {
     "Table S2": "src/demap_repro/data/characterization.py",
     "Table S3": "src/demap_repro/reporting/dataset_tables_pv_overlap.py",
     "Table S4": "src/demap_repro/reporting/inputs/build_stage_comparison.py",
-    "Table S5": "src/demap_repro/sensitivity/leakage.py",
-    "Table S6": "src/demap_repro/sensitivity/allowance/report.py",
+    # Table S5 (candidate-pool coverage) enters with the S5.6 migration.
+    "Table S6": "src/demap_repro/sensitivity/leakage.py",
+    "Table S7": "src/demap_repro/sensitivity/allowance/report.py",
 }
 
 

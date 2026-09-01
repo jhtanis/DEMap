@@ -71,7 +71,7 @@ Two are worth naming for future readers:
   the pre-correction crossencoder roots; re-running it would restore Figure 4 to
   MedCPT 0.9128 / BGE 0.8940 / MiniLM 0.8699. A test asserts those values do not
   reappear in the migrated inputs.
-- `K6_make_tableS6_v19.py` did produce the Table S6 that reached v21. Its
+- `K6_make_tableS6_v19.py` did produce the Table S7 (then numbered S6) that reached v21. Its
   behaviour is reimplemented as `sensitivity/allowance/report.table_s6()` and
   parity-tested against the shipped 120-row aggregate.
 

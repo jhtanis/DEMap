@@ -37,7 +37,7 @@ from demap_repro.sensitivity.allowance.arms import (
 )
 
 __all__ = [
-    "load_sensitivity", "primary_slice", "table_s6",
+    "load_sensitivity", "primary_slice", "allowance_sensitivity_table",
     "figure_s6_series", "figure_s7_series", "robustness_summary",
 ]
 
@@ -71,7 +71,12 @@ def primary_slice(df: pd.DataFrame, methods: Sequence[str],
                .drop(columns=["_m", "_d"]).reset_index(drop=True))
 
 
-def table_s6(df: pd.DataFrame) -> pd.DataFrame:
+def allowance_sensitivity_table(df: pd.DataFrame) -> pd.DataFrame:
+    """The allowance-sensitivity table: manuscript Table S7 (Table S6 up to v21).
+
+    Named without a manuscript number on purpose. The previous name,
+    ``table_s6``, silently became wrong when the supplement was renumbered.
+    """
     """Table S6: three methods x four datasets x six rates, all four metrics."""
     return primary_slice(df, TABLE_S6_METHODS)[list(REQUIRED_COLUMNS)]
 
