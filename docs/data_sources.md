@@ -242,7 +242,7 @@ CIMAC is **not** restricted and does not require private access.
 | GDC evaluation set | the 72-query curated input | **in this repository**, `data/frozen/gdc_combined.parquet` |
 | base model checkpoints | all-MPNet, BioSimCSE, PubMedBERT, MedCPT, BGE, MiniLM | **public**, from HuggingFace; see [`environment.md`](environment.md) |
 | fine-tuned weights | our trained bi-encoder and cross-encoder | **not distributed**; retrain from the specified protocols |
-| official NCI CDE Match output | the live service's saved results | **not reproducible by anyone**; reported as a frozen external number |
+| official NCI CDE Match output | the live service's saved results | **frozen external-service output**; not reproducible locally from this repository |
 
 Only two rows are neither downloadable nor shipped: the fine-tuned weights,
 which are reproducible by retraining, and the official-service output, which is

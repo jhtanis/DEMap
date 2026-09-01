@@ -113,7 +113,7 @@ Two inputs are not distributed. Neither blocks the tier it sits in:
 | not distributed | affects | consequence |
 |---|---|---|
 | fine-tuned weights | Figure 3, Figure 4, Table S4 | retrain from the specified protocols, or use frozen artifacts |
-| official NCI CDE Match output | Table 4, §3.8 | not reproducible by anyone; reported as a frozen external number |
+| official NCI CDE Match output | Table 4, §3.8 | a frozen output of an external service; not reproducible locally from this repository |
 
 Three things a reader might expect to be missing are **not**:
 

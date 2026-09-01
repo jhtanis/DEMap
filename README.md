@@ -142,7 +142,7 @@ The data tree itself is far too large to version and is not included.
 | | why |
 |---|---|
 | NCI-supplied Oracle PL/SQL and the CDE Match logic PDF | NCI's source material; redistribution unresolved |
-| saved output of the live NCI CDE Match service | a third-party service result, never reproducible by anyone |
+| saved output of the live NCI CDE Match service | a frozen output of an external service; not reproducible locally from this repository |
 | fine-tuned bi-encoder and cross-encoder weights | ours, but redistribution not yet determined |
 | large derived artifact trees | regenerable, and gigabytes; excluded by size, not by rights |
 

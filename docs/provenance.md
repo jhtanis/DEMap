@@ -90,17 +90,24 @@ new one. `source_parity.json` records that reasoning inline.
 | not included | reason |
 |---|---|
 | NCI-supplied Oracle PL/SQL and the CDE Match logic PDF | NCI's source material; redistribution unresolved |
-| saved output of the live NCI CDE Match service | a third-party service result, never reproducible by anyone |
-| the CIMAC workbook and its derived evaluation set | redistribution unresolved |
+| saved output of the live NCI CDE Match service | a frozen output of an external service; not reproducible locally from this repository |
 | fine-tuned bi-encoder and cross-encoder weights | ours, but redistribution not yet determined; reproducible by retraining |
+| raw GDC curation submissions | workflow metadata with no reproduction value; the derived evaluation set ships instead |
+| the superseded CIMAC permissible-value workbook | public but changed upstream; the PV-enriched evaluation set ships instead |
 | large derived artifact trees (candidate tables, feature tables, per-condition runs) | regenerable, and gigabytes; excluded by size, not by rights |
+| the caDSR XML exports and the derived catalog | ~1.3 GB; publicly re-acquirable with pinned digests |
 
-None of these has ever entered this repository or its git history.
+None of the first three has ever entered this repository or its git history.
 
 **Our own implementations of the keyword arm are included in full** — the Python
 approximation to NCI CDE Match and the CDE Match-Fuzzy retriever both ship in
 `src/demap_repro/lexical/cde_match/`. Only NCI's own supplied material is
 withheld, and nothing depends on it.
+
+**Both external evaluation sets ship**, in `data/frozen/`: CIMAC's 131-query
+PV-enriched set and GDC's 72-query curated set. See
+[`../data/frozen/README.md`](../data/frozen/README.md) for why each is frozen
+rather than rebuilt.
 
 What each exclusion costs a reader:
 [`reproducing.md`](reproducing.md#reproducibility-boundaries).

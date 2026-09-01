@@ -144,3 +144,88 @@ def test_both_frozen_inputs_are_accounted_for():
     assert frozen == ["cimac_v2.parquet", "gdc_combined.parquet"], (
         "data/frozen/ should hold exactly the two non-regenerable evaluation sets; "
         f"found {frozen}")
+
+
+# --------------------------------------------------------------------------
+# data/frozen/ is a distribution location; these guard the hand-off to the
+# data tree the pipeline actually reads
+# --------------------------------------------------------------------------
+
+#: The two frozen evaluation inputs, and the canonical name each is copied to.
+FROZEN_INPUTS = {
+    "cimac_v2.parquet": "1d0797330864cb8a73d277c1885fa5bba41a63d3a011cfaaa148e59c6dce4fe0",
+    "gdc_combined.parquet": "289c4f5fc966748c54fc3d4c8c0edda28937b55910796a65db7834034bf86f21",
+}
+
+
+def test_no_pipeline_stage_writes_into_data_frozen():
+    """The shipped artifacts are immutable paper inputs.
+
+    Both importers default under ``data/processed/splits/`` and the evaluation
+    registry reads ``data/processed/eval_canonical/``, so nothing can overwrite
+    ``data/frozen/`` by running a documented command. Asserted statically so a
+    future default cannot quietly point here.
+    """
+    import re
+
+    offenders = []
+    for path in (REPO / "src").rglob("*.py"):
+        for lineno, line in enumerate(path.read_text().splitlines(), 1):
+            if re.search(r"""["'][^"']*data/frozen[^"']*["']""", line):
+                offenders.append(f"{path.relative_to(REPO)}:{lineno}: {line.strip()[:80]}")
+    assert not offenders, (
+        "source code references data/frozen/ as a path; it is a distribution "
+        "location, not a runtime one:\n  " + "\n  ".join(offenders))
+
+
+def test_a_missing_canonical_split_fails_loudly_not_silently(tmp_path):
+    """If a reader skips the documented copy, evaluation must stop, not guess.
+
+    ``by_dataset`` returning partial results would silently drop a whole
+    evaluation dataset from the reported table while looking successful.
+    """
+    import pandas as pd
+    from demap_repro.evaluation.by_dataset import by_dataset
+
+    scored = pd.DataFrame({
+        "split": ["cimac_v2", "cimac_v2"],
+        "query_id": ["q1", "q2"],
+        "cde_id": ["1::1", "2::1"],
+        "is_label": [True, False],
+        "hgbc_rank": [1, 2],
+    })
+    empty = tmp_path / "eval_canonical"
+    empty.mkdir()
+
+    with pytest.raises(FileNotFoundError, match="cimac_v2"):
+        by_dataset(scored, empty, label="probe")
+
+    # ...and only an explicit opt-in may proceed without it.
+    out = by_dataset(scored, empty, label="probe", allow_missing=True)
+    assert out.empty
+
+
+@pytest.mark.needs_artifacts
+def test_the_data_tree_holds_the_shipped_frozen_inputs(artifact_root):
+    """Guards the copy step: the data tree's copy must BE the shipped artifact.
+
+    Removing the frozen file is caught by the test above. This catches the other
+    half — a stale or substituted copy in the data tree, which would evaluate
+    successfully against a different population and report different numbers.
+    """
+    import hashlib
+
+    canonical = artifact_root / "data" / "processed" / "eval_canonical"
+    if not canonical.is_dir():
+        pytest.skip(f"no canonical evaluation directory at {canonical}")
+
+    for name, want in FROZEN_INPUTS.items():
+        target = canonical / name
+        if not target.is_file():
+            pytest.skip(f"{name} not present in the data tree")
+        got = hashlib.sha256(target.read_bytes()).hexdigest()
+        assert got == want, (
+            f"{target} is not the shipped frozen input.\n"
+            f"  expected {want}\n  got      {got}\n"
+            f"Copy it from data/frozen/{name}; a different file evaluates a "
+            f"different population and changes the reported numbers.")

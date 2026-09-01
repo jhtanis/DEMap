@@ -187,9 +187,10 @@ exactly this.
 
 ### Dependent on external systems or undistributed inputs
 
-**The official NCI CDE Match column of Table 4.** Saved output of a live
-production service. It is not reproducible by us or by anyone, at any level, and
-is reported as a frozen external number for GDC and CIMAC only. The manuscript
+**The official NCI CDE Match column of Table 4.** The reported values are
+frozen outputs from the external NCI CDE Match service and are not reproducible
+locally from this repository, at any level. They are reported for GDC and CIMAC
+only. The manuscript
 reports it for those two sets alone because the four caDSR-derived sets were
 built from the same alternate-name and question-text fields the service queries,
 which would make the comparison circular, and because the live service cannot be
