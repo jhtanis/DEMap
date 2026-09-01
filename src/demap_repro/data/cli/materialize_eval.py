@@ -39,10 +39,10 @@ def _source_frames():
     }
 
 
-def main():
+def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument('--dry-run', action='store_true')
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
 
     prod_ids = set(pd.read_parquet(PROD)['cde_id'].astype(str))
     frames = _source_frames()

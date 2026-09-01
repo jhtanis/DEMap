@@ -101,10 +101,10 @@ def eval_method(cands: pd.DataFrame, subset_qids: set, gold_map: dict) -> dict:
     }
 
 
-def main() -> int:
+def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out-root", default=str(REPO / "artifacts/final_reranker/non_exact_subset_eval_v2_eligible"))
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
     out = Path(args.out_root)
     out.mkdir(parents=True, exist_ok=True)
 

@@ -82,14 +82,14 @@ def bm25_ranking(ds: str) -> pd.DataFrame:
     return d.rename(columns={"pub": "cde_pub"})
 
 
-def main() -> int:
+def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--hgbc-scored-rankings", default=None,
                     help="hgbc_scored_rankings.parquet from the corrected Step H "
                          "(with split/query_id/cde_id/hgbc_rank); omit to build "
                          "the lexical rows only")
     ap.add_argument("--out", default=str(REPO / ".scratch/demap/paper_v13_scientific_audit/table_s7_v13.csv"))
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
 
     global HGBC
     if args.hgbc_scored_rankings:
