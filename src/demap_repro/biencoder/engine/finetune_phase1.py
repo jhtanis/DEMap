@@ -889,95 +889,14 @@ def _evaluate_and_write_run(
             run_dir / "ambiguity_diagnostics.json",
         )
 
-    # Confidence calibration + reliability/ECE outputs.
-    calibration_method = "isotonic"
-    confidence_threshold = 0.9
-    n_bins = 10
-
-    calibrator_meta: Dict[str, Any] = {
-        "available": False,
-        "method": calibration_method,
-        "fit_split": "val",
-        "feature_col": "confidence_raw",
-        "target_col": "is_correct_top1",
-        "n_fit": 0,
-        "notes": "",
-    }
-
-    if len(rankings_df) > 0:
-        try:
-            from demap.evaluation import confidence as conf
-
-            rankings_df, _cal_model, meta = conf.calibrate_rankings(
-                rankings_df,
-                fit_split="val",
-                feature_col="confidence_raw",
-                target_col="is_correct_top1",
-                out_col="p_correct",
-                method=calibration_method,
-            )
-            calibrator_meta = meta.__dict__
-
-            reliability_df, ece_json = conf.per_split_reliability_and_ece(
-                rankings_df,
-                y_col="is_correct_top1",
-                p_col="p_correct",
-                n_bins=n_bins,
-                threshold=confidence_threshold,
-            )
-        except Exception as e:
-            reliability_df = pd.DataFrame(
-                {
-                    "split": [],
-                    "bin_idx": [],
-                    "bin_lo": [],
-                    "bin_hi": [],
-                    "n": [],
-                    "avg_confidence": [],
-                    "accuracy": [],
-                }
-            )
-            ece_json = {
-                "_error": {
-                    "available": False,
-                    "reason": f"calibration_failed: {type(e).__name__}: {e}",
-                }
-            }
-            rankings_df = rankings_df.copy()
-            if "p_correct" not in rankings_df.columns:
-                rankings_df["p_correct"] = np.nan
-    else:
-        reliability_df = pd.DataFrame(
-            {
-                "split": [],
-                "bin_idx": [],
-                "bin_lo": [],
-                "bin_hi": [],
-                "n": [],
-                "avg_confidence": [],
-                "accuracy": [],
-            }
-        )
-        ece_json = {}
-
+    # Calibration removed 2026-09-01: it imported `demap.evaluation.confidence`
+    # from the RESEARCH package, inside a bare except, so it silently produced
+    # empty artifacts here. No calibration or ECE result is in the manuscript.
     # Write core artifacts
     rankings_df.to_parquet(run_dir / "rankings.parquet", index=False)
-    reliability_df.to_csv(run_dir / "reliability.csv", index=False)
-    (run_dir / "ece.json").write_text(json.dumps(ece_json, indent=2), encoding="utf-8")
 
     if failures_all:
         pd.concat(failures_all, ignore_index=True).to_csv(run_dir / "failures_sample.csv", index=False)
-
-    # Add operational confidence metrics into metrics_by_split (mirror baseline_grid).
-    for split_name in list(split_metrics.keys()):
-        if split_name in ece_json and isinstance(ece_json[split_name], dict):
-            split_metrics[split_name]["ece"] = float(ece_json[split_name].get("ece", float("nan")))
-            split_metrics[split_name]["precision@conf>=0.9"] = float(
-                ece_json[split_name].get("precision_at_confidence_threshold", float("nan"))
-            )
-            split_metrics[split_name]["coverage@conf>=0.9"] = float(
-                ece_json[split_name].get("coverage_at_confidence_threshold", float("nan"))
-            )
 
     metrics_out = {
         "run_id": run_dir.name,
@@ -989,11 +908,6 @@ def _evaluate_and_write_run(
             "hybrid_alpha": float(hybrid_alpha),
         },
         "metrics_by_split": split_metrics,
-        "confidence": {
-            "calibration": calibrator_meta,
-            "confidence_threshold": float(confidence_threshold),
-            "n_bins": int(n_bins),
-        },
     }
 
     # Add ambiguity diagnostic summary into metrics.json (Phase 1 debugging aid).

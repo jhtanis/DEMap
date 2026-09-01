@@ -55,7 +55,14 @@ no_legacy_val: true          # the legacy `val` split must never be used anywher
 winner:
   backbone: ncbi/MedCPT-Cross-Encoder
   objective: pointwise_bce   # ep2, lr2e-5, bs32, max_len512, pos_weight~25
-  checkpoint: artifacts/final_reranker/crossencoder_fulltrain/runs/ncbi_MedCPT-Cross-Encoder/
-  scores: artifacts/final_reranker/crossencoder_fulltrain/scores/crossenc_scores_ncbi_MedCPT-Cross-Encoder.parquet
-  comparison: artifacts/final_reranker/crossencoder_fulltrain/comparison/BAKEOFF_ce_by_split_all_models.csv
-  selection_val_dev_recall_at_5: 0.9128
+  # CORRECTED 2026-09-01. This block pointed at the pre-correction
+  # crossencoder_fulltrain/ root and recorded 0.9128. The corrected run is
+  # _v2_eligible, whose training pool excludes ineligible CDEs and empty text,
+  # and its Validation Recall@5 is 0.9123 -- the 0.912 the manuscript reports and
+  # the value expected_results.json, docs/reproducing.md and reporting/table4.py
+  # have used throughout. No test guarded this block, so it stayed stale.
+  checkpoint: artifacts/final_reranker/crossencoder_fulltrain_v2_eligible/runs/ncbi_MedCPT-Cross-Encoder/
+  scores: artifacts/final_reranker/crossencoder_fulltrain_v2_eligible/scores/crossenc_scores_ncbi_MedCPT-Cross-Encoder.parquet
+  comparison: artifacts/final_reranker/crossencoder_fulltrain_v2_eligible/comparison/BAKEOFF_ce_by_split_all_models.csv
+  selection_val_dev_recall_at_5: 0.9123
+  superseded_selection_val_dev_recall_at_5: 0.9128

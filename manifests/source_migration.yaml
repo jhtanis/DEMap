@@ -3763,6 +3763,25 @@ entries:
     - the partition checks, the frozen hyperparameters, the full-condition control against Table 4, and
     the byte-identical figure reproduction. The Slurm driver is site-specific; the portable equivalent
     is `demap family-ablation --print-commands`.'
+- src: src/demap/evaluation/confidence.py
+  dst: null
+  source_class: tracked
+  worktree_sha256: null
+  worktree_bytes: null
+  paper_scope_ids: []
+  release_gate: null
+  nontrivial: true
+  role: confidence calibration, reliability curves and Expected Calibration Error
+  classification: not_migrated
+  copy_verbatim: false
+  migration_state: not_migrated_by_decision
+  exclusion_reason: 'out_of_paper_scope: no calibration, reliability or ECE result appears anywhere in
+    the manuscript, which reports Recall@K and MRR@100 only, and no paper_scope item requires it. It had
+    been migrated as src/demap_repro/evaluation/confidence.py but was never imported by anything here:
+    its three call sites - baseline_grid, finetune_phase1 and a bm25 placeholder - resolved `from demap.evaluation
+    import confidence`, the RESEARCH package, inside a bare `except Exception`. On a clean clone that
+    import always failed and every run silently wrote empty reliability.csv and ece.json. Removed 2026-09-01
+    along with those three call sites; nothing reported changes.'
 gated_material:
 - src: scripts/cde_match/cdeMatch_matchFlow.sql
   source_class: tracked

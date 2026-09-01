@@ -1102,101 +1102,20 @@ def run_grid(
                     # Concatenate per-split rankings, then calibrate confidence using the validation split.
                     rankings_df = pd.concat(rankings_all, ignore_index=True) if rankings_all else pd.DataFrame()
 
-                    # Confidence calibration + reliability/ECE outputs.
-                    # Always emit reliability.csv and ece.json for reproducibility.
-                    calibration_method = "isotonic"
-                    confidence_threshold = 0.9
-                    n_bins = 10
-
-                    calibrator_meta = {
-                        "available": False,
-                        "method": calibration_method,
-                        "fit_split": "val",
-                        "feature_col": "confidence_raw",
-                        "target_col": "is_correct_top1",
-                        "n_fit": 0,
-                        "notes": "",
-                    }
-
-                    if len(rankings_df) > 0:
-                        try:
-                            from demap.evaluation import confidence as conf
-
-                            rankings_df, _cal_model, meta = conf.calibrate_rankings(
-                                rankings_df,
-                                fit_split="val",
-                                feature_col="confidence_raw",
-                                target_col="is_correct_top1",
-                                out_col="p_correct",
-                                method=calibration_method,
-                            )
-                            calibrator_meta = meta.__dict__
-
-                            reliability_df, ece_json = conf.per_split_reliability_and_ece(
-                                rankings_df,
-                                y_col="is_correct_top1",
-                                p_col="p_correct",
-                                n_bins=n_bins,
-                                threshold=confidence_threshold,
-                            )
-                        except Exception as e:
-                            # Keep the run usable even if calibration fails; still emit empty artifacts.
-                            reliability_df = pd.DataFrame(
-                                {
-                                    "split": [],
-                                    "bin_idx": [],
-                                    "bin_lo": [],
-                                    "bin_hi": [],
-                                    "n": [],
-                                    "avg_confidence": [],
-                                    "accuracy": [],
-                                }
-                            )
-                            ece_json = {
-                                "_error": {
-                                    "available": False,
-                                    "reason": f"calibration_failed: {type(e).__name__}: {e}",
-                                }
-                            }
-                            rankings_df = rankings_df.copy()
-                            if "p_correct" not in rankings_df.columns:
-                                rankings_df["p_correct"] = np.nan
-                    else:
-                        # empty run (shouldn't happen, but keep artifacts consistent)
-                        reliability_df = pd.DataFrame(
-                            {
-                                "split": [],
-                                "bin_idx": [],
-                                "bin_lo": [],
-                                "bin_hi": [],
-                                "n": [],
-                                "avg_confidence": [],
-                                "accuracy": [],
-                            }
-                        )
-                        ece_json = {}
-
-                    # Write calibrated rankings and confidence artifacts.
+                    # Calibration removed 2026-09-01. This block fitted an isotonic
+                    # confidence calibrator and emitted reliability.csv / ece.json, via
+                    # `from demap.evaluation import confidence` - the RESEARCH package,
+                    # not this one. On a clean clone that import always failed; it was
+                    # inside a bare `except Exception`, so every run silently wrote empty
+                    # artifacts and nobody noticed. No calibration, reliability or ECE
+                    # result appears anywhere in the manuscript, which reports Recall@K
+                    # and MRR@100 only, so the block was out of scope rather than broken.
                     rankings_df.to_parquet(run_dir / "rankings.parquet", index=False)
-                    reliability_df.to_csv(run_dir / "reliability.csv", index=False)
-                    (run_dir / "ece.json").write_text(json.dumps(ece_json, indent=2), encoding="utf-8")
-
-                    # Add operational confidence metrics (precision@highconfidence + coverage) and ECE into metrics_by_split.
-                    for split_name in list(split_metrics.keys()):
-                        if split_name in ece_json and isinstance(ece_json[split_name], dict):
-                            split_metrics[split_name]["ece"] = float(ece_json[split_name].get("ece", float("nan")))
-                            split_metrics[split_name]["precision@conf>=0.9"] = float(
-                                ece_json[split_name].get("precision_at_confidence_threshold", float("nan"))
-                            )
-                            split_metrics[split_name]["coverage@conf>=0.9"] = float(
-                                ece_json[split_name].get("coverage_at_confidence_threshold", float("nan"))
-                            )
 
                     # Write failures sample (unchanged)
                     if failures_all:
                         pd.concat(failures_all, ignore_index=True).to_csv(run_dir / "failures_sample.csv", index=False)
 
-                    # Aggregate metrics (after confidence calibration so metrics.json includes confidence summaries)
                     metrics_out = {
                         "run_id": run_id,
                         "spec": {
@@ -1207,11 +1126,6 @@ def run_grid(
                             "hybrid_alpha": float(alpha),
                         },
                         "metrics_by_split": split_metrics,
-                        "confidence": {
-                            "calibration": calibrator_meta,
-                            "confidence_threshold": float(confidence_threshold),
-                            "n_bins": int(n_bins),
-                        },
                     }
                     (run_dir / "metrics.json").write_text(json.dumps(metrics_out, indent=2), encoding="utf-8")
 

@@ -108,3 +108,22 @@ def test_write_false_leaves_no_output(tmp_path):
     before = {p.name for p in root.rglob("*")}
     select(root, None, write=False)
     assert {p.name for p in root.rglob("*")} == before
+
+
+def test_the_protocol_config_records_the_corrected_winner():
+    """The `winner:` block had no test and went stale.
+
+    It recorded 0.9128 from the pre-correction crossencoder_fulltrain/ root,
+    while every other consumer used 0.9123 from _v2_eligible - the 0.912 the
+    manuscript reports. A config nobody checks is a config that drifts.
+    """
+    import yaml
+
+    proto = yaml.safe_load(
+        (Path(__file__).resolve().parents[2] / "configs/paper/crossencoder_protocol_v1.yaml").read_text())
+    winner = proto["winner"]
+    assert winner["backbone"] == "ncbi/MedCPT-Cross-Encoder"
+    assert winner["selection_val_dev_recall_at_5"] == pytest.approx(0.9123, abs=1e-9)
+    assert round(winner["selection_val_dev_recall_at_5"], 3) == 0.912, "must render as the manuscript's 0.912"
+    for key in ("checkpoint", "scores", "comparison"):
+        assert "_v2_eligible" in winner[key], f"{key} still points at the pre-correction root"

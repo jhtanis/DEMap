@@ -550,24 +550,10 @@ def run_grid(
                 rankings_df = pd.concat(rankings_all, ignore_index=True) if rankings_all else pd.DataFrame()
                 rankings_df.to_parquet(run_dir / "rankings.parquet", index=False)
 
-                pd.DataFrame(
-                    {
-                        "split": [],
-                        "bin_idx": [],
-                        "bin_lo": [],
-                        "bin_hi": [],
-                        "n": [],
-                        "avg_confidence": [],
-                        "accuracy": [],
-                    }
-                ).to_csv(run_dir / "reliability.csv", index=False)
-                ece_json = {
-                    "_error": {
-                        "available": False,
-                        "reason": "bm25_baseline_has_no_probability_calibration",
-                    }
-                }
-                (run_dir / "ece.json").write_text(json.dumps(ece_json, indent=2), encoding="utf-8")
+                # BM25 emits no calibrated probability, so it wrote empty
+                # reliability.csv / ece.json placeholders purely to match the
+                # neural runs' artifact shape. The calibration those mirrored was
+                # removed 2026-09-01, so the placeholders are removed too.
 
                 if failures_all:
                     pd.concat(failures_all, ignore_index=True).to_csv(run_dir / "failures_sample.csv", index=False)
