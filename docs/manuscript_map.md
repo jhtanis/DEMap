@@ -21,7 +21,7 @@ relative to `tests/fixtures/`; every command is a stage from `demap --list`.
 | item | § | command | inputs | verified against | tier |
 |---|---|---|---|---|---|
 | **Figure 1** | 2 | *manual schematic* | — | reference source in `reporting/schematics/_reference_figure1.py` | raw |
-| **Table 1** | 3.1 | `demap characterize` | evaluation sets, catalog | `expected_results.json` → `A_dataset_counts` | raw |
+| **Table 1** | 3.1 | `demap characterize` | evaluation sets, catalog | `manifests/expected_results.json` → `A_dataset_counts` | raw |
 | **Figure 2** | 3.2 | `demap biencoder` → `make_figure2_S1_S2_heatmaps.py` | representation screen | `B1_representation_screen` | raw |
 | **Table 2** | 3.3 | `demap biencoder` → `inputs/build_phase12.py` | rep × loss screen | `B2_representation_x_loss` | raw |
 | **Table 3** | 3.3 | same as Table 2 | rep × loss screen | `B2_representation_x_loss` | raw |

@@ -157,7 +157,9 @@ def build(summary_dir: Path | None = None, fig_dir: Path | None = None):
                "colour_scale": ("RdBu diverging, AsinhNorm centred at 0, symmetric limits and "
                                 "linear_width chosen independently per panel from that panel's "
                                 "largest neural-family effect"),
-               "companion_figure": "figureS7_feature_group_ablation (fine-grained, 9 rows)"})
+               "companion_figure": None,   # the fine-grained 9-row companion was retired
+                                      # from the manuscript and is not migrated
+           })
     fig.savefig(pfs.FIG_ROOT / "figureS6_broad_family_ablation.svg")
     print("wrote:", {k: str(v) for k, v in paths.items()})
     print("       ", pfs.FIG_ROOT / "figureS6_broad_family_ablation.svg")
