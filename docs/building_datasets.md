@@ -124,7 +124,8 @@ machine-learning splits.
 
 ## 3. Add the two external evaluation sets
 
-Neither is built from the caDSR export; both are supplied (see
+Neither is built from the caDSR export. GDC must be supplied; CIMAC's source
+workbook is a public NCI download and its exact evaluation set ships here (see
 [`data_sources.md`](data_sources.md)).
 
 ```bash
@@ -134,11 +135,23 @@ demap import-cimac --help        # the CIMAC workbook -> split parquet schema
 
 GDC arrives as two curation tables (ALT-name and question-text batches) that
 repeat one row per permissible value; the importer collapses them to one row per
-query and resolves the CDE version from the catalog. CIMAC is imported from its
-source workbook by `demap import-cimac`.
+query and resolves the CDE version from the catalog.
 
-If you cannot supply one of them, everything else still runs — they are 2 of the
-6 evaluation sets, and the four caDSR-derived ones are unaffected.
+**CIMAC needs one extra step.** `demap import-cimac` reads the public Appendix A
+workbook and reproduces the CIMAC query identities and gold CDEs — but not the
+permissible-value enrichment, whose upstream workbook has since changed. Use the
+frozen evaluation set instead:
+
+```bash
+cp data/frozen/cimac_v2.parquet \
+   "$DEMAP_DATA_ROOT/data/processed/eval_canonical/cimac_v2.parquet"
+```
+
+That file is the exact PV-enriched input the manuscript used; see
+[`../data/frozen/README.md`](../data/frozen/README.md).
+
+If you cannot supply GDC, everything else still runs — it is 1 of the 6
+evaluation sets, and the others are unaffected.
 
 ---
 

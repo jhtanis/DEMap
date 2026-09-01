@@ -87,6 +87,7 @@ deterministic.
 | `src/demap_repro/sensitivity/` | leakage and exact-match-allowance sensitivity analyses |
 | `src/demap_repro/reporting/` | tables, figure inputs, figure generators |
 | `configs/` | the dataset pipeline contract, curator allowlists, and the frozen protocols |
+| `data/frozen/` | the one frozen study input distributed here: the CIMAC evaluation set |
 | `manifests/` | paper scope, source migration ledger, expected results |
 | `workflows/` | optional Slurm drivers |
 | `tests/` | invariants, behaviour, and regression against the published results |
@@ -116,9 +117,15 @@ archive — URLs and sha256 digests in [`data_sources.md`](docs/data_sources.md)
 The January archive file was verified byte-identical to the copy this study ran
 on. Nothing is withheld here for privacy.
 
-Two evaluation sets are supplied rather than downloaded: the GDC curation tables
-and the CIMAC workbook. Neither can be regenerated from a public source; both are
-small, and the four caDSR-derived evaluation sets are unaffected.
+CIMAC's source is NCI's public CIMAC-CIDC clinical-data-element template —
+template and data-element metadata, not patient-level study data — and the
+workbook NCI serves today is byte-identical to the one this study used. Its
+exact PV-enriched evaluation set ships in
+[`data/frozen/`](data/frozen/README.md), because the separate permissible-value
+workbook it drew on has since changed upstream.
+
+Only the GDC curation tables must be supplied: their gold CDE assignments are a
+curator's expert judgement and no public GDC endpoint carries them.
 
 The data tree itself is far too large to version and is not included.
 
@@ -130,7 +137,6 @@ The data tree itself is far too large to version and is not included.
 |---|---|
 | NCI-supplied Oracle PL/SQL and the CDE Match logic PDF | NCI's source material; redistribution unresolved |
 | saved output of the live NCI CDE Match service | a third-party service result, never reproducible by anyone |
-| the CIMAC workbook and its derived evaluation set | redistribution unresolved |
 | fine-tuned bi-encoder and cross-encoder weights | ours, but redistribution not yet determined |
 | large derived artifact trees | regenerable, and gigabytes; excluded by size, not by rights |
 

@@ -128,8 +128,9 @@ not agree, and that disagreement is not a defect.
 
 ## The two external evaluation sets
 
-Neither was derived from the caDSR export, and neither is distributed with this
-repository. Both are small.
+Neither was derived from the caDSR export. Both are small, and they differ in
+what you have to obtain: GDC must be supplied, while CIMAC's source workbook is
+a public download and its evaluation set ships here.
 
 ### GDC — must be supplied
 
@@ -150,16 +151,71 @@ regenerated from a public source.** It has to be supplied.
 `src/demap_repro/data/gdc.py` documents the schema it expects, so an
 equivalently-shaped table from your own curation will run through the same path.
 
-### CIMAC — must be supplied
+### CIMAC — public, and partly shipped
+
+CIMAC's queries and gold CDE mappings come from NCI's public CIMAC-CIDC
+clinical-data-element template. To be explicit about what that is: it is
+**template and data-element metadata — the list of fields a trial is asked to
+report — not patient-level study data.**
+
+**Landing page:**
+<https://dctd.cancer.gov/research/networks/precision-medicine-oncology/cimac-cidc>
+("CIMACs and CIDC Network", NCI DCTD)
+
+**Direct download**, no authentication:
+
+```bash
+curl -L -O https://storage.googleapis.com/cidc-prod2-public-documents/CIMAC-CIDC_Master_AppendixA.xlsx
+```
+
+| | |
+|---|---|
+| filename | `CIMAC-CIDC_Master_AppendixA.xlsx` |
+| link text on the page | "Template of clinical data elements used in CIMAC-CIDC studies (Excel)" |
+| sha256 | `6d657dfd3f7289e74137929836974f742136fea3d2cb753432499418a57c71a3` |
+| size | 43,312 bytes |
+| sheets | `Appendix A`, `Custom Data Elements` |
+
+**The file NCI serves today is byte-identical to the one this study used.**
+Verified by direct download and digest comparison. The project's copy carries a
+`_v2` suffix; that is a local rename, not a different document.
+
+From it, `demap import-cimac` reproduces all 131 canonical query identities, and
+every canonical gold CDE identifier is present in the workbook.
+
+#### The permissible-value workbook, and why one artifact is shipped
+
+The same page links a second workbook:
 
 ```
-data/raw/cimac/CIMAC-CIDC_Master_AppendixA_v2.xlsx   →   131 queries
+https://storage.googleapis.com/cidc-prod2-public-documents/CIMAC-CIDC_Permissible_Values.xlsx
+  "List of CIDC permissible values per category and data element (Excel)"
 ```
 
-Redistribution of the CIMAC material is unresolved, so neither the workbook nor
-the evaluation set derived from it is included here. See
-[`reproducing.md`](reproducing.md) for what this does and does not block: CIMAC
-is one of six evaluation sets, and the other five are unaffected.
+It is equally public, but it is a **live upstream document**. The version served
+today (sha256 `a7cb76eb…`, 80,391 bytes) is **not** byte-identical to the copy
+used during study preparation (`cedc1d2d…`, 102,783 bytes), and no dated archive
+of it exists — unlike caDSR, which keeps one.
+
+Permissible values feed `query_text_q3`, the representation evaluation actually
+consumes, so rebuilding it from today's copy would quietly change the CIMAC
+results. The exact PV-enriched 131-query evaluation set is therefore distributed
+with this repository instead:
+
+```
+data/frozen/cimac_v2.parquet    131 rows, 26,963 bytes
+                                sha256 1d0797330864cb8a73d277c1885fa5bba41a63d3a011cfaaa148e59c6dce4fe0
+```
+
+See [`../data/frozen/README.md`](../data/frozen/README.md). In short:
+
+```
+public Appendix A workbook   ──►  reproducible query and gold provenance
+frozen cimac_v2.parquet      ──►  the exact PV-enriched evaluation input
+                             ──►  the manuscript's CIMAC results
+```
+
+CIMAC is **not** restricted and does not require private access.
 
 ---
 
@@ -173,14 +229,16 @@ is one of six evaluation sets, and the other five are unaffected.
 | pipeline config | the dataset build contract | **in this repository**, `configs/pipeline.yaml` |
 | protocol configs | bi-encoder, cross-encoder, BM25, HGBC settings | **in this repository**, `configs/paper/` |
 | GDC evaluation tables | 120 curated query→CDE rows | **must be supplied** (not public) |
-| CIMAC workbook | 131 curated query→CDE rows | **must be supplied** (redistribution unresolved) |
+| CIMAC Appendix A workbook | source of the 131 CIMAC queries and their gold CDEs | **public download**, digest above |
+| CIMAC evaluation set | the exact PV-enriched 131-query input | **in this repository**, `data/frozen/cimac_v2.parquet` |
 | base model checkpoints | all-MPNet, BioSimCSE, PubMedBERT, MedCPT, BGE, MiniLM | **public**, from HuggingFace; see [`environment.md`](environment.md) |
 | fine-tuned weights | our trained bi-encoder and cross-encoder | **not distributed**; retrain from the specified protocols |
 | official NCI CDE Match output | the live service's saved results | **not reproducible by anyone**; reported as a frozen external number |
 
-Only the last four rows are not obtainable by downloading. Of those, the weights
-are reproducible by retraining, and the official-service column is a single
-reported comparison, not an input to the system.
+Only three rows are not obtainable by downloading: the GDC tables, the
+fine-tuned weights, and the official-service output. Of those, the weights are
+reproducible by retraining, and the official-service column is a single reported
+comparison rather than an input to the system.
 
 ---
 

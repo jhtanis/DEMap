@@ -96,8 +96,9 @@ splits, the 62,976-record catalog, the six evaluation sets and their
 denominators, the leakage filter. These are asserted as **exact integers**, not
 tolerances.
 
-Two evaluation sets cannot be rebuilt from public inputs — GDC and CIMAC are
-supplied. The four caDSR-derived sets are unaffected.
+One evaluation set cannot be rebuilt from public inputs: GDC must be supplied.
+CIMAC's source workbook is a public download, and its exact evaluation input
+ships in `data/frozen/`. The four caDSR-derived sets are unaffected.
 
 ---
 
@@ -163,6 +164,15 @@ pv-diagnostics` runs the same grouping code and reproduces the recomputation,
 which demonstrates the code did not drift — only the input it was originally run
 over is gone.
 
+**The CIMAC evaluation set.** Its queries and gold CDE mappings come from NCI's
+public CIMAC-CIDC clinical-data-element template — template and data-element
+metadata, not patient-level study data — and the Appendix A workbook NCI serves
+today is byte-identical to the one this study used. Permissible-value metadata
+came from a second public workbook that has since changed upstream, with no
+dated archive, so the exact PV-enriched 131-query evaluation set is distributed
+here as `data/frozen/cimac_v2.parquet`. CIMAC is a public input; only its
+PV-enriched representation is frozen rather than regenerated.
+
 **The neural checkpoints**, if you choose not to retrain. Level 2 exists for
 exactly this.
 
@@ -176,10 +186,9 @@ built from the same alternate-name and question-text fields the service queries,
 which would make the comparison circular, and because the live service cannot be
 subjected to the query-level exact-match masking the controlled experiments use.
 
-**GDC and CIMAC evaluation sets.** Supplied inputs, not downloads. GDC cannot be
+**The GDC evaluation set.** A supplied input, not a download. It cannot be
 regenerated from a public GDC source: its `Preferred CDE ID` column is the
-curator's expert assignment, which is the benchmark label itself. CIMAC
-redistribution is unresolved.
+curator's expert assignment, which is the benchmark label itself.
 
 **Fine-tuned weights.** Ours, but not distributed. Reproducible by retraining at
 level 4.

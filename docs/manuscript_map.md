@@ -108,14 +108,18 @@ described in [`reproducing.md`](reproducing.md).
 
 ## What is gated, and what that costs you
 
-Four inputs are not distributed. None of them blocks the tier they sit in:
+Three inputs are not distributed. None of them blocks the tier they sit in:
 
 | gate | affects | consequence |
 |---|---|---|
-| CIMAC workbook and derived set | Table 1, Table 4, Table S4, Table S5, Table S6, Figure S6, §S1.5 | one of six evaluation columns; the other five reproduce |
+| GDC curation tables | Table 1, Table 4, Table S1/S2/S4/S5/S6, Figure S6, §S1.5 | one of six evaluation columns; the other five reproduce |
 | fine-tuned weights | Figure 3, Figure 4, Table S4 | retrain from the specified protocols, or use frozen artifacts |
 | official NCI CDE Match output | Table 4, §3.8 | not reproducible by anyone; reported as a frozen external number |
 | NCI-supplied PL/SQL and logic PDF | — | **nothing.** Our Python implementations ship and run |
 
 The keyword arm — the Python approximation to NCI CDE Match and CDE Match-Fuzzy
 — is included in full. Only NCI's own source material is withheld.
+
+CIMAC is **not** on this list. Its source workbook is a public NCI download,
+byte-identical to the study copy, and its exact evaluation input ships as
+`data/frozen/cimac_v2.parquet`.

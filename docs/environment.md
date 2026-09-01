@@ -26,6 +26,7 @@ Extras, by what you intend to run:
 | `neural` | torch, transformers, sentence-transformers, accelerate, datasets | bi-encoder and cross-encoder training and inference |
 | `figures` | matplotlib | regenerating any figure |
 | `extract` | lxml | parsing the caDSR XML |
+| `excel` | openpyxl | reading the CIMAC Appendix A workbook |
 | `documents` | python-pptx, python-docx | reading the schematic sources and one validator |
 | `dev` | pytest | the test suite |
 | `all` | everything above | |
@@ -80,7 +81,7 @@ $DEMAP_DATA_ROOT/
     raw/
       cadsr_xml/                       # the 2026-01-12 export (or its zip)
       gdc/                             # supplied: the two curation tables
-      cimac/                           # supplied: the workbook
+      cimac/                           # public download: the Appendix A workbook
     interim/                           # extraction and merge scratch
     processed/
       cde_master_enriched.parquet      # January construction catalog
@@ -89,6 +90,7 @@ $DEMAP_DATA_ROOT/
       pairs.parquet                    # 69,102 pairs
       splits/
       eval_canonical/                  # the six evaluation sets
+                                       #   cimac_v2.parquet: copy from data/frozen/
 
 $DEMAP_ARTIFACT_ROOT/
   artifacts/
