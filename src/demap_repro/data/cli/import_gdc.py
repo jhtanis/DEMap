@@ -140,7 +140,7 @@ def import_one(
     )
 
 
-def main() -> None:
+def main(argv=None) -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--alt-csv", type=str, required=True, help="CSV file for ALT-name batch.")
     ap.add_argument("--qtext-csv", type=str, required=True, help="CSV file for Question Text batch.")
@@ -164,7 +164,7 @@ def main() -> None:
         default="artifacts/summaries/gdc_import_manifest.json",
         help="Where to write an import manifest JSON.",
     )
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
 
     splits_dir = Path(args.splits_dir)
     _ensure_dir(splits_dir)

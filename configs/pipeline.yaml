@@ -1,0 +1,95 @@
+# Pipeline config for `demap make-dataset`
+#
+# This file is the default contract for building the dataset from caDSR XML.
+# Paths are repo-root relative.
+
+pipeline:
+  # Manifests: write the same build manifest to both locations.
+  manifests:
+    processed: data/processed/dataset_build_manifest.json
+    artifacts: artifacts/manifests/dataset_build_manifest.json
+
+  extract:
+    # Either a directory containing the 14 XML files, OR a directory containing
+    # a single zip (preferably releasedCDEsXML-OD.zip) that contains the 14 XMLs.
+    input: data/raw/cadsr_xml
+    out_root: data/interim/cadsr_extracted
+    chunk_size: 50000
+    # NOTE: `demap make-dataset --force` will also overwrite extraction outputs.
+    overwrite: false
+
+  merge:
+    # Root directory containing per-file outputs produced by `extract`.
+    out_root: data/interim/cadsr_extracted
+    merged_dir: data/interim/cadsr_merged
+    summaries_dir: artifacts/summaries/cadsr_merge
+    sample_size: 25
+    seed: 13
+    # tables: [cde_master, cde_reference_documents, ...]  # optional
+
+  enrich:
+    merged_dir: data/interim/cadsr_merged
+    out_parquet: data/processed/cde_master_enriched.parquet
+    pv_max_n: 10
+    language: English
+
+  pv_summary:
+    pv_summary_profile: cadsr
+    pv_center_fraction: 0.5
+    pv_min_n: 2
+    pv_max_n_query: 8
+    pv_max_n_cde: 10
+    pv_size_jitter: 1
+    pv_generic_boost: 0.10
+    pv_generic_cap: 0.70
+    sde_generic_label_p: 0.30
+    pv_small_n_generic_threshold: 0.5
+    pv_max_resample_attempts: 3
+    pv_placeholder_token: <MISSING_PV_SUMMARY>
+    diagnostics_summary: artifacts/summaries/pv_summary/pv_summary_diagnostics.json
+    diagnostics_records: artifacts/summaries/pv_summary/pv_summary_diagnostics.csv
+
+  build_queries:
+    alt_parquet: data/interim/cadsr_merged/cde_alternate_names.parquet
+    ref_parquet: data/interim/cadsr_merged/cde_reference_documents.parquet
+    out_dir: artifacts/summaries/inwild_strict
+    out_parquet: data/processed/queries.parquet
+    language: English
+    alt_allowlist: configs/allowlists/alt_allowlist_current.csv
+    refdoc_allowlist: configs/allowlists/refdoc_allowlist_current.csv
+
+  build_pairs:
+    queries_parquet: data/processed/queries.parquet
+    out_parquet: data/processed/pairs.parquet
+
+  split:
+    pairs_parquet: data/processed/pairs.parquet
+    out_dir: data/processed/splits
+    seed: 1234
+    val_frac: 0.10
+    test_frac: 0.10
+    # train_frac: null  # if unset, computed as 1 - val_frac - test_frac
+
+  # CDE-side catalog source (stage 7, `catalog-filter`; opt-in via `--stop-after catalog-filter`).
+  # The catalog defines the retrievable CDE universe; every emitted query's gold `cde_id` must be
+  # present in it (orphan queries are dropped deterministically and recorded).
+  #
+  # IDEMPOTENCE NOTE: make-dataset skips stages whose outputs already exist. When you change the
+  # query XML source (--query-xml / extract.input) or the catalog XML source (--catalog-xml /
+  # catalog.xml_source), also pass `--force` (or point at clean/distinct interim dirs and a distinct
+  # catalog.out_parquet), otherwise stale interim outputs / an old catalog parquet are silently reused.
+  catalog:
+    # same_as_query : build the catalog from the query-side enriched master (extract.input snapshot).
+    # separate      : build the catalog from a DIFFERENT caDSR XML folder (set xml_source).
+    source_mode: same_as_query
+    xml_source: null                       # required iff source_mode: separate
+    eligibility: production_cde_match       # none | production_cde_match (production CDE-Match filter)
+    out_parquet: data/processed/cde_catalog_enriched.parquet
+    interim_root: data/interim/cde_catalog  # only used when source_mode: separate
+
+  # Which query splits to emit (filtered against the catalog), and where.
+  emit:
+    splits: [train, val_dev, test, val_train]  # set to [train] for train-only production
+    filter_by_catalog: true
+    out_dir: data/processed/splits_catalog_filtered
+    reports_dir: artifacts/manifests/catalog_filter

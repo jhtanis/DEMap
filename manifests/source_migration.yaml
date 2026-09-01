@@ -141,7 +141,7 @@ entries:
   parity_artifact: .scratch/demap/paper_v16/lineage_verified.json
   parity_artifact_sha256: 2e434e2b7acb8002c70269e51a4e8989cc75299984dcc30d880342ab710d40fd
   required_config:
-  - configs/paper/dataset_v1.yaml
+  - configs/pipeline.yaml
   role: caDSR released-CDEs XML -> normalized parquet
   divergence_note: null
   release_gate: null
@@ -349,7 +349,7 @@ entries:
   parity_artifact: .scratch/demap/paper_v16/lineage_verified.json
   parity_artifact_sha256: 2e434e2b7acb8002c70269e51a4e8989cc75299984dcc30d880342ab710d40fd
   required_config:
-  - configs/paper/dataset_v1.yaml
+  - configs/pipeline.yaml
   role: dataset build orchestration
   divergence_note: null
   release_gate: null
@@ -497,7 +497,7 @@ entries:
   parity_artifact: artifacts/summaries/pv_frozen_diagnostics/query_cde_pv_pair_records.csv
   parity_artifact_sha256: c944fd4a1967783421785dd52745bf722437847534a1d4cf1f5d9322c7d868a1
   required_config:
-  - configs/paper/dataset_v1.yaml
+  - configs/pipeline.yaml
   role: 'Table S3 stage 1/2: CONFIRMED producer. CLI `demap pv-frozen-diagnostics`. Reads the frozen data/processed/pairs.parquet
     (query-side PV_BLOCK + paired gold-CDE PV block; cde_master_enriched.parquet only for integrity checks)
     and emits per-pair records carrying both_present, normalized_block_match, query_shorter_than_cde,
@@ -572,7 +572,7 @@ entries:
   parity_artifact: data/processed/pairs.parquet
   parity_artifact_sha256: 1664cc537b3aae4ebc14f874e425ffb7b0d97ba3b1a1373cda8197b8c3665751
   required_config:
-  - configs/paper/dataset_v1.yaml
+  - configs/pipeline.yaml
   role: public PV-summary adapter build_pv_summary_table / build_pv_summary_with_diagnostics; delegates
     to pv_summary_v2.build_pv_summary_tables
   divergence_note: 'PV-GENERATION AUDIT 2026-08-07: current SRC worktree code is VERIFIED IDENTICAL to
@@ -607,7 +607,7 @@ entries:
   parity_artifact: data/processed/pairs.parquet
   parity_artifact_sha256: 1664cc537b3aae4ebc14f874e425ffb7b0d97ba3b1a1373cda8197b8c3665751
   required_config:
-  - configs/paper/dataset_v1.yaml
+  - configs/pipeline.yaml
   role: 'conservative dual-summary engine: canonicalize_pv_pool, compute_side_sample_size, allocate_strata_counts,
     sample_side_subset, render_query_side / render_cde_side, apply_small_n_policy, apply_anti_leakage,
     build_dual_summary_for_group'

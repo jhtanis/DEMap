@@ -121,7 +121,7 @@ items:
       - "demap_repro.reporting.table1"
     required_config:
       - "configs/paper/eval_datasets_v1.yaml"
-      - "configs/paper/dataset_v1.yaml"
+      - "configs/pipeline.yaml"
     public_runnable: "data_gated"
     release_gate: "cadsr_snapshot_unresolved; cimac_unresolved"
     release:
@@ -321,7 +321,6 @@ items:
     required_code:
       - "demap_repro.lexical.keyword_select"
     required_config:
-      - "configs/paper/keyword_protocol_v1.yaml"
     public_runnable: "gated"
     release_gate: "none"
     release:
@@ -350,7 +349,6 @@ items:
       - "demap_repro.lexical.non_exact_subset"
       - "demap_repro.reporting.figures.keyword"
     required_config:
-      - "configs/paper/keyword_protocol_v1.yaml"
       - "configs/paper/non_exact_eval_defaults.yaml"
     public_runnable: "gated"
     release_gate: "none"
@@ -462,7 +460,6 @@ items:
     required_code:
       - "demap_repro.sensitivity.leakage"
     required_config:
-      - "configs/paper/sensitivity_leakage_v1.yaml"
     public_runnable: "partial"
     release_gate: "cimac_unresolved"
     release:
@@ -489,7 +486,7 @@ items:
     required_code:
       - "demap_repro.sensitivity.allowance"
     required_config:
-      - "configs/paper/sensitivity_allowance_v1.yaml"
+      - "configs/paper/non_exact_eval_defaults.yaml"
     public_runnable: "gated"
     release_gate: "none"
     release:
@@ -545,7 +542,7 @@ items:
       - "demap_repro.data.splits"
       - "demap_repro.data.reachability"
     required_config:
-      - "configs/paper/dataset_v1.yaml"
+      - "configs/pipeline.yaml"
     public_runnable: "data_gated"
     release_gate: "cadsr_snapshot_unresolved"
     release:
@@ -573,7 +570,7 @@ items:
       - "demap_repro.data.catalog"
       - "demap_repro.data.reachability"
     required_config:
-      - "configs/paper/catalog_v1.yaml"
+      - "configs/pipeline.yaml"
     public_runnable: "data_gated"
     release_gate: "cadsr_snapshot_unresolved"
     release:
@@ -600,7 +597,6 @@ items:
     required_code:
       - "demap_repro.data.leakage_filter"
     required_config:
-      - "configs/paper/sensitivity_leakage_v1.yaml"
     public_runnable: "data_gated"
     release_gate: "cimac_unresolved"
     release:
@@ -684,7 +680,7 @@ items:
       - "demap_repro.data.pv_frozen_diagnostics"
       - "demap_repro.reporting.dataset_tables_pv_overlap"
     required_config:
-      - "configs/paper/dataset_v1.yaml"
+      - "configs/pipeline.yaml"
     public_runnable: "data_gated"
     release_gate: "cadsr_snapshot_unresolved"
     release:
@@ -933,7 +929,6 @@ items:
     required_code:
       - "demap_repro.lexical.cde_match (GATED)"
     required_config:
-      - "configs/paper/keyword_protocol_v1.yaml"
     public_runnable: "gated"
     release_gate: "none"
     release:
@@ -961,7 +956,7 @@ items:
       - "demap_repro.pool.candidate_union"
       - "demap_repro.pool.select_k"
     required_config:
-      - "configs/paper/pool_protocol_v1.yaml"
+      - "configs/paper/biencoder_protocol_v2.yaml"
     public_runnable: "gated"
     release_gate: "none"
     release:
@@ -989,7 +984,7 @@ items:
       - "demap_repro.pool.select_k"
       - "demap_repro.reporting.figures.k_ceiling"
     required_config:
-      - "configs/paper/pool_protocol_v1.yaml"
+      - "configs/paper/biencoder_protocol_v2.yaml"
     public_runnable: "gated"
     release_gate: "none"
     release:
@@ -1048,7 +1043,6 @@ items:
       - "demap_repro.reranker.train"
       - "demap_repro.reranker.rank"
     required_config:
-      - "configs/paper/hgbc_protocol_v1.yaml"
       - "configs/paper/features_117_noprov.json"
       - "configs/paper/determinism_policy_v1.json"
     public_runnable: "gated"
@@ -1124,7 +1118,6 @@ items:
       - "demap_repro.sensitivity.leakage"
       - "demap_repro.reporting.sensitivity_tables"
     required_config:
-      - "configs/paper/sensitivity_leakage_v1.yaml"
     public_runnable: "partial"
     release_gate: "cimac_unresolved"
     release:
@@ -1151,7 +1144,7 @@ items:
     required_code:
       - "demap_repro.lexical.mask"
     required_config:
-      - "configs/paper/sensitivity_allowance_v1.yaml"
+      - "configs/paper/non_exact_eval_defaults.yaml"
     public_runnable: "yes"
     release_gate: "none"
     release:
@@ -1179,7 +1172,7 @@ items:
       - "demap_repro.sensitivity.allowance"
       - "demap_repro.reporting.figures.allowance"
     required_config:
-      - "configs/paper/sensitivity_allowance_v1.yaml"
+      - "configs/paper/non_exact_eval_defaults.yaml"
     public_runnable: "gated"
     release_gate: "none"
     release:
@@ -1207,7 +1200,7 @@ items:
       - "demap_repro.sensitivity.allowance"
       - "demap_repro.reporting.figures.allowance"
     required_config:
-      - "configs/paper/sensitivity_allowance_v1.yaml"
+      - "configs/paper/non_exact_eval_defaults.yaml"
     public_runnable: "gated"
     release_gate: "none"
     release:
@@ -1234,7 +1227,7 @@ items:
     required_code:
       - "demap_repro.sensitivity.allowance"
     required_config:
-      - "configs/paper/sensitivity_allowance_v1.yaml"
+      - "configs/paper/non_exact_eval_defaults.yaml"
     public_runnable: "gated"
     release_gate: "none"
     release:
@@ -1262,7 +1255,7 @@ items:
       - "demap_repro.sensitivity.allowance"
       - "demap_repro.reporting.sensitivity_tables"
     required_config:
-      - "configs/paper/sensitivity_allowance_v1.yaml"
+      - "configs/paper/non_exact_eval_defaults.yaml"
     public_runnable: "gated"
     release_gate: "none"
     release:
