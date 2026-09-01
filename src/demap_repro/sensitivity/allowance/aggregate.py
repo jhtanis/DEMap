@@ -7,7 +7,9 @@ pool statistics and the fixed-vs-retrained delta.
 """
 from __future__ import annotations
 
+import argparse
 import json
+import sys
 from pathlib import Path
 
 import pandas as pd
@@ -27,7 +29,33 @@ PRIMARY = ["test", "cctg", "oid_alt", "cdash"]
 METRICS = ["recall@1", "recall@5", "recall@10", "mrr@100"]
 
 
-def main() -> None:
+def main(argv=None) -> int:
+    global K, J_CSV, OUT
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--fixed-dir", default=None,
+                    help=f"per-rate fixed-model metrics (default: $DEMAP_DATA_ROOT/{K.relative_to(REPO)})")
+    ap.add_argument("--retrained-csv", default=None,
+                    help=f"the retrained-arm grid (default: $DEMAP_DATA_ROOT/{J_CSV.relative_to(REPO)})")
+    ap.add_argument("--out-dir", default=None,
+                    help=f"output directory (default: $DEMAP_DATA_ROOT/{OUT.relative_to(REPO)})")
+    args = ap.parse_args(argv)
+
+    if args.fixed_dir:
+        K = Path(args.fixed_dir)
+    if args.retrained_csv:
+        J_CSV = Path(args.retrained_csv)
+    if args.out_dir:
+        OUT = Path(args.out_dir)
+
+    missing = [str(p) for p in (K, J_CSV) if not p.exists()]
+    if missing:
+        sys.exit("ERROR: this stage consumes the frozen allowance sweep, which is not\n"
+                 "distributed with the repository. Missing:\n  " + "\n  ".join(missing) +
+                 "\n\nRegenerate it with the J1-J3 and K1 workflows (see docs/slurm.md),\n"
+                 "or check the published values against tests/fixtures/"
+                 "allowance_sensitivity_four_methods.csv.")
+
     OUT.mkdir(parents=True, exist_ok=True)
 
     # ---- fixed-model rows --------------------------------------------------
@@ -103,7 +131,8 @@ def main() -> None:
     print(f"\nwrote {OUT/'allowance_sensitivity_four_methods.csv'}")
     print(f"wrote {OUT/'pool_stats_fixed070.csv'}")
     print(f"wrote {OUT/'fixed_vs_retrained_delta.csv'}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

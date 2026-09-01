@@ -94,20 +94,24 @@ STAGES: List[Stage] = [
           "train and select the 117-feature HGBC reranker"),
     Stage("eval-by-dataset", "demap_repro.evaluation.by_dataset", "F. Reranker",
           "evaluate the reranker per evaluation dataset"),
-
-    # G/H — reporting and sensitivity
-    Stage("table4", "demap_repro.reporting.table4", "G. Reporting",
-          "assemble Table 4, the six-method comparison"),
-    Stage("leakage-sensitivity", "demap_repro.sensitivity.leakage", "H. Sensitivity",
-          "Table S6: rescore saved rankings on the filtered query lists"),
-    Stage("figure4-inputs", "demap_repro.reporting.inputs.build_crossencoder", "G. Reporting",
-          "Figure 4 input tables from the corrected roots"),
     Stage("family-ablation", "demap_repro.reranker.family_ablation", "F. Reranker",
           "Figure S6: the three-family drop-lists and their frozen-config commands"),
-    Stage("figureS6", "demap_repro.reporting.figures.make_figureS6_broad_family_ablation",
-          "G. Reporting", "Figure S6: render the broad evidence-family ablation heatmap"),
+
+    # G — reporting
+    Stage("table4", "demap_repro.reporting.table4", "G. Reporting",
+          "assemble Table 4, the six-method comparison"),
+    Stage("figure4-inputs", "demap_repro.reporting.inputs.build_crossencoder", "G. Reporting",
+          "Figure 4 input tables from the corrected roots"),
     Stage("figure5-inputs", "demap_repro.reporting.inputs.build_keyword", "G. Reporting",
           "Figure 5 input tables from the corrected roots"),
+    Stage("figureS6", "demap_repro.reporting.figures.make_figureS6_broad_family_ablation",
+          "G. Reporting", "Figure S6: render the broad evidence-family ablation heatmap"),
+
+    # H — sensitivity
+    Stage("leakage-sensitivity", "demap_repro.sensitivity.leakage", "H. Sensitivity",
+          "Table S6: rescore saved rankings on the filtered query lists"),
+    Stage("allowance-sensitivity", "demap_repro.sensitivity.allowance.aggregate", "H. Sensitivity",
+          "Table S7 / Figures S7-S8: aggregate the allowance sweep"),
 ]
 
 BY_NAME: Dict[str, Stage] = {s.name: s for s in STAGES}
