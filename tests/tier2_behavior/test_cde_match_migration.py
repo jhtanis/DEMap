@@ -232,10 +232,24 @@ def test_the_live_service_output_is_still_excluded(ledger):
     assert ledger["release_gates"]["official_nci_cde_match_frozen"]["status"] == "unresolved"
 
 
-def test_cimac_is_still_gated(ledger):
-    """The keyword-algorithm clearance did not extend to the CIMAC workbook."""
-    assert ledger["release_gates"]["cimac_unresolved"]["status"] == "unresolved"
-    assert any(e["release_gate"] == "cimac_unresolved" for e in ledger["gated_material"])
+def test_the_keyword_clearance_did_not_silently_clear_anything_else(ledger):
+    """Each gate must be retired on its own evidence, not by association.
+
+    CIMAC was retired later and separately, once the public NCI workbook was
+    verified byte-identical to the study copy - see
+    tests/tier3_regression/test_cimac_frozen_input.py. What the keyword-algorithm
+    clearance covered was our own implementations, and nothing beyond them: NCI's
+    supplied source material and the live-service output are still restricted.
+    """
+    gates = ledger["release_gates"]
+    assert gates["nci_cde_match_source"]["status"] == "unresolved"
+    assert gates["official_nci_cde_match_frozen"]["status"] == "unresolved"
+    assert gates["finetuned_weights_unresolved"]["status"] == "unresolved"
+    assert gates["medcpt_derivative_weights_unresolved"]["status"] == "unresolved"
+    # And the resolved ones each carry a written resolution.
+    for name, gate in gates.items():
+        if gate.get("status") == "resolved":
+            assert gate.get("resolution"), f"{name} is resolved without a stated reason"
 
 
 def test_no_nci_source_material_is_in_the_repository():

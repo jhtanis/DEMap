@@ -123,7 +123,7 @@ items:
       - "configs/paper/eval_datasets_v1.yaml"
       - "configs/pipeline.yaml"
     public_runnable: "data_gated"
-    release_gate: "cadsr_snapshot_unresolved; cimac_unresolved"
+    release_gate: "cadsr_snapshot_unresolved"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -407,7 +407,7 @@ items:
       - "configs/paper/results_provenance_v1.yaml"
       - "configs/paper/eval_datasets_v1.yaml"
     public_runnable: "partial"
-    release_gate: "cimac_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -461,7 +461,7 @@ items:
       - "demap_repro.sensitivity.leakage"
     required_config:
     public_runnable: "partial"
-    release_gate: "cimac_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -598,7 +598,7 @@ items:
       - "demap_repro.data.leakage_filter"
     required_config:
     public_runnable: "data_gated"
-    release_gate: "cimac_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -626,7 +626,7 @@ items:
     required_config:
       - "configs/paper/eval_datasets_v1.yaml"
     public_runnable: "data_gated"
-    release_gate: "cadsr_snapshot_unresolved; cimac_unresolved"
+    release_gate: "cadsr_snapshot_unresolved"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -654,7 +654,7 @@ items:
     required_config:
       - "configs/paper/eval_datasets_v1.yaml"
     public_runnable: "data_gated"
-    release_gate: "cadsr_snapshot_unresolved; cimac_unresolved"
+    release_gate: "cadsr_snapshot_unresolved"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -877,7 +877,7 @@ items:
       - "configs/paper/phase2_winners_final_v3.yaml"
       - "configs/paper/eval_datasets_v1.yaml"
     public_runnable: "data_gated"
-    release_gate: "cimac_unresolved; finetuned_weights_unresolved"
+    release_gate: "finetuned_weights_unresolved"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -1071,7 +1071,7 @@ items:
       - "demap_repro.pool.coverage"
     required_config: []
     public_runnable: "yes"
-    release_gate: "cimac_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -1095,7 +1095,7 @@ items:
       - "demap_repro.reporting.figures.make_figureS6_broad_family_ablation"
     required_config: []
     public_runnable: "yes"
-    release_gate: "cimac_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -1119,7 +1119,7 @@ items:
       - "demap_repro.reporting.sensitivity_tables"
     required_config:
     public_runnable: "partial"
-    release_gate: "cimac_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"

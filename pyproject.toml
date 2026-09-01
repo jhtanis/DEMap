@@ -47,6 +47,9 @@ neural = [
 figures = ["matplotlib==3.10.8"]
 # caDSR XML extraction.
 extract = ["lxml==6.1.0"]
+# Excel readers. The CIMAC evaluation set is built from the public NCI
+# CIMAC-CIDC Appendix A workbook, which pandas reads through openpyxl.
+excel = ["openpyxl==3.1.5"]
 # Word/PowerPoint readers. Two modules import these at module level:
 # reporting/schematics/_reference_figure6.py (pptx) and
 # sensitivity/allowance/validate.py (docx). Unlike every other pin in this file
@@ -61,6 +64,7 @@ all = [
   "DEMap[neural]",
   "DEMap[figures]",
   "DEMap[extract]",
+  "DEMap[excel]",
   "DEMap[documents]",
   "DEMap[dev]",
 ]

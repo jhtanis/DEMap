@@ -72,19 +72,24 @@ release_gates:
       any resolution; it is a frozen input, not a gate on our code.
     copy_policy: Never runnable publicly; treat as frozen externally supplied numbers.
   cimac_unresolved:
-    description: CIMAC-CIDC Appendix A source workbook and every CIMAC-derived evaluation artifact.
-    status: unresolved
-    affects_stages:
-    - A
-    - B5a
-    - G
-    - H1
-    decision_needed: Whether CIMAC raw or derived (n=131 query/gold) data may be published.
+    description: RETIRED 2026-09-01. The CIMAC source workbook and its derived evaluation set.
+    status: resolved
+    resolution: 'The CIMAC evaluation queries and gold CDE mappings originate from the NCI CIMAC-CIDC
+      clinical-data-element template, which NCI publishes openly - template and data-element metadata,
+      not patient-level study data. The Appendix A workbook NCI serves today is BYTE-IDENTICAL to the
+      copy this study used (sha256 6d657dfd3f7289e74137929836974f742136fea3d2cb753432499418a57c71a3, 43,312
+      bytes), verified by direct download. All 131 canonical query identities and every canonical gold
+      public identifier reproduce from it. CIMAC is therefore a public input and is not restricted.
+
+      Permissible-value metadata came from a second public workbook, CIMAC-CIDC_Permissible_Values.xlsx,
+      which is a LIVE upstream document: the version served today is not byte-identical to the one used
+      during study preparation, and no dated archive exists. So the exact PV-enriched 131-query evaluation
+      representation is distributed as a compact frozen artifact, data/frozen/cimac_v2.parquet, rather
+      than regenerated. The superseded PV workbook is deliberately NOT shipped: the frozen parquet already
+      preserves what evaluation consumes.'
+    affects_stages: []
     dimension: data_redistributable
     blocks_reproducible_by_retraining: false
-    dimension_note: Distinguish raw workbook redistribution from processed n=131 evaluation-set redistribution.
-      A user holding the workbook locally can run the CIMAC stages regardless of the decision.
-    copy_policy: Do not copy into DST until cleared.
   cadsr_snapshot_unresolved:
     description: caDSR nightly XML exports of 2026-01-12 (benchmark construction) and 2026-06-18 (production
       catalog). These are nightly exports, not archived public releases.
@@ -3782,6 +3787,64 @@ entries:
     import confidence`, the RESEARCH package, inside a bare `except Exception`. On a clean clone that
     import always failed and every run silently wrote empty reliability.csv and ece.json. Removed 2026-09-01
     along with those three call sites; nothing reported changes.'
+- src: data/processed/eval_canonical/cimac_v2.parquet
+  dst: data/frozen/cimac_v2.parquet
+  source_class: untracked
+  worktree_sha256: 1d0797330864cb8a73d277c1885fa5bba41a63d3a011cfaaa148e59c6dce4fe0
+  worktree_bytes: 26963
+  paper_scope_ids:
+  - MT-T1
+  - MT-T4
+  - SM-TS1
+  - SM-TS2
+  - SM-TS4
+  - SM-TS5
+  - SM-TS6
+  - SM-FS6
+  - SM-S15-01
+  role: CIMAC canonical evaluation set (131 queries), PV-enriched, exactly as the manuscript used it
+  release_gate: null
+  nontrivial: false
+  classification: frozen_input
+  copy_verbatim: true
+  migration_state: copied_verbatim
+  divergence_note: null
+  provenance_status: Queries and gold reproduce from the public NCI Appendix A workbook, which is byte-identical
+    to the study copy. The PV-enriched query_text_q3 cannot be regenerated because its upstream PV workbook
+    has changed, so this artifact is shipped frozen. See data/frozen/README.md.
+- src: data/raw/cimac/CIMAC-CIDC_Permissible_Values.xlsx
+  dst: null
+  source_class: untracked
+  worktree_sha256: cedc1d2ddc96a2c4fa4f085aa3c779b51076158214ae4310db2d5c46026725b0
+  worktree_bytes: 102783
+  paper_scope_ids: []
+  release_gate: null
+  nontrivial: false
+  role: CIMAC permissible-value workbook used during study preparation
+  classification: not_migrated
+  copy_verbatim: false
+  migration_state: not_migrated_by_decision
+  exclusion_reason: 'superseded_upstream: NCI publishes this workbook openly, but it is a live document
+    - the version served today (sha256 a7cb76eb..., 80,391 bytes) differs from the copy used here (cedc1d2d...,
+    102,783 bytes), and no dated archive exists. Shipping our superseded copy would distribute a stale
+    upstream file while implying it is current. data/frozen/cimac_v2.parquet already preserves the PV-enriched
+    representation evaluation consumes, which is the only thing downstream needs from it.'
+- src: scripts/build_cimac_pv_sideparquet_fixed.py, scripts/build_corrected_cimac_pv_split.py
+  dst: null
+  source_class: untracked
+  worktree_sha256: null
+  worktree_bytes: null
+  paper_scope_ids: []
+  release_gate: null
+  nontrivial: true
+  role: CIMAC PV enrichment and the corrected-PV split builder
+  classification: not_migrated
+  copy_verbatim: false
+  migration_state: not_migrated_by_decision
+  exclusion_reason: 'no_public_workflow_requires_them: they consume the superseded PV workbook and scratch
+    intermediates, and their only output that anything downstream needs is data/frozen/cimac_v2.parquet,
+    which is shipped. Migrating them would add a path that cannot be run to a correct result from public
+    inputs, since the PV workbook they read has changed upstream.'
 gated_material:
 - src: scripts/cde_match/cdeMatch_matchFlow.sql
   source_class: tracked
@@ -3905,34 +3968,6 @@ gated_material:
   - MT-ABS-01
   - MT-P38-01
   release_gate: official_nci_cde_match_frozen
-  copied_to_dst: false
-  migration_state: not_copied
-- src: data/raw/cimac/CIMAC-CIDC_Master_AppendixA_v2.xlsx
-  source_class: untracked
-  worktree_sha256: 6d657dfd3f7289e74137929836974f742136fea3d2cb753432499418a57c71a3
-  worktree_bytes_or_filecount: 43312
-  digest_kind: file
-  role: CIMAC source workbook for the canonical n=131 set (UNTRACKED in SRC)
-  paper_scope_ids:
-  - MT-T1
-  - MT-T4
-  - SM-TS1
-  - SM-TS4
-  release_gate: cimac_unresolved
-  copied_to_dst: false
-  migration_state: not_copied
-- src: data/processed/eval_canonical/cimac_v2.parquet
-  source_class: untracked
-  worktree_sha256: 1d0797330864cb8a73d277c1885fa5bba41a63d3a011cfaaa148e59c6dce4fe0
-  worktree_bytes_or_filecount: 26963
-  digest_kind: file
-  role: CIMAC canonical evaluation set (n = 131)
-  paper_scope_ids:
-  - MT-T1
-  - MT-T4
-  - SM-TS4
-  - MT-P38-02
-  release_gate: cimac_unresolved
   copied_to_dst: false
   migration_state: not_copied
 - src: data/processed/cadsr_xml_2026-06-18/cde_master_enriched_eval_production_cde_match.parquet

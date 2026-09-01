@@ -86,3 +86,8 @@ data/processed/
 !docs/**
 !workflows/
 !workflows/**
+
+# The one frozen study input distributed with the repository. See
+# data/frozen/README.md for why it is shipped rather than regenerated.
+!data/frozen/
+!data/frozen/**

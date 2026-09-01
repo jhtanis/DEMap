@@ -37,6 +37,7 @@ OPTIONAL_EXTRA_FOR: Dict[str, str] = {
     "safetensors": "neural",
     "matplotlib": "figures",
     "lxml": "extract",
+    "openpyxl": "excel",
     "pptx": "documents", "docx": "documents",
 }
 

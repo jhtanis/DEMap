@@ -39,6 +39,7 @@ OPTIONAL_MODULE_EXTRA = {
     "safetensors": "neural",
     "matplotlib": "figures",
     "lxml": "extract",
+    "openpyxl": "excel",
     "pptx": "documents",
     "docx": "documents",
 }

@@ -541,7 +541,7 @@
           "sha256": "561cbe2f6d55c46fbd2928487756bebe40573f09e93bfc3a8337230f7e397794"
         }
       },
-      "release_gate": "cde_match_derivative_unresolved"
+      "release_gate": null
     },
     "C_cde_match_fuzzy_protocol": {
       "paper_scope_ids": [
@@ -558,7 +558,7 @@
       "eligibility_mode": "production_cde_match",
       "eligibility_universe_cdes": 62976,
       "tie_break": "ascending CDE public identifier",
-      "release_gate": "cde_match_derivative_unresolved",
+      "release_gate": null,
       "notes": "Settings are recorded per split in cde_match_clone_summary_<split>__allow<rate>.json."
     },
     "I_manual_schematic_claims": {
@@ -641,7 +641,7 @@
         "val_dev_ceiling_k30": 0.9888,
         "pct_queries_below_30": "88-90"
       },
-      "release_gate": "cde_match_derivative_unresolved"
+      "release_gate": null
     },
     "E_crossencoder": {
       "paper_scope_ids": [
@@ -696,7 +696,7 @@
       "dev_pairs_rows": 108800,
       "dev_pairs_positive": 4140,
       "train_queries_removed_unobtainable_gold": 172,
-      "release_gate": "medcpt_derivative_weights_unresolved; cde_match_derivative_unresolved"
+      "release_gate": "medcpt_derivative_weights_unresolved"
     },
     "F_hgbc_final_model": {
       "paper_scope_ids": [
@@ -744,7 +744,7 @@
       "pool_max_per_query": 30,
       "pool_mean_per_query_approx": 28,
       "tie_break": "ascending CDE public identifier",
-      "release_gate": "cde_match_derivative_unresolved"
+      "release_gate": null
     },
     "G_table4_final_comparison": {
       "paper_scope_ids": [
@@ -829,7 +829,7 @@
       },
       "final_reranker_gdc_hits": "70/72",
       "required_ordering_claim": "final reranker highest Recall@5 on five of six datasets (GDC is the exception)",
-      "release_gate": "cde_match_derivative_unresolved; cimac_unresolved; official_nci_cde_match_frozen",
+      "release_gate": "official_nci_cde_match_frozen",
       "eval_rows": 7,
       "source_note": "Rebuilt at full precision 2026-09-01. python_cde_match_approx and bm25 now come from table_s7_v13_with_hgbc.csv (eval_set=v1) and ft_mpnet from the phase2 canonical_metrics.csv, replacing three artifacts that store recall pre-rounded to 4 dp. Only the OID ALT python_cde_match_approx (0.769->0.770) and bm25 (0.175->0.176) 3-dp renderings change; every value still equals its legacy 4-dp artifact when rounded to 4 dp.",
       "source_sha256_superseded_prerounded": "9f697e39c13f16742786de22a619770218fe1ddefd9f44c09986c9aaa0741b5b"
@@ -954,7 +954,7 @@
         ]
       },
       "ordering_preserved_claim": true,
-      "release_gate": "cde_match_derivative_unresolved; cimac_unresolved",
+      "release_gate": null,
       "leakage_filter": {
         "producer": ".scratch/demap/paper_v11_validation/build_eval_canonical_v2.py",
         "producer_sha256": "1c2c004a03576720520312ba4b8c90577bb83dfdc269bb77c0dda64e868bc6b3",
@@ -1116,7 +1116,7 @@
         "lexical_at_zero_min": 0.151,
         "lexical_at_zero_max": 0.556
       },
-      "release_gate": "cde_match_derivative_unresolved"
+      "release_gate": null
     },
     "D_candidate_pool_coverage": {
       "paper_scope_ids": [
@@ -1223,7 +1223,7 @@
         "path": "artifacts/final_reranker/k_selection/k_selection_grid.csv",
         "note": "Also carries union coverage and disagrees on exactly three queries (OID ALT 1,528 vs 1,527; GDC 71 vs 72; CIMAC 114 vs 113). It predates the production-catalog eligibility correction and must NOT be cited for coverage. The GDC cell was a false positive: a retired version sharing the gold public identifier sat at rank 1. Retained as a K-selection fixture only."
       },
-      "release_gate": "cimac_unresolved"
+      "release_gate": null
     },
     "F_broad_family_ablation": {
       "paper_scope_ids": [
@@ -1331,7 +1331,17 @@
         "item": "fine-grained nine-condition feature-group ablation (v25 Figure S7)",
         "reason": "retired from the manuscript in the 2026-09-01 revision; deliberately not migrated"
       },
-      "release_gate": "cimac_unresolved"
+      "release_gate": null
+    }
+  },
+  "frozen_inputs": {
+    "data/frozen/cimac_v2.parquet": {
+      "sha256": "1d0797330864cb8a73d277c1885fa5bba41a63d3a011cfaaa148e59c6dce4fe0",
+      "bytes": 26963,
+      "rows": 131,
+      "why_frozen": "Queries and gold reproduce from the public NCI CIMAC-CIDC Appendix A workbook, which is byte-identical to the study copy. The PV-enriched query_text_q3 cannot be regenerated: its upstream permissible-value workbook is a live document that has since changed, with no dated archive. Shipped so every reported CIMAC result reproduces exactly.",
+      "public_source": "https://storage.googleapis.com/cidc-prod2-public-documents/CIMAC-CIDC_Master_AppendixA.xlsx",
+      "public_source_sha256": "6d657dfd3f7289e74137929836974f742136fea3d2cb753432499418a57c71a3"
     }
   }
 }
