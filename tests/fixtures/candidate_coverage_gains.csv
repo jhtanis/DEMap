@@ -1,0 +1,7 @@
+dataset,n_queries,union_minus_ftmpnet_n,union_minus_ftmpnet_prop,union_minus_fuzzy_n,union_minus_fuzzy_prop,stronger_arm,union_minus_stronger_n,union_minus_stronger_prop,both_arms_n,ftmpnet_only_n,fuzzy_only_n
+Test,3959,112,0.0283,754,0.1905,FT-MPNet,112,0.0283,3037,754,112
+CCTG,1097,129,0.1176,167,0.1523,FT-MPNet,129,0.1176,756,167,129
+OID ALT,1766,547,0.3097,275,0.1557,CDE Match-Fuzzy,275,0.1557,706,275,547
+CDASH,324,15,0.0463,35,0.108,FT-MPNet,15,0.0463,264,35,15
+GDC,72,5,0.0694,1,0.0139,CDE Match-Fuzzy,1,0.0139,65,1,5
+CIMAC,131,26,0.1984,8,0.061,CDE Match-Fuzzy,8,0.061,80,8,26

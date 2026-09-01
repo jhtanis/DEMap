@@ -31,7 +31,7 @@ source_repository:
   path: "/data/nextgen2/james/tasks/cde_project/demap"
   git_head: "cf8743f535f4f4fb8eb7bcc71362986d615ec58f"
   status: immutable_read_only
-n_items: 42
+n_items: 43
 stages:
   A: "Dataset construction and characterization"
   B1: "Off-the-shelf 4x10 query/CDE representation evaluation"
@@ -1064,6 +1064,28 @@ items:
       externally_frozen_result: "no"
       release_notes: "Training code is ours; the fitted HGBC is a 296 KB scikit-learn model we own and can publish. It consumes the gated candidate pool, so public execution requires a precomputed feature table or pool while that gate is open."
     notes: "'A prespecified follow-up comparison selected the feature set without query-provenance variables' is the ONLY manuscript trace of the A/B comparison. The public path declares the 117-feature no-provenance model directly and does NOT replay the A/B selection."
+  - id: "SM-TS5"
+    manuscript_section: "S5.6"
+    manuscript_heading: "S5.6 Candidate-pool coverage and retrieval complementarity"
+    item_type: "table"
+    item_id: "Table S5"
+    description: "Table S5. Candidate-pool gold coverage by retrieval arm: Test 3,959 / 0.958 / 0.795 / 0.986; CCTG 1,097 / 0.841 / 0.807 / 0.959; OID ALT 1,766 / 0.555 / 0.710 / 0.865; CDASH 324 / 0.923 / 0.861 / 0.969; GDC 72 / 0.917 / 0.972 / 0.986; CIMAC 131 / 0.672 / 0.809 / 0.870."
+    stage: "D"
+    authoritative_artifact: "artifacts/final_reranker/candidate_coverage_v1/summary/candidate_coverage_by_dataset.csv"
+    authoritative_artifact_kind: "file"
+    required_code:
+      - "demap_repro.pool.coverage"
+    required_config: []
+    public_runnable: "yes"
+    release_gate: "cimac_unresolved"
+    release:
+      code_redistributable: "yes"
+      data_redistributable: "unknown"
+      weights_redistributable: "not_applicable"
+      runnable_from_public_inputs: "partial"
+      runnable_with_user_supplied_or_private_inputs: "yes"
+    notes: "Coverage is whether an accepted gold CDE appears ANYWHERE in the stated candidate set - candidate generation, not reranker performance. Computed from the frozen fixed-K feature table, so it is the pool the final reranker actually scored. The lexical arm is in_cdematch_topk OR in_keyword_topk: the fixed top-10 CDE Match-Fuzzy list is decomposed at build time into a clone tier and a fuzzy-fallback tier, and either flag alone understates the arm (in_cdematch_topk alone covers ~3.5% of rows). Union coverage equals the shipped HGBC n_queries_with_gold_in_candidates and its recall@100 on every dataset, so S5.6 and S5.7 rest on one identical pool. DO NOT use artifacts/final_reranker/k_selection/k_selection_grid.csv for this: it predates the production-catalog eligibility correction and disagrees on three queries; the divergences are traced in candidate_coverage_v1/summary/discrepant_queries.csv."
+
   - id: "SM-TS6"
     manuscript_section: "S6.1"
     manuscript_heading: "S6.1 Training-evaluation overlap sensitivity"

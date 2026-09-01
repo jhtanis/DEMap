@@ -1,0 +1,7 @@
+split,dataset,n_queries,ftmpnet20_n,ftmpnet20_prop,fuzzy10_n,fuzzy10_prop,union_n,union_prop
+test,Test,3959,3791,0.9576,3149,0.7954,3903,0.9859
+cctg,CCTG,1097,923,0.8414,885,0.8067,1052,0.959
+oid_alt,OID ALT,1766,981,0.5555,1253,0.7095,1528,0.8652
+cdash,CDASH,324,299,0.9228,279,0.8611,314,0.9691
+gdc_combined,GDC,72,66,0.9167,70,0.9722,71,0.9861
+cimac_v2,CIMAC,131,88,0.6718,106,0.8092,114,0.8702

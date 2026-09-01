@@ -8,6 +8,17 @@ The branch matters as much as the number: the grid also contains ``clone`` and
 give different ceilings. The paper pool is ``kwfuzzy`` only, so that the Python
 approximation to NCI CDE Match stays an independent comparison method in Table 4
 rather than an ingredient of the system it is compared against.
+
+SUPERSEDED FOR COVERAGE. ``tests/fixtures/k_selection_grid.csv`` also carries
+union gold-coverage counts, and they are NOT the canonical ones. The grid
+predates the production-catalog eligibility correction and disagrees with the
+shipped pool on exactly three queries: OID ALT 1,528 vs 1,527, GDC 71 vs 72,
+CIMAC 114 vs 113. The GDC cell was a false positive - a retired version sharing
+the gold's public identifier sat at rank 1, and public-id matching credited it.
+
+The grid remains correct for what it is used for here, which is the K = 20/30/40/60
+ceiling comparison behind Figure S5 and the choice of K. For candidate-pool
+coverage use :mod:`demap_repro.pool.coverage` and Table S5 instead.
 """
 from __future__ import annotations
 

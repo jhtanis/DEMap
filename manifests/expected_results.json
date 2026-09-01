@@ -13,7 +13,7 @@
     }
   },
   "scope_gate": "manifests/paper_scope.yaml",
-  "policy": "Only results represented in paper_scope.yaml appear here. No HGBC A/B or provenance-dropout experiment, no exact-match pinning, no Phase 2 curriculum arm, no historical wrong-band semihard runs, no SapBERT, no XGBoost, no non-paper feature ablation, no stale pre-correction results.",
+  "policy": "Only results represented in paper_scope.yaml appear here. No HGBC A/B or provenance-dropout experiment, no exact-match pinning, no Phase 2 curriculum arm, no historical wrong-band semihard runs, no SapBERT, no XGBoost, no stale pre-correction results.",
   "tolerance_policy": {
     "level1_from_frozen_artifacts": 0.0005,
     "level2_retrained": 0.01,
@@ -1117,6 +1117,113 @@
         "lexical_at_zero_max": 0.556
       },
       "release_gate": "cde_match_derivative_unresolved"
+    },
+    "D_candidate_pool_coverage": {
+      "paper_scope_ids": [
+        "SM-TS5"
+      ],
+      "source_artifact": "artifacts/final_reranker/candidate_coverage_v1/summary/candidate_coverage_by_dataset.csv",
+      "computed_from": "artifacts/final_reranker/hgbc_features_v2_eligible/feature_table_fixedk30_crossenc_v2.parquet",
+      "tolerance": 0.0005,
+      "arms": {
+        "ftmpnet20": "in_biencoder_topk",
+        "fuzzy10": "in_cdematch_topk OR in_keyword_topk",
+        "union": "every row in the pool"
+      },
+      "coverage": {
+        "Test": {
+          "n_queries": 3959,
+          "ftmpnet20_n": 3791,
+          "ftmpnet20_prop": 0.9576,
+          "fuzzy10_n": 3149,
+          "fuzzy10_prop": 0.7954,
+          "union_n": 3903,
+          "union_prop": 0.9859
+        },
+        "CCTG": {
+          "n_queries": 1097,
+          "ftmpnet20_n": 923,
+          "ftmpnet20_prop": 0.8414,
+          "fuzzy10_n": 885,
+          "fuzzy10_prop": 0.8067,
+          "union_n": 1052,
+          "union_prop": 0.959
+        },
+        "OID ALT": {
+          "n_queries": 1766,
+          "ftmpnet20_n": 981,
+          "ftmpnet20_prop": 0.5555,
+          "fuzzy10_n": 1253,
+          "fuzzy10_prop": 0.7095,
+          "union_n": 1528,
+          "union_prop": 0.8652
+        },
+        "CDASH": {
+          "n_queries": 324,
+          "ftmpnet20_n": 299,
+          "ftmpnet20_prop": 0.9228,
+          "fuzzy10_n": 279,
+          "fuzzy10_prop": 0.8611,
+          "union_n": 314,
+          "union_prop": 0.9691
+        },
+        "GDC": {
+          "n_queries": 72,
+          "ftmpnet20_n": 66,
+          "ftmpnet20_prop": 0.9167,
+          "fuzzy10_n": 70,
+          "fuzzy10_prop": 0.9722,
+          "union_n": 71,
+          "union_prop": 0.9861
+        },
+        "CIMAC": {
+          "n_queries": 131,
+          "ftmpnet20_n": 88,
+          "ftmpnet20_prop": 0.6718,
+          "fuzzy10_n": 106,
+          "fuzzy10_prop": 0.8092,
+          "union_n": 114,
+          "union_prop": 0.8702
+        }
+      },
+      "manuscript_stated": {
+        "Test": [
+          "0.958",
+          "0.795",
+          "0.986"
+        ],
+        "CCTG": [
+          "0.841",
+          "0.807",
+          "0.959"
+        ],
+        "OID ALT": [
+          "0.555",
+          "0.710",
+          "0.865"
+        ],
+        "CDASH": [
+          "0.923",
+          "0.861",
+          "0.969"
+        ],
+        "GDC": [
+          "0.917",
+          "0.972",
+          "0.986"
+        ],
+        "CIMAC": [
+          "0.672",
+          "0.809",
+          "0.870"
+        ]
+      },
+      "required_ordering_claim": "the union exceeds both arms alone on every dataset; union range 0.865-0.986",
+      "superseded_source": {
+        "path": "artifacts/final_reranker/k_selection/k_selection_grid.csv",
+        "note": "Also carries union coverage and disagrees on exactly three queries (OID ALT 1,528 vs 1,527; GDC 71 vs 72; CIMAC 114 vs 113). It predates the production-catalog eligibility correction and must NOT be cited for coverage. The GDC cell was a false positive: a retired version sharing the gold public identifier sat at rank 1. Retained as a K-selection fixture only."
+      },
+      "release_gate": "cimac_unresolved"
     }
   }
 }

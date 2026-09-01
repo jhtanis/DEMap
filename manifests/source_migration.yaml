@@ -3657,6 +3657,43 @@ entries:
   migration_state: parity_established
   provenance_status: Previously gated under cde_match_derivative_unresolved and reached through lexical/cde_match_interface.py.
     Cleared for release 2026-09-01; the adapter is deleted.
+- src: artifacts/final_reranker/candidate_coverage_v1/scripts/compute_coverage.py
+  dst: src/demap_repro/pool/coverage.py
+  source_class: untracked
+  worktree_sha256: 4cbaf158a2b5f22eb16d3a4cd6218fc1394d7c43e65b862cc4592e2b4509e5af
+  worktree_bytes: 3590
+  paper_scope_ids:
+  - SM-TS5
+  role: 'S5.6 / Table S5: Stage-1 candidate-pool gold coverage by retrieval arm'
+  release_gate: null
+  divergence_note: 'Refactored on migration, not copied verbatim: the hardcoded research-repository root
+    became artifact_root(), the module-level script body became compute_coverage() and compute_gains()
+    so it is importable and unit-testable, and a main() with --feature-table / --out-dir was added for
+    `demap coverage`. The computation is unchanged and reproduces candidate_coverage_by_dataset.csv exactly,
+    asserted by tests/tier3_regression/test_candidate_coverage.py.'
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: false
+  migration_state: parity_established
+  provenance_status: Canonical source validated by 48 checks in candidate_coverage_v1/summary/VALIDATION.md.
+- src: artifacts/final_reranker/candidate_coverage_v1/scripts/{validate,trace_discrepancies,finalize}.py
+  dst: null
+  source_class: untracked
+  worktree_sha256: null
+  worktree_bytes: null
+  paper_scope_ids:
+  - SM-TS5
+  role: one-off validators and the discrepancy trace for the coverage run
+  release_gate: null
+  nontrivial: false
+  classification: not_migrated
+  copy_verbatim: false
+  migration_state: not_migrated_by_decision
+  exclusion_reason: 'superseded_by_hardened_code: their scientific assertions are reimplemented as tests/tier3_regression/test_candidate_coverage.py,
+    which checks the same denominators, the union-vs-arms claim, the OR definition of the lexical arm,
+    and the identity between union coverage and the shipped model pool. The discrepancy trace against
+    the superseded k_selection_grid is recorded in expected_results.json and in the K-selection test docstring
+    rather than re-run.'
 gated_material:
 - src: scripts/cde_match/cdeMatch_matchFlow.sql
   source_class: tracked

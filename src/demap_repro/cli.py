@@ -62,6 +62,8 @@ STAGES: List[Stage] = [
     # D — candidate pool
     Stage("select-k", "demap_repro.pool.select_k", "D. Candidate pool",
           "choose the pool size K from the ceiling grid"),
+    Stage("coverage", "demap_repro.pool.coverage", "D. Candidate pool",
+          "Table S5: gold coverage of each retrieval arm and their union"),
 
     # E — cross-encoder
     Stage("ce-pool-train", "demap_repro.crossencoder.pool_train", "E. Cross-encoder",
