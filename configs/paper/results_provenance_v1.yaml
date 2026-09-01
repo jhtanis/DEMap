@@ -321,7 +321,7 @@ results:
     method: "pv_summary_overlap_query_vs_cde"
     dataset: "frozen benchmark pairs (data/processed/pairs.parquet)"
     metric: "normalized block match rate, query-shorter-than-CDE rate, mean Jaccard overlap"
-    denominator: "pair rows where BOTH the query-side and gold-CDE-side PV blocks are present: 38,964 of 69,102 (grouped overall and by cde_pv_type with >= 100 rows)"
+    denominator: "pair rows where BOTH the query-side and gold-CDE-side PV blocks are present: 39,391 of 69,844 in the frozen 2026-04-23 run the manuscript prints (grouped overall and by cde_pv_type with >= 100 rows)"
     checkpoint_identity: "n/a (no model)"
     seed_handling: "deterministic"
     exact_match_allowance: "n/a"
@@ -329,7 +329,7 @@ results:
     candidate_pool_context: "n/a"
     authoritative_artifact: "data/processed/pairs.parquet"
     authoritative_artifact_sha256: "1664cc537b3aae4ebc14f874e425ffb7b0d97ba3b1a1373cda8197b8c3665751"
-    notes: "CORRECTED 2026-08-08 (author-approved): v21 Table S3 and its S3.5 prose denominator now carry the values recomputed from the canonical 69,102-pair pairs.parquet (38,964 / 24,158 / 3,040 / 8,815; ENUM query-shorter 45.3%). Producer chain unchanged: src/demap/analysis/pv_frozen_diagnostics.py (CLI `demap pv-frozen-diagnostics`) writes artifacts/summaries/pv_frozen_diagnostics/query_cde_pv_pair_records.csv; notebooks/07_dataset_statistics_tables_and_figure.ipynb cell 13 groups it into the table. PV_DIAG_DIR resolves to pv_frozen_diagnostics, NOT the _with_gdc variant. The computation carries 6 groups; v21 reports 4. HISTORICAL PROVENANCE ONLY: artifacts/tables/table04_pv_overlap_query_vs_cde.csv holds the superseded 69,844-row-input values (39,391 / 24,543 / 3,074 / 8,816) and is not a parity target."
+    notes: "FROZEN HISTORICAL RESULT, not regenerable here. Table S3 comes from the 2026-04-23 PV diagnostics run over a pairs.parquet build of 69,844 rows, which was OVERWRITTEN on 2026-05-13 by the 69,102-row paper-era build every model stage consumed. The source is artifacts/tables/table04_pv_overlap_query_vs_cde.csv (sha256 1b0a5522...), corroborated by two independent siblings of the same run. Because the 69,844-row input no longer exists, this table is reproduced from a committed fixture, like the official NCI CDE Match column of Table 4. SUPERSEDED DECISION: from 2026-08-08 to 2026-09-01 this repository targeted 38,964 / 24,158 / 3,040 / 8,815 (ENUM query-shorter 45.3%), the same table recomputed over the surviving 69,102-row build and printed in v21. The manuscript revision reviewed the discrepancy against the retained artifacts and kept 39,391; 38,964 was never written to an artifact, existing only as a recomputation, which is why that review found no source for it. The recomputation is retained as tests/fixtures/table_s3_pv_overlap_69102_recomputed.csv. The difference is one denominator, moves a single displayed rate cell, and does not change the interpretation. This was never PV-code drift: current code regenerates the current pairs.parquet PV blocks with 100% row-level parity. Producer chain: pairs.parquet -> pv_frozen_diagnostics -> reporting/dataset_tables_pv_overlap.py. The computation carries 6 groups; the paper reports 4 (BINARY_WITH_UNKNOWN_NA and BINARY are omitted)."
   - id: "RP-20"
     paper_scope_ids:
       - "SM-S15-01"

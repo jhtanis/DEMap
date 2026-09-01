@@ -170,9 +170,9 @@
       "paper_scope_ids": [
         "SM-TS3"
       ],
-      "source_artifact": "data/processed/pairs.parquet",
-      "source_sha256": "1664cc537b3aae4ebc14f874e425ffb7b0d97ba3b1a1373cda8197b8c3665751",
-      "source_n_pairs": 69102,
+      "source_artifact": "artifacts/tables/table04_pv_overlap_query_vs_cde.csv",
+      "source_sha256": "1b0a552265b68f6a780242966423ec58c87a52e805fbf85470fe9644fd802d99",
+      "source_n_pairs": 69844,
       "tolerance": 0.0005,
       "reported_groups": [
         "overall",
@@ -182,99 +182,58 @@
       ],
       "expected_values": {
         "overall": {
-          "n_rows_both_present": 38964,
-          "normalized_block_match_rate": 0.004029,
-          "query_shorter_than_cde_rate": 0.300534,
-          "mean_jaccard_overlap": 0.167501
+          "n_rows_both_present": 39391,
+          "normalized_block_match_rate": 0.0040110685181894345,
+          "query_shorter_than_cde_rate": 0.3014648016044274,
+          "mean_jaccard_overlap": 0.16761775615063243
         },
         "ENUM": {
-          "n_rows_both_present": 24158,
-          "normalized_block_match_rate": 0.004181,
-          "query_shorter_than_cde_rate": 0.452893,
-          "mean_jaccard_overlap": 0.152807
+          "n_rows_both_present": 24543,
+          "normalized_block_match_rate": 0.0042,
+          "query_shorter_than_cde_rate": 0.4524,
+          "mean_jaccard_overlap": 0.1529
         },
         "BINARY_WITH_UNKNOWN": {
-          "n_rows_both_present": 3040,
-          "normalized_block_match_rate": 0.000987,
+          "n_rows_both_present": 3074,
+          "normalized_block_match_rate": 0.001,
           "query_shorter_than_cde_rate": 0.0,
-          "mean_jaccard_overlap": 0.333004
+          "mean_jaccard_overlap": 0.333
         },
         "BINARY_WITH_NA": {
-          "n_rows_both_present": 8815,
-          "normalized_block_match_rate": 0.000227,
-          "query_shorter_than_cde_rate": 0.000113,
-          "mean_jaccard_overlap": 0.122708
+          "n_rows_both_present": 8816,
+          "normalized_block_match_rate": 0.0002,
+          "query_shorter_than_cde_rate": 0.0001,
+          "mean_jaccard_overlap": 0.1227
         }
       },
       "manuscript_stated": {
         "overall": {
-          "rows": 38964,
+          "rows": 39391,
           "block_match_pct": 0.4,
           "query_shorter_pct": 30.1,
           "mean_jaccard": 0.168
         },
         "ENUM": {
-          "rows": 24158,
+          "rows": 24543,
           "block_match_pct": 0.4,
-          "query_shorter_pct": 45.3,
+          "query_shorter_pct": 45.2,
           "mean_jaccard": 0.153
         },
         "BINARY_WITH_UNKNOWN": {
-          "rows": 3040,
+          "rows": 3074,
           "block_match_pct": 0.1,
           "query_shorter_pct": 0.0,
           "mean_jaccard": 0.333
         },
         "BINARY_WITH_NA": {
-          "rows": 8815,
+          "rows": 8816,
           "block_match_pct": 0.0,
           "query_shorter_pct": 0.0,
           "mean_jaccard": 0.123
         }
       },
-      "manuscript_prose_denominator": 38964,
-      "provenance_status": "corrected_to_canonical_69102_pairs",
-      "correction": {
-        "date": "2026-08-08",
-        "authorized_by": "author",
-        "manuscript_edit": "v21 Table S3 row counts changed to 38,964 / 24,158 / 3,040 / 8,815; ENUM query-shorter 45.2% -> 45.3%; S3.5 prose denominator 39,391 -> 38,964. No other text changed.",
-        "rationale": "The printed values came from a superseded 69,844-row build of pairs.parquet. Every model stage and the \u00a73.1 / S1.3 pair count use the 69,102-row file, so Table S3 was internally inconsistent with the rest of the manuscript."
-      },
-      "superseded_artifact": {
-        "path": "artifacts/tables/table04_pv_overlap_query_vs_cde.csv",
-        "sha256": "1b0a552265b68f6a780242966423ec58c87a52e805fbf85470fe9644fd802d99",
-        "upstream_artifact": "artifacts/summaries/pv_frozen_diagnostics/query_cde_pv_pair_records.csv",
-        "upstream_sha256": "c944fd4a1967783421785dd52745bf722437847534a1d4cf1f5d9322c7d868a1",
-        "generated": "2026-04-23 15:48",
-        "input_pairs_parquet_rows": 69844,
-        "values": {
-          "overall": {
-            "n_rows_both_present": 39391,
-            "normalized_block_match_rate": 0.004,
-            "query_shorter_than_cde_rate": 0.3015,
-            "mean_jaccard_overlap": 0.1676
-          },
-          "ENUM": {
-            "n_rows_both_present": 24543,
-            "normalized_block_match_rate": 0.0042,
-            "query_shorter_than_cde_rate": 0.4524,
-            "mean_jaccard_overlap": 0.1529
-          },
-          "BINARY_WITH_UNKNOWN": {
-            "n_rows_both_present": 3074,
-            "normalized_block_match_rate": 0.001,
-            "query_shorter_than_cde_rate": 0.0,
-            "mean_jaccard_overlap": 0.333
-          },
-          "BINARY_WITH_NA": {
-            "n_rows_both_present": 8816,
-            "normalized_block_match_rate": 0.0002,
-            "query_shorter_than_cde_rate": 0.0001,
-            "mean_jaccard_overlap": 0.1227
-          }
-        },
-        "why_superseded": "Its input pairs.parquet (69,844 rows) was overwritten on 2026-05-13 14:43 by the paper-era 69,102-row build. 11 of 12 rate cells round identically; all four row counts differ. Retained to explain the historical discrepancy; never a parity target."
-      },
+      "manuscript_prose_denominator": 39391,
+      "provenance_status": "frozen_2026_04_23_run_69844_pairs",
       "pv_generation_audit": {
         "date": "2026-08-07",
         "row_level_parity_query_side": "46948/46948 exact (100%)",
@@ -282,7 +241,37 @@
         "frozen_vs_regenerated_diagnostics": "identical to full float precision, all 6 groups",
         "verdict": "no PV-code regression"
       },
-      "notes": "Producer chain: data/processed/pairs.parquet -> src/demap/analysis/pv_frozen_diagnostics.py (CLI `demap pv-frozen-diagnostics`) -> query_cde_pv_pair_records.csv -> notebooks/07_dataset_statistics_tables_and_figure.ipynb cell 13 -> Table S3. The computation carries 6 groups; v21 reports 4 (BINARY_WITH_UNKNOWN_NA and BINARY are omitted). The DST reimplementation must reproduce expected_values from pairs.parquet directly."
+      "notes": "Producer chain: data/processed/pairs.parquet -> src/demap/analysis/pv_frozen_diagnostics.py (CLI `demap pv-frozen-diagnostics`) -> query_cde_pv_pair_records.csv -> notebooks/07_dataset_statistics_tables_and_figure.ipynb cell 13 -> Table S3. The computation carries 6 groups; v21 reports 4 (BINARY_WITH_UNKNOWN_NA and BINARY are omitted). The DST reimplementation must reproduce expected_values from pairs.parquet directly.",
+      "status": "frozen_historical_input_not_reproducible",
+      "status_note": "Table S3 comes from the 2026-04-23 PV diagnostics run over a 69,844-row build of pairs.parquet that was overwritten on 2026-05-13 by the 69,102-row paper-era build. The 69,844-row input no longer exists and the per-pair records of that run were not retained in a form the grouping code can consume, so this table is reproduced from a committed fixture rather than recomputed - the same class as the official NCI CDE Match column of Table 4.",
+      "corroborating_artifacts": [
+        {
+          "path": "artifacts/summaries/pv_frozen_diagnostics/query_cde_pv_overlap_summary.csv",
+          "note": "independent sibling of the same run: n_pairs 69844, both_present_n 39391"
+        },
+        {
+          "path": "artifacts/summaries/pv_frozen_diagnostics/pv_frozen_diagnostics.json",
+          "note": "pair_overlap_summary.both_present_n 39391; the full-precision overall row"
+        }
+      ],
+      "expected_values_precision_note": "The overall row is full precision from pv_frozen_diagnostics.json; the per-group rows are only available at 4 dp. Only overall query_shorter_than_cde_rate is affected: 0.3015 double-rounds to 30.2% where the manuscript prints 30.1%, while the full-precision value rounds once to 30.1%.",
+      "superseded_decision": {
+        "values": {
+          "overall": 38964,
+          "ENUM": 24158,
+          "BINARY_WITH_UNKNOWN": 3040,
+          "BINARY_WITH_NA": 8815
+        },
+        "enum_query_shorter_pct": 45.3,
+        "pinned_from": "2026-08-08",
+        "pinned_until": "2026-09-01",
+        "recomputed_from": "data/processed/pairs.parquet",
+        "recomputed_from_sha256": "1664cc537b3aae4ebc14f874e425ffb7b0d97ba3b1a1373cda8197b8c3665751",
+        "recomputed_from_n_pairs": 69102,
+        "fixture": "tests/fixtures/table_s3_pv_overlap_69102_recomputed.csv",
+        "rationale": "Recomputing the table over the surviving 69,102-row benchmark - the build every model stage consumed and the one 3.1/S1.3 quote - gives these values. Author-approved 2026-08-08 and printed in v21.",
+        "why_superseded": "The manuscript revision reviewed the same discrepancy against the retained artifacts of the original run and kept 39,391; 38,964 was never written to an artifact, existing only as a recomputation. The author's decision is 39,391. Retained as provenance: the difference is one denominator, it moves a single displayed rate cell (ENUM query-shorter 45.3% vs 45.2%), and it does not change the interpretation of the PV-overlap analysis."
+      }
     },
     "B1_representation_screen": {
       "paper_scope_ids": [

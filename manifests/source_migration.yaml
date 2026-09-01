@@ -536,7 +536,7 @@ entries:
     PV_DIAG_DIR resolves to artifacts/summaries/pv_frozen_diagnostics (NOT the _with_gdc variant).'
   divergence_note: 'Cell 13 (the Table S3 grouping) ported to a module. AUDIT 2026-08-08: the earlier
     reason claimed tests covered it, but no DST code performed the grouping. The full chain pairs.parquet
-    -> pv_frozen_diagnostics -> this module now reproduces the CORRECTED Table S3 (38,964 / 24,158 / 3,040
+    -> pv_frozen_diagnostics -> this module reproduces, from the surviving 69,102-row benchmark, (38,964 / 24,158 / 3,040
     / 8,815) end to end; the other notebook cells build tables not reported in v21.'
   release_gate: null
   nontrivial: true

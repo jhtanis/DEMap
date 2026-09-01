@@ -42,8 +42,10 @@ All four were re-migrated under the standard loop and reach
   exactly** — same input hash, same geometry, same fonts, same recorded anchor and
   best cells;
 - the Table S3 chain (`pairs.parquet` → `pv_frozen_diagnostics` → grouping) now
-  reproduces the **corrected** table end to end: 38,964 / 24,158 / 3,040 / 8,815
-  with ENUM query-shorter 45.3%.
+  reproduces, end to end, the table the surviving 69,102-row benchmark implies:
+  38,964 / 24,158 / 3,040 / 8,815 with ENUM query-shorter 45.3%. The manuscript
+  prints the frozen 2026-04-23 run instead (39,391 / 24,543 / 3,074 / 8,816); see
+  `A_pv_overlap` in `manifests/expected_results.json` for why both are kept.
 
 `tests/tier1_invariants/test_paper_scope_coverage.py` now asserts that every
 reported figure and table maps to a module that exists, so this class of gap

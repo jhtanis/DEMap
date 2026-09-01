@@ -18,22 +18,24 @@ Query-side permissible values contribute partial, not duplicated, evidence.
 Grouping
 --------
 An ``overall`` row plus one row per ``cde_pv_type`` with at least 100 both-present
-rows. The computation yields six such groups; v21 prints four
+rows. The computation yields six such groups; the paper prints four
 (``BINARY_WITH_UNKNOWN_NA`` and ``BINARY`` are omitted from the table).
 
-Denominator correction (2026-08-08)
------------------------------------
-The values published before this date came from a ``pairs.parquet`` build of
-69,844 rows that was later overwritten by the paper-era 69,102-row build — the one
-every model stage actually consumed. Table S3 was corrected to the canonical
-computation: 38,964 both-present rows overall, 24,158 ENUM, 3,040
-BINARY_WITH_UNKNOWN, 8,815 BINARY_WITH_NA, with ENUM query-shorter moving from
-45.2% to 45.3%. Eleven of the twelve rate cells were unaffected.
+Which input Table S3 came from
+------------------------------
+The manuscript prints 39,391 / 24,543 / 3,074 / 8,816: the frozen 2026-04-23 run
+over a ``pairs.parquet`` build of 69,844 rows. That build was overwritten on
+2026-05-13 by the paper-era 69,102-row build — the one every model stage
+consumed — so **this code cannot regenerate the printed table**. Run over the
+surviving benchmark it gives 38,964 / 24,158 / 3,040 / 8,815, with ENUM
+query-shorter at 45.3% rather than 45.2%; eleven of the twelve rate cells are
+unaffected either way.
 
-This was never PV-code drift. The generation code regenerates the frozen blocks
-with 100% row-level parity; the *input* to the frozen diagnostic had been
-replaced. See ``manifests/expected_results.json`` under ``A_pv_overlap``, which
-keeps the superseded artifact only to explain the discrepancy.
+Both are kept as fixtures, and the difference changes neither the table's
+message nor any downstream result. This was never PV-code drift: the generation
+code regenerates the current PV blocks with 100% row-level parity; only the
+*input* to the frozen diagnostic was replaced. See
+``manifests/expected_results.json`` under ``A_pv_overlap``.
 
 Migrated from cell 13 of
 ``notebooks/07_dataset_statistics_tables_and_figure.ipynb``, the confirmed

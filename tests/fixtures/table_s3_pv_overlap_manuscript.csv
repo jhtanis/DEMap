@@ -1,5 +1,5 @@
 group,n_rows_both_present,normalized_block_match_rate,normalized_set_match_rate,query_shorter_than_cde_rate,mean_jaccard_overlap
-overall,39391,0.004,0.004,0.3015,0.1676
+overall,39391,0.0040110685181894345,0.0040110685181894345,0.3014648016044274,0.16761775615063243
 ENUM,24543,0.0042,0.0042,0.4524,0.1529
 BINARY_WITH_NA,8816,0.0002,0.0002,0.0001,0.1227
 BINARY_WITH_UNKNOWN,3074,0.001,0.001,0.0,0.333
