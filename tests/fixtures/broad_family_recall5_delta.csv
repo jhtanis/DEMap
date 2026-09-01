@@ -1,0 +1,5 @@
+condition,label,n_features,Test,CCTG,OID ALT,CDASH,GDC,CIMAC
+full,Full HGBC,117,0.0,0.0,0.0,0.0,0.0,0.0
+minus_lexical_keyword,− Lexical/keyword-oriented evidence,19,-0.0384,-0.1449,-0.2322,-0.0432,-0.0833,-0.1527
+minus_ft_mpnet,− FT-MPNet evidence,104,-0.0111,-0.0109,0.0,-0.0031,0.0,0.0076
+minus_ft_medcpt,− FT-MedCPT evidence,111,-0.004,-0.0119,-0.0079,-0.0062,0.0,-0.0076

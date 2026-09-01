@@ -99,6 +99,39 @@ def _load_feature_spec(path: str, key: str) -> List[str]:
     return [str(c) for c in names]
 
 
+FIXED_CONFIG_KEYS = ("max_iter", "max_depth", "learning_rate", "min_samples_leaf")
+
+
+def parse_fixed_config(spec: str) -> Dict[str, Any]:
+    """Parse a frozen hyperparameter spec: a path to a JSON file, or inline JSON.
+
+    Must define exactly the four tuned HGBC hyperparameters. Extra or missing keys
+    are an error rather than a silent default, so a frozen run cannot quietly differ
+    from the configuration it claims to reproduce.
+    """
+    p = Path(spec)
+    txt = p.read_text() if p.exists() else spec
+    try:
+        obj = json.loads(txt)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"--fixed-config is neither a readable file nor valid JSON: {exc}")
+    if not isinstance(obj, dict):
+        raise ValueError("--fixed-config must be a JSON object, not %s" % type(obj).__name__)
+    missing = [k for k in FIXED_CONFIG_KEYS if k not in obj]
+    extra = [k for k in obj if k not in FIXED_CONFIG_KEYS]
+    if missing or extra:
+        raise ValueError(
+            f"--fixed-config must define exactly {list(FIXED_CONFIG_KEYS)}; "
+            f"missing={missing} unexpected={extra}"
+        )
+    return {
+        "max_iter": int(obj["max_iter"]),
+        "max_depth": int(obj["max_depth"]),
+        "learning_rate": float(obj["learning_rate"]),
+        "min_samples_leaf": int(obj["min_samples_leaf"]),
+    }
+
+
 def prepare_features(
     df: pd.DataFrame,
     *,
@@ -358,15 +391,21 @@ def run_grid_search(
     tune_df: pd.DataFrame,
     feature_names: List[str],
     categorical_features: List[int] | None = None,
+    configs: List[Tuple[int, int, float, int]] | None = None,
 ) -> Tuple[Any, Dict, pd.DataFrame]:
     from sklearn.ensemble import HistGradientBoostingClassifier
 
-    configs = list(product(
-        GRID["max_iter"],
-        GRID["max_depth"],
-        GRID["learning_rate"],
-        GRID["min_samples_leaf"],
-    ))
+    # ``configs=None`` (the default) searches the full predefined GRID, exactly as
+    # before. A caller may pass an explicit list -- e.g. the single frozen
+    # configuration of an already-selected model -- to skip re-selection; the fit
+    # and scoring path below is otherwise unchanged.
+    if configs is None:
+        configs = list(product(
+            GRID["max_iter"],
+            GRID["max_depth"],
+            GRID["learning_rate"],
+            GRID["min_samples_leaf"],
+        ))
 
     # Only pass categorical_features when explicitly requested, so the legacy
     # (table-relative) path constructs the estimator with byte-identical params.
@@ -440,7 +479,22 @@ def main(argv=None):
                          "(categorical_vocab.json), encode absent/empty/unseen to the reserved "
                          "__FALLBACK__ category, and train with sklearn-native "
                          "categorical_features.")
+    ap.add_argument("--fixed-config", default=None,
+                    help="Skip hyperparameter selection and train the single given "
+                         "configuration. Accepts a path to a JSON file or an inline JSON "
+                         "object with keys max_iter, max_depth, learning_rate, "
+                         "min_samples_leaf. Used to hold an already-selected model's "
+                         "hyperparameters frozen across feature ablations so that the "
+                         "feature set is the only design change. Omitted by default, in "
+                         "which case the full predefined grid is searched as before.")
     args = ap.parse_args(argv)
+
+    fixed_config = None
+    if args.fixed_config:
+        try:
+            fixed_config = parse_fixed_config(args.fixed_config)
+        except ValueError as exc:
+            ap.error(str(exc))
 
     ft_path = Path(args.feature_table)
     out_dir = Path(args.out)
@@ -579,14 +633,29 @@ def main(argv=None):
             f"MRR={row['mrr@100']:.4f}"
         )
 
-    # Grid search — deployment style on val_dev
-    print(f"\nGrid search ({len(list(product(*GRID.values())))} configs)...")
+    # Grid search — deployment style on val_dev. With --fixed-config the "grid" is
+    # the single frozen configuration, so no re-selection happens.
+    grid_configs = None
+    if fixed_config is not None:
+        grid_configs = [tuple(fixed_config[k] for k in FIXED_CONFIG_KEYS)]
+        print(f"\nFrozen configuration (no hyperparameter selection): {fixed_config}")
+    else:
+        print(f"\nGrid search ({len(list(product(*GRID.values())))} configs)...")
     best_model, best_config, grid_df = run_grid_search(
         X_train, y_train, X_tune, tune_df, feature_names,
         categorical_features=(cat_indices if args.categorical_mode == "stable" else None),
+        configs=grid_configs,
     )
     grid_df.to_csv(out_dir / "hgbc_grid_results.csv", index=False)
     print(f"\nBest config: {best_config}")
+
+    # Provenance for frozen runs goes to its own file, so the default run's
+    # feature_set.json / selected_hgbc_config.json stay byte-identical.
+    if fixed_config is not None:
+        with open(out_dir / "fixed_config.json", "w") as f:
+            json.dump({"fixed_config": fixed_config,
+                       "fixed_config_arg": args.fixed_config,
+                       "hyperparameter_selection": "skipped"}, f, indent=2)
 
     with open(out_dir / "selected_hgbc_config.json", "w") as f:
         json.dump(best_config, f, indent=2)

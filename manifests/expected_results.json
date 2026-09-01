@@ -1224,6 +1224,114 @@
         "note": "Also carries union coverage and disagrees on exactly three queries (OID ALT 1,528 vs 1,527; GDC 71 vs 72; CIMAC 114 vs 113). It predates the production-catalog eligibility correction and must NOT be cited for coverage. The GDC cell was a false positive: a retired version sharing the gold public identifier sat at rank 1. Retained as a K-selection fixture only."
       },
       "release_gate": "cimac_unresolved"
+    },
+    "F_broad_family_ablation": {
+      "paper_scope_ids": [
+        "SM-FS6"
+      ],
+      "source_artifact": "artifacts/final_reranker/broad_family_ablation_v1/summary/",
+      "computed_from": "artifacts/final_reranker/hgbc_features_v2_eligible/feature_table_fixedk30_crossenc_v2.parquet",
+      "tolerance": 0.0005,
+      "protocol": {
+        "pool": "identical fixed Stage-1 pool for every condition; no candidate removed",
+        "training": "HGBC retrained from scratch on val_train per condition; never a rescore",
+        "hyperparameters": {
+          "frozen": true,
+          "max_iter": 200,
+          "max_depth": 3,
+          "learning_rate": 0.05,
+          "min_samples_leaf": 30,
+          "random_state": 42
+        },
+        "control": "the full condition reproduces the shipped HGBC byte-identically"
+      },
+      "families": {
+        "lexical_keyword": 98,
+        "ft_mpnet": 13,
+        "ft_medcpt": 6
+      },
+      "recall5_delta": {
+        "full": {
+          "Test": 0.0,
+          "CCTG": 0.0,
+          "OID ALT": 0.0,
+          "CDASH": 0.0,
+          "GDC": 0.0,
+          "CIMAC": 0.0
+        },
+        "minus_lexical_keyword": {
+          "Test": -0.0384,
+          "CCTG": -0.1449,
+          "OID ALT": -0.2322,
+          "CDASH": -0.0432,
+          "GDC": -0.0833,
+          "CIMAC": -0.1527
+        },
+        "minus_ft_mpnet": {
+          "Test": -0.0111,
+          "CCTG": -0.0109,
+          "OID ALT": 0.0,
+          "CDASH": -0.0031,
+          "GDC": 0.0,
+          "CIMAC": 0.0076
+        },
+        "minus_ft_medcpt": {
+          "Test": -0.004,
+          "CCTG": -0.0119,
+          "OID ALT": -0.0079,
+          "CDASH": -0.0062,
+          "GDC": 0.0,
+          "CIMAC": -0.0076
+        }
+      },
+      "recall1_delta": {
+        "full": {
+          "Test": 0.0,
+          "CCTG": 0.0,
+          "OID ALT": 0.0,
+          "CDASH": 0.0,
+          "GDC": 0.0,
+          "CIMAC": 0.0
+        },
+        "minus_lexical_keyword": {
+          "Test": -0.1359,
+          "CCTG": -0.2844,
+          "OID ALT": -0.4037,
+          "CDASH": -0.1543,
+          "GDC": -0.1944,
+          "CIMAC": -0.3511
+        },
+        "minus_ft_mpnet": {
+          "Test": -0.0194,
+          "CCTG": -0.0128,
+          "OID ALT": -0.0045,
+          "CDASH": -0.0401,
+          "GDC": 0.0,
+          "CIMAC": -0.0305
+        },
+        "minus_ft_medcpt": {
+          "Test": -0.0088,
+          "CCTG": 0.0009,
+          "OID ALT": -0.0057,
+          "CDASH": -0.0278,
+          "GDC": 0.0,
+          "CIMAC": -0.0153
+        }
+      },
+      "figure_png_md5": "537ca37d6f29901b7cc5063ee8398dec",
+      "required_ordering_claim": "removing lexical/keyword-oriented evidence costs more than removing either neural family on every dataset, at both Recall@5 and Recall@1",
+      "interpretation_guardrails": [
+        "This is Stage-2 ranking contribution, not candidate generation (see D_candidate_pool_coverage).",
+        "Do not attribute small deltas to candidate-pool ceiling proximity: the ceiling bounds improvement, not deterioration.",
+        "Arm-level effects are conservative: corr(in_biencoder_topk, in_keyword_topk) = -0.862.",
+        "GDC is n=72; one query is 0.014 Recall@5. Do not interpret per-dataset GDC deltas.",
+        "Read absolute values from the *_display.csv files; re-rounding the 4-dp files double-rounds."
+      ],
+      "not_migrated": {
+        "item": "fine-grained nine-condition feature-group ablation (v25 Figure S7)",
+        "reason": "retired from the manuscript in the 2026-09-01 revision; deliberately not migrated"
+      },
+      "release_gate": "cimac_unresolved"
     }
   }
 }

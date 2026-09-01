@@ -3694,6 +3694,75 @@ entries:
     and the identity between union coverage and the shipped model pool. The discrepancy trace against
     the superseded k_selection_grid is recorded in expected_results.json and in the K-selection test docstring
     rather than re-run.'
+- src: artifacts/final_reranker/broad_family_ablation_v1/scripts/make_conditions.py
+  dst: src/demap_repro/reranker/family_ablation.py
+  source_class: untracked
+  worktree_sha256: 549d530f2449d8e337d60969d4f51991054f273c2c3c6caa1b603c420b0d4600
+  worktree_bytes: 6363
+  paper_scope_ids:
+  - SM-FS6
+  role: 'S5.7 / Figure S6: derive and verify the three-family partition, emit per-condition drop-lists'
+  release_gate: null
+  divergence_note: Refactored on migration. The hardcoded research root is gone, and the partition is
+    read from the committed broad_family_map.json rather than re-derived from feature_group_ablation_v1,
+    which is retired and not migrated - broad_family_map.json is self-contained and carries each family
+    member list. Partition verification, the drop-lists and the frozen hyperparameters are unchanged and
+    asserted by tests/tier3_regression/test_family_ablation.py.
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: false
+  migration_state: parity_established
+- src: manuscript/figures/make_figureS6_broad_family_ablation.py
+  dst: src/demap_repro/reporting/figures/make_figureS6_broad_family_ablation.py
+  source_class: untracked
+  worktree_sha256: b25fcee45c1ac6f62a117a4593a7e37a0f1c1d5c3f10acad3b3687fee541c857
+  worktree_bytes: 6866
+  paper_scope_ids:
+  - SM-FS6
+  role: 'S5.7 / Figure S6: two-panel diverging heatmap of the broad-family deltas'
+  release_gate: null
+  divergence_note: 'Copied, then repointed: the house style module is demap_repro.reporting.figures.style
+    (the same file), the sys.path insertion is gone, and the module-level rendering is wrapped in build()/main()
+    so importing it does no work. Delta CSVs are read from committed fixtures by default. Verified to
+    regenerate the published PNG byte-identically, md5 537ca37d6f29901b7cc5063ee8398dec.'
+  nontrivial: true
+  classification: migration_candidate
+  copy_verbatim: false
+  migration_state: parity_established
+- src: artifacts/final_reranker/feature_group_ablation_v1/
+  dst: null
+  source_class: untracked
+  worktree_sha256: null
+  worktree_bytes: null
+  paper_scope_ids: []
+  release_gate: null
+  nontrivial: true
+  role: fine-grained nine-condition HGBC feature-group ablation (v25 Figure S7)
+  classification: not_migrated
+  copy_verbatim: false
+  migration_state: not_migrated_by_decision
+  exclusion_reason: 'unused_by_current_manuscript: it was Figure S7 in v25 and was RETIRED in the 2026-09-01
+    revision, whose S5.7 carries only the broad three-family Figure S6. Considered and deliberately declined
+    rather than overlooked. Its seven-group map was the original input to the broad partition, but broad_family_map.json
+    is self-contained, so nothing here depends on it. 73 MB, no paper_scope item.'
+- src: artifacts/final_reranker/broad_family_ablation_v1/scripts/{build_results,validate,run_array.sbatch}
+  dst: null
+  source_class: untracked
+  worktree_sha256: null
+  worktree_bytes: null
+  paper_scope_ids:
+  - SM-FS6
+  release_gate: null
+  nontrivial: false
+  role: result aggregation, the 47-check validator, and the Slurm array driver
+  classification: not_migrated
+  copy_verbatim: false
+  migration_state: not_migrated_by_decision
+  exclusion_reason: 'superseded_by_hardened_code: the aggregation output is committed as the four delta
+    and display fixtures, and the validator assertions are reimplemented in tests/tier3_regression/test_family_ablation.py
+    - the partition checks, the frozen hyperparameters, the full-condition control against Table 4, and
+    the byte-identical figure reproduction. The Slurm driver is site-specific; the portable equivalent
+    is `demap family-ablation --print-commands`.'
 gated_material:
 - src: scripts/cde_match/cdeMatch_matchFlow.sql
   source_class: tracked

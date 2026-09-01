@@ -31,7 +31,7 @@ source_repository:
   path: "/data/nextgen2/james/tasks/cde_project/demap"
   git_head: "cf8743f535f4f4fb8eb7bcc71362986d615ec58f"
   status: immutable_read_only
-n_items: 43
+n_items: 44
 stages:
   A: "Dataset construction and characterization"
   B1: "Off-the-shelf 4x10 query/CDE representation evaluation"
@@ -1085,6 +1085,30 @@ items:
       runnable_from_public_inputs: "partial"
       runnable_with_user_supplied_or_private_inputs: "yes"
     notes: "Coverage is whether an accepted gold CDE appears ANYWHERE in the stated candidate set - candidate generation, not reranker performance. Computed from the frozen fixed-K feature table, so it is the pool the final reranker actually scored. The lexical arm is in_cdematch_topk OR in_keyword_topk: the fixed top-10 CDE Match-Fuzzy list is decomposed at build time into a clone tier and a fuzzy-fallback tier, and either flag alone understates the arm (in_cdematch_topk alone covers ~3.5% of rows). Union coverage equals the shipped HGBC n_queries_with_gold_in_candidates and its recall@100 on every dataset, so S5.6 and S5.7 rest on one identical pool. DO NOT use artifacts/final_reranker/k_selection/k_selection_grid.csv for this: it predates the production-catalog eligibility correction and disagrees on three queries; the divergences are traced in candidate_coverage_v1/summary/discrepant_queries.csv."
+
+  - id: "SM-FS6"
+    manuscript_section: "S5.7"
+    manuscript_heading: "S5.7 Contribution of feature groups to final ranking"
+    item_type: "figure"
+    item_id: "Figure S6"
+    description: "Figure S6. Broad evidence-family ablation of the final HGBC. Change in Recall@5 (A) and Recall@1 (B) after retraining with one of three evidence families removed: lexical/keyword-oriented (98 features), FT-MPNet (13) and FT-MedCPT (6), which together partition all 117. Largest effects: removing lexical/keyword-oriented evidence costs 0.232 Recall@5 and 0.404 Recall@1 on OID ALT."
+    stage: "F"
+    authoritative_artifact: "artifacts/final_reranker/broad_family_ablation_v1/summary/broad_family_recall5_delta.csv"
+    authoritative_artifact_kind: "file"
+    required_code:
+      - "demap_repro.reranker.family_ablation"
+      - "demap_repro.reranker.train"
+      - "demap_repro.reporting.figures.make_figureS6_broad_family_ablation"
+    required_config: []
+    public_runnable: "yes"
+    release_gate: "cimac_unresolved"
+    release:
+      code_redistributable: "yes"
+      data_redistributable: "unknown"
+      weights_redistributable: "not_applicable"
+      runnable_from_public_inputs: "partial"
+      runnable_with_user_supplied_or_private_inputs: "yes"
+    notes: "A Stage-2 CONDITIONAL RERANKING ablation: every condition scores the identical fixed Stage-1 candidate pool (423,395 rows, row-multiset identical) and no candidate is removed, so it measures contribution to ranking within the pool, NOT candidate generation - that is S5.6 / Table S5. The HGBC is retrained from scratch on val_train for each condition (never a rescore) with the shipped hyperparameters FROZEN via train-hgbc --fixed-config, so the feature set is the only design change; the full condition reproduces the shipped model byte-identically. G4 (PV overlap) and G5 (text characteristics) sit in the lexical family by TYPE OF EVIDENCE, not provenance: they are computed for every pooled candidate from the public catalog and are not CDE Match-Fuzzy outputs, which is why the family is named 'Lexical/keyword-oriented evidence' and must not be renamed after the retriever. Read absolute values from broad_family_recall{5,1}_display.csv (single-rounded); re-rounding the 4-dp absolute/delta files double-rounds. DO NOT attribute small deltas to candidate-pool ceiling proximity: the ceiling bounds improvement, not deterioration. Arm-level effects are conservative because arm membership is partly inferable by negation (corr(in_biencoder_topk, in_keyword_topk) = -0.862). GDC is n=72, so one query is 0.014 Recall@5; do not interpret per-dataset GDC deltas. The fine-grained nine-condition companion (v25 Figure S7) is retired and deliberately not migrated."
 
   - id: "SM-TS6"
     manuscript_section: "S6.1"

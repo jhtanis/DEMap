@@ -45,6 +45,7 @@ FIGURE_GENERATORS = {
     "Figure S3": "make_figureS3_repxloss.py",
     "Figure S4": "make_figureS4_stage_comparison.py",
     "Figure S5": "make_figureS5_k_ceiling.py",
+    "Figure S6": "make_figureS6_broad_family_ablation.py",
     "Figure S7": "make_figureS7_S8_allowance.py",
     "Figure S8": "make_figureS7_S8_allowance.py",
 }
