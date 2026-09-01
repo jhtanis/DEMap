@@ -123,7 +123,7 @@ items:
       - "configs/paper/eval_datasets_v1.yaml"
       - "configs/pipeline.yaml"
     public_runnable: "data_gated"
-    release_gate: "cadsr_snapshot_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -544,7 +544,7 @@ items:
     required_config:
       - "configs/pipeline.yaml"
     public_runnable: "data_gated"
-    release_gate: "cadsr_snapshot_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -572,7 +572,7 @@ items:
     required_config:
       - "configs/pipeline.yaml"
     public_runnable: "data_gated"
-    release_gate: "cadsr_snapshot_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -626,7 +626,7 @@ items:
     required_config:
       - "configs/paper/eval_datasets_v1.yaml"
     public_runnable: "data_gated"
-    release_gate: "cadsr_snapshot_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -654,7 +654,7 @@ items:
     required_config:
       - "configs/paper/eval_datasets_v1.yaml"
     public_runnable: "data_gated"
-    release_gate: "cadsr_snapshot_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"
@@ -682,7 +682,7 @@ items:
     required_config:
       - "configs/pipeline.yaml"
     public_runnable: "data_gated"
-    release_gate: "cadsr_snapshot_unresolved"
+    release_gate: "none"
     release:
       code_redistributable: "yes"
       data_redistributable: "unknown"

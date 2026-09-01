@@ -91,18 +91,37 @@ release_gates:
     dimension: data_redistributable
     blocks_reproducible_by_retraining: false
   cadsr_snapshot_unresolved:
-    description: caDSR nightly XML exports of 2026-01-12 (benchmark construction) and 2026-06-18 (production
-      catalog). These are nightly exports, not archived public releases.
-    status: unresolved
-    affects_stages:
-    - A
-    decision_needed: Whether the snapshots or the derived splits/catalog may be published. Byte-exact
-      re-acquisition by an external user is impossible either way.
-    dimension: data_redistributable
+    description: "caDSR XML exports of 2026-01-12 (benchmark construction) and
+      2026-06-18 (production catalog), and the catalog parquet derived from the
+      latter."
+    status: not_distributed_by_size
+    resolution: "RECLASSIFIED 2026-09-01. This gate previously asserted that these
+      are nightly exports rather than archived public releases, and that byte-exact
+      re-acquisition by an external user is impossible. Both claims are false.
+      caDSR maintains a dated archive at
+      https://cadsr.nci.nih.gov/ftp/caDSR_Downloads/CDE/XML_Archive/ holding 811
+      dated snapshots (2024-02-22 to 2026-07-01), and both dates this study used
+      are in it. The 2026-01-12 archive file was downloaded and compared
+      member-by-member against the copy this study ran on: 14 of 14 XML files
+      CRC32-identical.
+
+      So this is not a redistribution question. The raw exports are ~1.3 GB
+      unpacked and the derived catalog parquet is 15 MB; they are excluded by
+      size, like every other large artifact tree, and are publicly re-acquirable
+      with verified digests. See docs/data_sources.md."
+    affects_stages: []
+    dimension: artifact_size
     blocks_reproducible_by_retraining: false
-    dimension_note: Distinguish snapshot redistribution from derived split/catalog redistribution. Neither
-      blocks the code; both bound how much of Level 3 an external user can execute.
-    copy_policy: Do not copy into DST until cleared.
+    public_download:
+      2026-01-12:
+        url: "https://cadsr.nci.nih.gov/ftp/caDSR_Downloads/CDE/XML_Archive/releasedCDEsXML-OD.zip.2026-01-12"
+        sha256: "0fa759d39f0c966aedf2623c17386601b639b5502fb99ee730e66d8cfdd6a457"
+        bytes: 119919708
+        verified_byte_identical_to_study_copy: true
+      2026-06-18:
+        url: "https://cadsr.nci.nih.gov/ftp/caDSR_Downloads/CDE/XML_Archive/releasedCDEsXML-OD.zip.2026-06-18"
+        sha256: "e37f90a790a987747fdb87d7cbe9937bc342cd5d8ec9a80420273135681b6494"
+        bytes: 122032967
   finetuned_weights_unresolved:
     description: FT-MPNet, FT-BioSimCSE and FT-PubMedBERT Phase 2 checkpoints.
     status: unresolved
