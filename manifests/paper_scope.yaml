@@ -9,10 +9,24 @@ schema_version: 1
 manifest_id: paper_scope_v1
 generated_utc: "2026-08-08T16:49:27.317352+00:00"
 authoritative_manuscript:
-  path: "manuscript/cde_paper_v21.docx"
-  sha256: "2df7895cd8657a7928be220c958aaa38a85c5b5199526f03979c4967b159eecd"
-  size_bytes: 6159078
-  rationale: "Author-designated authoritative manuscript. Version chain: plain-numbered files are author-approved; *_claude.docx files are unapproved build candidates."
+  path: "manuscript/cde_paper_20260901_rnd1_revisions.docx"
+  sha256: "4002f7c102f579e75fd2ebaa5c982580a05836e66037a2fd08eda9626725c7cf"
+  size_bytes: 7014310
+  rationale: >-
+    Author-designated authoritative manuscript: the round-1 revision carrying the
+    coauthor comments and the author's responses. Resolved in the research
+    checkout declared under source_repository, which is where manuscripts live;
+    this path has never resolved inside this repository.
+  supersedes:
+    - path: "manuscript/cde_paper_v21.docx"
+      sha256: "2df7895cd8657a7928be220c958aaa38a85c5b5199526f03979c4967b159eecd"
+      size_bytes: 6159078
+      note: >-
+        The pin this manifest carried from 2026-08-08 to 2026-09-01. Still a
+        valid historical pin; superseded by the v22-v25 revision sequence, which
+        added the candidate-pool coverage table and the broad evidence-family
+        ablation, renumbered the supplement, and corrected two Table 4 cells and
+        the Table S3 row counts.
 source_repository:
   path: "/data/nextgen2/james/tasks/cde_project/demap"
   git_head: "cf8743f535f4f4fb8eb7bcc71362986d615ec58f"

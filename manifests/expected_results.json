@@ -3,8 +3,14 @@
   "manifest_id": "expected_results_v1",
   "generated_utc": "2026-08-08T16:49:41.861920+00:00",
   "authoritative_manuscript": {
-    "path": "manuscript/cde_paper_v21.docx",
-    "sha256": "2df7895cd8657a7928be220c958aaa38a85c5b5199526f03979c4967b159eecd"
+    "path": "manuscript/cde_paper_20260901_rnd1_revisions.docx",
+    "sha256": "4002f7c102f579e75fd2ebaa5c982580a05836e66037a2fd08eda9626725c7cf",
+    "size_bytes": 7014310,
+    "supersedes": {
+      "path": "manuscript/cde_paper_v21.docx",
+      "sha256": "2df7895cd8657a7928be220c958aaa38a85c5b5199526f03979c4967b159eecd",
+      "note": "Pinned 2026-08-08 to 2026-09-01. Superseded by the v22-v25 revision sequence."
+    }
   },
   "scope_gate": "manifests/paper_scope.yaml",
   "policy": "Only results represented in paper_scope.yaml appear here. No HGBC A/B or provenance-dropout experiment, no exact-match pinning, no Phase 2 curriculum arm, no historical wrong-band semihard runs, no SapBERT, no XGBoost, no non-paper feature ablation, no stale pre-correction results.",
