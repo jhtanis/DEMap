@@ -158,24 +158,35 @@ FROZEN_INPUTS = {
 }
 
 
-def test_no_pipeline_stage_writes_into_data_frozen():
-    """The shipped artifacts are immutable paper inputs.
+def test_only_the_materializer_references_data_frozen():
+    """One reader, and it reads. The shipped artifacts are immutable inputs.
 
-    Both importers default under ``data/processed/splits/`` and the evaluation
-    registry reads ``data/processed/eval_canonical/``, so nothing can overwrite
-    ``data/frozen/`` by running a documented command. Asserted statically so a
-    future default cannot quietly point here.
+    ``demap materialize-eval`` copies them into the data tree; nothing else in
+    the package should know the path exists, and nothing at all should write to
+    it. The behavioural half of this guarantee is in
+    ``tests/tier2_behavior/test_materialize_frozen.py``.
     """
     import re
 
-    offenders = []
+    referencing = set()
     for path in (REPO / "src").rglob("*.py"):
-        for lineno, line in enumerate(path.read_text().splitlines(), 1):
-            if re.search(r"""["'][^"']*data/frozen[^"']*["']""", line):
-                offenders.append(f"{path.relative_to(REPO)}:{lineno}: {line.strip()[:80]}")
-    assert not offenders, (
-        "source code references data/frozen/ as a path; it is a distribution "
-        "location, not a runtime one:\n  " + "\n  ".join(offenders))
+        for line in path.read_text().splitlines():
+            if re.search(r"""["'][^"']*data/frozen[^"']*["']""", line) or '"frozen"' in line:
+                if "data" in line or "frozen_dir" in line:
+                    referencing.add(str(path.relative_to(REPO)))
+    assert referencing <= {"src/demap_repro/data/cli/materialize_eval.py"}, (
+        "data/frozen/ should be reachable only from the materialization stage; "
+        f"also referenced by {sorted(referencing - {'src/demap_repro/data/cli/materialize_eval.py'})}")
+
+
+def test_the_materializer_never_opens_the_frozen_source_for_writing():
+    """Static check that the copy is one-directional."""
+    src = (REPO / "src/demap_repro/data/cli/materialize_eval.py").read_text()
+    # the only filesystem writes are to the destination
+    assert "shutil.copy2(src, dst)" in src, "the copy must go source -> destination"
+    assert "copy2(dst, src)" not in src
+    for bad in ('open(src, "w"', "open(src, 'w'", "src.write_", "src.unlink", "src.rename"):
+        assert bad not in src, f"materialize_eval writes to the frozen source: {bad}"
 
 
 def test_a_missing_canonical_split_fails_loudly_not_silently(tmp_path):

@@ -12,13 +12,21 @@ repository from those downloads.
 | `gdc_combined.parquet` | 72 | 38,833 | `289c4f5fc966748c54fc3d4c8c0edda28937b55910796a65db7834034bf86f21` |
 
 Both are byte-identical to the inputs the study evaluated on, and both digests
-are asserted by the test suite. Copy them into your data tree where the
-evaluation registry expects them:
+are asserted by the test suite. Put them where the evaluation registry expects
+them with:
 
 ```bash
-cp data/frozen/cimac_v2.parquet     "$DEMAP_DATA_ROOT/data/processed/eval_canonical/cimac_v2.parquet"
-cp data/frozen/gdc_combined.parquet "$DEMAP_DATA_ROOT/data/processed/eval_canonical/gdc_combined.parquet"
+export DEMAP_DATA_ROOT=/path/to/your/data/tree
+demap materialize-eval --frozen-only
 ```
+
+That verifies each pinned digest before and after copying, creates the
+destination, and is idempotent. A destination that already matches is skipped; a
+destination that differs is refused rather than overwritten. `--frozen-only`
+needs no splits tree; plain `demap materialize-eval` does the same thing as part
+of materializing all six canonical datasets.
+
+**This directory is read-only.** No stage writes into it.
 
 ---
 

@@ -125,12 +125,8 @@ machine-learning splits.
 ## 3. Add the two external evaluation sets
 
 Neither is built from the caDSR export. Both ship in
-[`data/frozen/`](../data/frozen/README.md), so this step is a copy:
-
-```bash
-cp data/frozen/cimac_v2.parquet     "$DEMAP_DATA_ROOT/data/processed/eval_canonical/cimac_v2.parquet"
-cp data/frozen/gdc_combined.parquet "$DEMAP_DATA_ROOT/data/processed/eval_canonical/gdc_combined.parquet"
-```
+[`data/frozen/`](../data/frozen/README.md) and are put in place by the
+materialization stage in step 4 — there is nothing to copy by hand.
 
 Why each is frozen rather than rebuilt is in
 [`data_sources.md`](data_sources.md): CIMAC's permissible-value workbook changed
@@ -165,11 +161,33 @@ demap reachable-splits \
     --eligible   data/processed/cde_catalog_enriched.parquet \
     --out-dir    data/processed/splits_catalog_filtered
 
-demap materialize-eval            # writes the six canonical sets
-demap materialize-eval --dry-run  # counts only, writes nothing
+demap materialize-eval               # writes the six canonical sets
+demap materialize-eval --dry-run     # report only, writes nothing
+demap materialize-eval --frozen-only # just the two shipped inputs, no splits tree needed
 ```
 
 The registry that defines the six sets is `configs/paper/eval_datasets_v1.yaml`.
+
+The six arrive by two routes. **Four are derived here** — `test`, `cctg`,
+`oid_alt` and `cdash` are built from the splits and reachability-filtered.
+**Two are shipped frozen** — `cimac_v2` and `gdc_combined` are copied from
+`data/frozen/` after their pinned SHA-256 is verified, because neither can be
+rebuilt from public inputs in the form the manuscript used.
+
+The frozen half is verified on the way in and on the way out, creates its
+destination, and is idempotent: a destination that already matches is left
+alone, and one that *differs* is refused rather than overwritten — a silent
+overwrite would change the evaluated population without saying so. Nothing is
+written back into `data/frozen/`.
+
+If you only want the two shipped evaluation inputs — to check a reported CIMAC
+or GDC number without building the benchmark — `--frozen-only` needs nothing but
+the repository:
+
+```bash
+export DEMAP_DATA_ROOT=/path/to/your/data/tree
+demap materialize-eval --frozen-only
+```
 
 ### The counts you should get
 

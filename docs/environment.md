@@ -90,7 +90,7 @@ $DEMAP_DATA_ROOT/
       pairs.parquet                    # 69,102 pairs
       splits/
       eval_canonical/                  # the six evaluation sets
-                                       #   cimac_v2.parquet: copy from data/frozen/
+                                       #   written by `demap materialize-eval`
 
 $DEMAP_ARTIFACT_ROOT/
   artifacts/

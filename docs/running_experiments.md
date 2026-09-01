@@ -27,7 +27,7 @@ demap import-cimac                   # supplied input
 demap reachable-splits --splits-dir data/processed/splits \
                        --eligible data/processed/cde_catalog_enriched.parquet \
                        --out-dir data/processed/splits_catalog_filtered
-demap materialize-eval
+demap materialize-eval               # derives four, materializes the two frozen
 demap leakage-filter
 demap characterize                   # Tables 1, S1, S2
 ```
