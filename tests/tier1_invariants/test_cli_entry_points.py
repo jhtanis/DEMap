@@ -57,7 +57,13 @@ def test_stage_main_accepts_argv(stage):
 
 @pytest.mark.parametrize("stage", STAGES, ids=lambda s: s.name)
 def test_stage_responds_to_help(stage):
-    """``demap <stage> --help`` must exit cleanly and print usage."""
+    """``demap <stage> --help`` must print usage, or say which extra it needs.
+
+    What must never happen is a bare traceback. A reader who installed the
+    documented quick start (`pip install -e '.[dev]'`) and asks a neural or
+    figure stage for help should be told to install that extra, not shown a
+    ModuleNotFoundError. Both outcomes are acceptable; a traceback is not.
+    """
     proc = subprocess.run(
         [sys.executable, "-m", "demap_repro.cli", stage.name, "--help"],
         capture_output=True, text=True, cwd=ROOT, timeout=180,
@@ -66,6 +72,12 @@ def test_stage_responds_to_help(stage):
     assert "Traceback" not in combined, (
         f"{stage.name}: --help raised\n{combined[-2000:]}"
     )
+    if "optional dependency" in combined:
+        assert "pip install -e" in combined, (
+            f"{stage.name}: reported a missing extra without saying how to install it\n"
+            f"{combined[-2000:]}")
+        assert proc.returncode == 2, f"{stage.name}: expected exit 2, got {proc.returncode}"
+        return
     assert proc.returncode == 0, (
         f"{stage.name}: --help exited {proc.returncode}\n{combined[-2000:]}"
     )

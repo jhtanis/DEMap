@@ -28,6 +28,18 @@ class Stage(NamedTuple):
 
 
 # Ordered as the pipeline runs.
+#: Top-level import name -> the ``[project.optional-dependencies]`` extra that
+#: installs it. A stage whose module needs one of these should say so rather than
+#: raising ModuleNotFoundError at a reader who followed the quick start.
+OPTIONAL_EXTRA_FOR: Dict[str, str] = {
+    "torch": "neural", "transformers": "neural", "sentence_transformers": "neural",
+    "accelerate": "neural", "datasets": "neural", "huggingface_hub": "neural",
+    "safetensors": "neural",
+    "matplotlib": "figures",
+    "lxml": "extract",
+    "pptx": "documents", "docx": "documents",
+}
+
 STAGES: List[Stage] = [
     # A — dataset construction
     Stage("make-dataset", "demap_repro.data.pipeline", "A. Dataset",
@@ -151,7 +163,18 @@ def main(argv=None) -> int:
         _print_stages()
         return 2
 
-    module = importlib.import_module(stage.module)
+    try:
+        module = importlib.import_module(stage.module)
+    except ImportError as exc:
+        missing = getattr(exc, "name", None) or ""
+        extra = OPTIONAL_EXTRA_FOR.get(missing.split(".")[0])
+        if extra is None:
+            raise
+        print(f"stage {stage.name!r} needs the optional dependency {missing!r}, which is "
+              f"not installed.\n\n    pip install -e '.[{extra}]'\n\n"
+              f"See docs/environment.md for what each extra covers.", file=sys.stderr)
+        return 2
+
     entry = getattr(module, "main", None)
     if entry is None:
         print(f"{stage.module} has no main(); run it as a module", file=sys.stderr)
