@@ -1,7 +1,7 @@
 """The minimal revalidation of the paper's core results, as executable tests.
 
 These are the Level A and Level B checks defined in
-``docs/handoff/2026-08-21-paper-repo-bug-backport-and-core-revalidation.md``.
+``docs/reproducing.md`` (level 2).
 They exist because the rest of the tier-3 suite checks *committed fixtures*, and
 a fixture faithfully preserves whatever produced it — including, in principle, a
 number produced by buggy code. These tests instead recompute from upstream:

@@ -6,7 +6,7 @@ evaluation-population lock, the pooling-variant setter under both
 sentence-transformers generations, the guarded CIMAC import, and the
 by-dataset denominators.
 
-See ``docs/bugfix/2026-08-21-metamodel-bug-backport-audit.md``.
+Each fix is recorded as a ``divergence_note`` in ``manifests/source_migration.yaml``.
 """
 from __future__ import annotations
 

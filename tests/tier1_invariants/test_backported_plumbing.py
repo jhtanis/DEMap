@@ -6,7 +6,7 @@ runs from a clean clone and code that only ever ran on one machine, with the
 paths and imports of a research tree baked in.
 
 The audit that decided which of those defects apply to the non-metamodel paper,
-and which do not, is ``docs/bugfix/2026-08-21-metamodel-bug-backport-audit.md``.
+and which do not, is recorded per file in ``manifests/source_migration.yaml``.
 """
 from __future__ import annotations
 
