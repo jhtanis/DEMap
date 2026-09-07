@@ -11,10 +11,8 @@ semantic features. It reaches Recall@5 of 0.971 on the internal test set and
 0.802–0.972 across five distribution-shifted external evaluation sets.
 
 This repository contains **only** the code behind results reported in the
-manuscript, plus what those results depend on. Abandoned approaches, superseded
-runs and debugging variants are deliberately absent. The manuscript is the scope
-boundary, and every included component maps to an entry in
-[`manifests/paper_scope.yaml`](manifests/paper_scope.yaml).
+manuscript, plus what those results depend on. Every included component maps to an 
+entry in [`manifests/paper_scope.yaml`](manifests/paper_scope.yaml).
 
 ---
 
