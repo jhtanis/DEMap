@@ -8,10 +8,10 @@ version = "1.0.0"
 description = "DEMap: code and reproducibility workflows for the reported CDE-mapping analyses — benchmark construction, bi-encoder and cross-encoder training, lexical retrieval, and the final HGBC reranker."
 readme = "README.md"
 requires-python = ">=3.10"
-# No license is declared: the terms for this repository have not been decided.
-# Do not add one here without a written determination from the team.
+license = { text = "MIT" }
 authors = [{ name = "HHS/NIH collaborators" }]
 keywords = ["caDSR", "common data elements", "information retrieval", "biomedical NLP"]
+classifiers = ["License :: OSI Approved :: MIT License"]
 
 # Pinned to the versions the paper environment actually ran (Python 3.10.8).
 # Lower bounds are the tested versions; upper bounds guard the majors that

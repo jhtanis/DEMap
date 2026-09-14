@@ -155,8 +155,7 @@ than an input to the system. What each exclusion costs is set out in
 
 ## License
 
-To be determined. No license has been chosen for this repository, and none is
-declared in `pyproject.toml`.
+MIT. See [`LICENSE`](LICENSE).
 
 ## Citation
 
