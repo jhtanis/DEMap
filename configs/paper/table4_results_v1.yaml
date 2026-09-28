@@ -1,0 +1,123 @@
+schema_version: 1
+contract_id: table4_v1
+title: DEMap manuscript Table 4 results contract
+scope: >-
+  Recompute the published Table 4 metrics from frozen query-level outputs.
+  This contract does not describe model training or neural inference.
+
+metric:
+  id: recall_at_5
+  cutoff: 5
+  definition: >-
+    A query is a hit when at least one accepted gold CDE public identifier
+    occurs among the first five returned public identifiers.
+  multi_gold_semantics: any accepted gold public identifier is a hit
+  query_denominator: reachable evaluation queries only
+  unreachable_gold_queries_excluded: true
+  primary_authority: exact integer hit count and exact query denominator
+  rendering:
+    decimal_places: 3
+    rounding: ROUND_HALF_UP
+
+total_queries: 7349
+
+methods:
+  - id: final_reranker
+    display_name: Final reranker
+    maximum_depth: 30
+    ranking_policy: score_desc_numeric_public_id_asc_v1
+    depth_description: complete final candidate pool
+  - id: python_cde_match_approx
+    display_name: Python approximation
+    maximum_depth: 10
+    ranking_policy: archived_rank_asc_v1
+    depth_description: archived top 10; deeper ranks are not fabricated
+  - id: bm25
+    display_name: BM25
+    maximum_depth: 100
+    ranking_policy: archived_rank_asc_v1
+    depth_description: archived top 100
+  - id: ft_mpnet
+    display_name: FT-MPNet
+    maximum_depth: 100
+    ranking_policy: archived_rank_asc_v1
+    depth_description: archived top 100
+  - id: cde_match_fuzzy
+    display_name: CDE Match-Fuzzy
+    maximum_depth: 100
+    ranking_policy: archived_rank_asc_v1
+    depth_description: archived top 100
+  - id: ft_medcpt
+    display_name: FT-MedCPT pooled rerank
+    maximum_depth: 30
+    ranking_policy: archived_rank_asc_v1
+    depth_description: complete pooled-candidate ranking
+
+datasets:
+  - id: test
+    display_name: Test
+    denominator: 3959
+    results:
+      final_reranker: {hits_at_5: 3846, recall_at_5: 0.9714574387471584, manuscript_3dp: "0.971"}
+      python_cde_match_approx: {hits_at_5: 2847, recall_at_5: 0.7191209901490275, manuscript_3dp: "0.719"}
+      bm25: {hits_at_5: 1429, recall_at_5: 0.3609497347815105, manuscript_3dp: "0.361"}
+      ft_mpnet: {hits_at_5: 3609, recall_at_5: 0.9115938368274817, manuscript_3dp: "0.912"}
+      cde_match_fuzzy: {hits_at_5: 3061, recall_at_5: 0.7731750442030816, manuscript_3dp: "0.773"}
+      ft_medcpt: {hits_at_5: 3618, recall_at_5: 0.9138671381662036, manuscript_3dp: "0.914"}
+  - id: cctg
+    display_name: CCTG
+    denominator: 1097
+    results:
+      final_reranker: {hits_at_5: 997, recall_at_5: 0.9088422971741112, manuscript_3dp: "0.909"}
+      python_cde_match_approx: {hits_at_5: 811, recall_at_5: 0.7392889699179581, manuscript_3dp: "0.739"}
+      bm25: {hits_at_5: 430, recall_at_5: 0.3919781221513218, manuscript_3dp: "0.392"}
+      ft_mpnet: {hits_at_5: 773, recall_at_5: 0.7046490428441203, manuscript_3dp: "0.705"}
+      cde_match_fuzzy: {hits_at_5: 856, recall_at_5: 0.780309936189608, manuscript_3dp: "0.780"}
+      ft_medcpt: {hits_at_5: 788, recall_at_5: 0.7183226982680037, manuscript_3dp: "0.718"}
+  - id: oid_alt
+    display_name: OID ALT
+    denominator: 1766
+    results:
+      final_reranker: {hits_at_5: 1470, recall_at_5: 0.8323895809739524, manuscript_3dp: "0.832"}
+      python_cde_match_approx: {hits_at_5: 1359, recall_at_5: 0.7695356738391846, manuscript_3dp: "0.770"}
+      bm25: {hits_at_5: 310, recall_at_5: 0.1755379388448471, manuscript_3dp: "0.176"}
+      ft_mpnet: {hits_at_5: 756, recall_at_5: 0.42808607021517553, manuscript_3dp: "0.428"}
+      cde_match_fuzzy: {hits_at_5: 1240, recall_at_5: 0.7021517553793885, manuscript_3dp: "0.702"}
+      ft_medcpt: {hits_at_5: 996, recall_at_5: 0.5639864099660249, manuscript_3dp: "0.564"}
+  - id: cdash
+    display_name: CDASH
+    denominator: 324
+    results:
+      final_reranker: {hits_at_5: 298, recall_at_5: 0.9197530864197531, manuscript_3dp: "0.920"}
+      python_cde_match_approx: {hits_at_5: 243, recall_at_5: 0.75, manuscript_3dp: "0.750"}
+      bm25: {hits_at_5: 230, recall_at_5: 0.7098765432098766, manuscript_3dp: "0.710"}
+      ft_mpnet: {hits_at_5: 272, recall_at_5: 0.8395061728395061, manuscript_3dp: "0.840"}
+      cde_match_fuzzy: {hits_at_5: 269, recall_at_5: 0.8302469135802469, manuscript_3dp: "0.830"}
+      ft_medcpt: {hits_at_5: 280, recall_at_5: 0.8641975308641975, manuscript_3dp: "0.864"}
+  - id: gdc
+    display_name: GDC
+    denominator: 72
+    results:
+      final_reranker: {hits_at_5: 70, recall_at_5: 0.9722222222222222, manuscript_3dp: "0.972"}
+      python_cde_match_approx: {hits_at_5: 71, recall_at_5: 0.9861111111111112, manuscript_3dp: "0.986"}
+      bm25: {hits_at_5: 39, recall_at_5: 0.5416666666666666, manuscript_3dp: "0.542"}
+      ft_mpnet: {hits_at_5: 60, recall_at_5: 0.8333333333333334, manuscript_3dp: "0.833"}
+      cde_match_fuzzy: {hits_at_5: 70, recall_at_5: 0.9722222222222222, manuscript_3dp: "0.972"}
+      ft_medcpt: {hits_at_5: 65, recall_at_5: 0.9027777777777778, manuscript_3dp: "0.903"}
+  - id: cimac
+    display_name: CIMAC
+    denominator: 131
+    results:
+      final_reranker: {hits_at_5: 105, recall_at_5: 0.8015267175572519, manuscript_3dp: "0.802"}
+      python_cde_match_approx: {hits_at_5: 89, recall_at_5: 0.6793893129770993, manuscript_3dp: "0.679"}
+      bm25: {hits_at_5: 21, recall_at_5: 0.16030534351145037, manuscript_3dp: "0.160"}
+      ft_mpnet: {hits_at_5: 74, recall_at_5: 0.5648854961832062, manuscript_3dp: "0.565"}
+      cde_match_fuzzy: {hits_at_5: 103, recall_at_5: 0.7862595419847328, manuscript_3dp: "0.786"}
+      ft_medcpt: {hits_at_5: 78, recall_at_5: 0.5954198473282443, manuscript_3dp: "0.595"}
+
+provenance:
+  binding: false
+  manuscript_filename: cde_paper_20260806.docx
+  note: >-
+    Manuscript-file provenance is informational. The DOCX binary and its hash
+    are not runtime dependencies and do not determine verification success.

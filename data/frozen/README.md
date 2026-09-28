@@ -1,8 +1,8 @@
-# Frozen study inputs
+# Frozen study inputs and referee bundle
 
-Two files live here — the two evaluation sets that cannot be rebuilt from a
-public source in the form the manuscript used. Everything else this pipeline
-consumes is either downloadable (see
+This directory contains the two evaluation sets that cannot be rebuilt from a
+public source in the form the manuscript used, plus the compact frozen Table 4
+referee bundle. Everything else this pipeline consumes is either downloadable (see
 [`../../docs/data_sources.md`](../../docs/data_sources.md)) or built by the
 repository from those downloads.
 
@@ -27,6 +27,34 @@ needs no splits tree; plain `demap materialize-eval` does the same thing as part
 of materializing all six canonical datasets.
 
 **This directory is read-only.** No stage writes into it.
+
+---
+
+## `table4_v1/` — quick referee verification
+
+This text-free, checksummed bundle contains 7,349 opaque query identities and
+44,094 query/method ranking rows for the six methods in manuscript Table 4. It
+allows a referee to independently recalculate every one of the 36 published
+Recall@5 cells:
+
+```bash
+demap reproduce-paper-table4 \
+  --bundle data/frozen/table4_v1 \
+  --out-dir ../demap-table4-verification \
+  --offline
+```
+
+The command validates file hashes and sizes, query and dataset identities,
+denominators, ranking invariants, and exact integer hit counts before writing
+`table4.csv`, `metrics.json`, and `verification.json` to the requested output
+directory. It recomputes metrics from frozen query-level outputs; it does not
+retrain models, rerun neural inference, or reconstruct upstream experiments.
+
+| file | rows | bytes | sha256 |
+|---|---:|---:|---|
+| `table4_v1/table4_queries.parquet` | 7,349 | 197,613 | `7ed5ab6b5ea1ee21db28ea5103925c3936609b485f171d415c32426d22e08793` |
+| `table4_v1/table4_rankings.parquet` | 44,094 | 8,119,690 | `3f42fbe35f6ccc55e0632aa449d8b1ffefa05bd9fbb8ab7ab25399ff7834617a` |
+| `table4_v1/table4_bundle_manifest.json` | — | 13,489 | `9fd095cc9a0a06a6726568183256c68b1f4bd0a910180960887a204623974e87` |
 
 ---
 

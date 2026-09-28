@@ -111,6 +111,8 @@ STAGES: List[Stage] = [
           "Figure S6: the three-family drop-lists and their frozen-config commands"),
 
     # G — reporting
+    Stage("reproduce-paper-table4", "demap_repro.reporting.reproduce_table4", "G. Reporting",
+          "recompute published Table 4 metrics from frozen query-level outputs"),
     Stage("table4", "demap_repro.reporting.table4", "G. Reporting",
           "assemble Table 4, the six-method comparison"),
     Stage("figure4-inputs", "demap_repro.reporting.inputs.build_crossencoder", "G. Reporting",

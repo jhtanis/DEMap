@@ -1,14 +1,49 @@
 # Reproducing the reported results
 
-Four levels, in increasing cost and decreasing exactness. Start at level 1 — it
-needs nothing but a clone.
+The release separates a quick referee check from the much larger experiment
+workflow. These answer different questions and must not be described as the
+same reproduction.
 
 Which command produces which table or figure:
 [`manuscript_map.md`](manuscript_map.md).
 
 ---
 
-## Level 1 — offline, no data
+## Level A — quick referee verification
+
+Level A recomputes every published Table 4 Recall@5 cell from a compact,
+checksummed bundle of frozen query-level outputs:
+
+```bash
+demap reproduce-paper-table4 \
+  --bundle data/frozen/table4_v1 \
+  --out-dir ../demap-table4-verification \
+  --offline
+```
+
+The command validates the stable `configs/paper/table4_results_v1.yaml`
+scientific contract, both Parquet checksums and byte sizes, all 7,349 query
+identities, the six exact denominators, and all 44,094 query/method rows. It
+rejects missing or extra queries, duplicate candidates, invalid depths and
+scores, ranking-policy violations, and any integer R@5 hit-count discrepancy.
+It writes `table4.csv`, `metrics.json`, and `verification.json` only to the
+requested external output directory.
+
+This is **metric recomputation from frozen query-level outputs**. It does not
+retrain the bi-encoder, cross-encoder, or HGBC; it does not rerun neural
+inference; and it does not reconstruct every upstream experiment.
+
+The repository includes the verified bundle at `data/frozen/table4_v1/`; no
+download or network access is required. Missing bundle data is a hard failure,
+never a skipped check.
+
+## Level B — full / expensive reproduction
+
+The remaining workflows range from inexpensive regression checks to full model
+retraining. They remain separate from Level A and retain their existing cost and
+artifact requirements.
+
+### B1 — offline regression, no data
 
 ```bash
 pip install -e '.[dev]'
@@ -29,14 +64,14 @@ No data, no weights, no network, under a minute. Checks:
   declared config is present.
 
 This is the level that catches a regression. It cannot catch a case where the
-original artifact was itself wrong — for that, see level 2.
+original artifact was itself wrong — for that, use Level A or B2.
 
 The ~25 skips are explicit: stages needing a data or artifact tree you have not
 pointed at, plus two optional-extra guards.
 
 ---
 
-## Level 2 — recompute from frozen artifacts
+### B2 — recompute models from frozen artifacts
 
 Needs the experiment artifact tree.
 
@@ -85,7 +120,7 @@ demap figureS6
 
 ---
 
-## Level 3 — rebuild the data
+### B3 — rebuild the data
 
 Needs only the two public caDSR downloads. See
 [`data_sources.md`](data_sources.md) and
@@ -103,7 +138,7 @@ upstream. The four caDSR-derived sets are unaffected.
 
 ---
 
-## Level 4 — retrain
+### B4 — retrain
 
 The bi-encoder and cross-encoder protocols are fully specified and start from
 public HuggingFace checkpoints. Retraining will **not** reproduce weights
@@ -182,15 +217,15 @@ dated archive, so the exact PV-enriched 131-query evaluation set is distributed
 here as `data/frozen/cimac_v2.parquet`. CIMAC is a public input; only its
 PV-enriched representation is frozen rather than regenerated.
 
-**The neural checkpoints**, if you choose not to retrain. Level 2 exists for
+**The neural checkpoints**, if you choose not to retrain. B2 exists for
 exactly this.
 
 ### Dependent on external systems or undistributed inputs
 
-**The official NCI CDE Match column of Table 4.** The reported values are
+**The official NCI CDE Match narrative comparison.** The reported values are
 frozen outputs from the external NCI CDE Match service and are not reproducible
 locally from this repository, at any level. They are reported for GDC and CIMAC
-only. The manuscript
+only and are not a column in the manuscript's six-method Table 4. The manuscript
 reports it for those two sets alone because the four caDSR-derived sets were
 built from the same alternate-name and question-text fields the service queries,
 which would make the comparison circular, and because the live service cannot be

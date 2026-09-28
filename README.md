@@ -28,6 +28,22 @@ The test suite runs on a clean clone. It verifies the published numbers against
 small committed fixtures and checks that the migrated implementations still match
 the ones that produced them.
 
+The repository includes the versioned, checksummed query-level bundle used by
+the strict referee check:
+
+```bash
+demap reproduce-paper-table4 \
+  --bundle data/frozen/table4_v1 \
+  --out-dir ../demap-table4-verification \
+  --offline
+```
+
+This recomputes the 36 published Table 4 Recall@5 cells from frozen query-level
+outputs. It independently validates query identities, denominators, rankings,
+file hashes, and result counts. It does not retrain a model, rerun neural
+inference, or reconstruct the upstream experiments, and it needs no network
+access.
+
 ---
 
 ## Documentation
@@ -41,7 +57,7 @@ Start wherever your question is.
 | **[Environment](docs/environment.md)** | install, extras, the two environment variables, directory layout, hardware |
 | **[Running the experiments](docs/running_experiments.md)** | the final workflow as 15 ordered stages |
 | **[Manuscript map](docs/manuscript_map.md)** | one row per table and figure: command, inputs, output, verifying fixture |
-| **[Reproducing](docs/reproducing.md)** | four levels, and the reproducibility boundaries |
+| **[Reproducing](docs/reproducing.md)** | quick referee verification, full reproduction, and the reproducibility boundaries |
 | **[Provenance](docs/provenance.md)** | the copy-first rule, the migration ledger, what is excluded and why |
 | **[Slurm](docs/slurm.md)** | optional; the cluster drivers and their resource envelopes |
 
@@ -66,8 +82,9 @@ caDSR export ──► benchmark pairs ──► splits ──► reachability f
                       117-feature HGBC ──► final ranking
 ```
 
-Ties are broken by ascending CDE public identifier, so the output is fully
-deterministic.
+Exact-score ties in the final HGBC ranking are broken by ascending numeric CDE
+public identifier. The frozen FT-MedCPT comparison instead preserves its
+authoritative archived order; the HGBC tie rule is not imposed on it.
 
 ---
 
@@ -85,7 +102,7 @@ deterministic.
 | `src/demap_repro/sensitivity/` | leakage and exact-match-allowance sensitivity analyses |
 | `src/demap_repro/reporting/` | tables, figure inputs, figure generators |
 | `configs/` | the dataset pipeline contract, curator allowlists, and the frozen protocols |
-| `data/frozen/` | the two frozen evaluation sets distributed here: CIMAC and GDC |
+| `data/frozen/` | the two frozen evaluation sets and the query-level Table 4 referee bundle |
 | `manifests/` | paper scope, source migration ledger, expected results |
 | `workflows/` | optional Slurm drivers |
 | `tests/` | invariants, behaviour, and regression against the published results |
@@ -94,17 +111,16 @@ deterministic.
 
 ## Reproducing the reported numbers
 
-Four levels, in increasing cost — full detail in
+There are two distinct goals — full detail in
 [`reproducing.md`](docs/reproducing.md):
 
-1. **Offline.** `pytest` checks every headline result against committed fixtures.
-2. **From frozen artifacts.** The paper's central result recomputes from the
-   trained model in about four seconds on one CPU core.
-3. **Rebuild the data.** Both caDSR snapshots are publicly downloadable with
-   verified digests; the structural counts reproduce exactly. The two external
-   evaluation sets ship in `data/frozen/`.
-4. **Retrain.** Protocols are fully specified and start from public checkpoints.
-   Acceptance is 0.01 Recall@5 **and** unchanged method ordering.
+- **Level A: quick referee verification.** One strict, offline command recomputes
+  every Table 4 metric from a checksummed bundle of query identities, accepted
+  gold public IDs, and frozen per-method rankings. The repository includes this
+  bundle at `data/frozen/table4_v1/`.
+- **Level B: full / expensive reproduction.** Fixture regression, artifact-backed
+  model evaluation, public-data rebuilding, and retraining remain separate
+  workflows. They are not substitutes for the Level-A query-level check.
 
 ---
 
@@ -147,8 +163,8 @@ The data tree itself is far too large to version and is not included.
 **The keyword arm itself is included.** Both the Python approximation to NCI CDE
 Match and the CDE Match-Fuzzy retriever ship here and run; only NCI's own
 supplied material is withheld. An unresolved *weights* gate does not prevent
-retraining, and the live-service column is a single reported comparison rather
-than an input to the system. What each exclusion costs is set out in
+retraining, and the live-service result is a narrative GDC/CIMAC comparison,
+not a Table 4 column or an input to the system. What each exclusion costs is set out in
 [`reproducing.md`](docs/reproducing.md#reproducibility-boundaries).
 
 ---

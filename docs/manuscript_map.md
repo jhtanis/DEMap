@@ -29,11 +29,13 @@ relative to `tests/fixtures/`; every command is a stage from `demap --list`.
 | **Figure 4** | 3.5 | `demap figure4-inputs` → `make_figure4_crossencoder.py` | CE bake-off | `ce_bakeoff/`, `E_crossencoder` | raw |
 | **Figure 5** | 3.6 | `demap figure5-inputs` → `make_figure5_keyword.py` | keyword runs, non-exact subset | `figure_inputs/*.csv`, `C_keyword_selection` | raw |
 | **Figure 6** | 3.7 | *manual schematic* | — | reference source in `reporting/schematics/_reference_figure6.py` | raw |
-| **Table 4** | 3.8 | `demap table4` | all six per-method artifacts | `final_table4.csv`, `G_table4_final_comparison` | raw + **external** |
+| **Table 4** | 3.8 | `demap reproduce-paper-table4 --bundle data/frozen/table4_v1 --out-dir <out> --offline` | `data/frozen/table4_v1/` checksummed query-level referee bundle | `configs/paper/table4_results_v1.yaml` (36 exact hit counts) | **frozen** |
 
-**Table 4 carries one external column.** The official NCI CDE Match row is saved
-output of a live production service — not reproducible by us or anyone, at any
-tier. It is reported as a frozen external number for GDC and CIMAC only.
+Table 4 contains six methods: Final reranker, Python approximation, BM25,
+FT-MPNet, CDE Match-Fuzzy, and FT-MedCPT pooled rerank. The official NCI CDE
+Match service is a separate narrative comparison for GDC and CIMAC, not a Table
+4 column. The Level-A bundle is included in the repository and requires no
+download.
 
 ---
 
@@ -95,6 +97,19 @@ Not every reported number is in a table. These are asserted directly:
 
 ## The fastest way to check all of it
 
+To recompute the actual Table 4 cells from the included frozen query-level
+outputs, use the strict Level-A command from the repository root:
+
+```bash
+demap reproduce-paper-table4 \
+  --bundle data/frozen/table4_v1 \
+  --out-dir ../demap-table4-verification \
+  --offline
+```
+
+This verifies all 36 cells and performs no training or neural inference. For
+fixture regression across every reported item, use:
+
 ```bash
 pytest -q
 ```
@@ -113,7 +128,7 @@ Two inputs are not distributed. Neither blocks the tier it sits in:
 | not distributed | affects | consequence |
 |---|---|---|
 | fine-tuned weights | Figure 3, Figure 4, Table S4 | retrain from the specified protocols, or use frozen artifacts |
-| official NCI CDE Match output | Table 4, §3.8 | a frozen output of an external service; not reproducible locally from this repository |
+| official NCI CDE Match output | §3.8 narrative comparison only | a frozen output of an external service; not reproducible locally from this repository |
 
 Three things a reader might expect to be missing are **not**:
 
