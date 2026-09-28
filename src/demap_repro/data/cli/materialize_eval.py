@@ -40,7 +40,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from demap_repro.utils.paths import data_root, repo_root
+from demap_repro.utils.paths import artifact_root, data_root, repo_root
 
 #: Shipped frozen evaluation inputs: canonical name -> (filename, pinned sha256).
 #: The digests are the study's own; a mismatch means the artifact was replaced.
@@ -119,22 +119,23 @@ def materialize_frozen(out_dir: Path, *, dry_run: bool = False,
     return rows
 
 
-def _source_frames(splits: Path):
+def _source_frames(splits: Path, *, logical_prefix: str = "data/processed/splits"):
     """The four datasets derived from the caDSR splits."""
     org = pd.read_parquet(splits / "external_holdout_org.parquet")
     return {
         "test": (pd.read_parquet(splits / "test.parquet"),
-                 ["data/processed/splits/test.parquet"], "none"),
+                 [f"{logical_prefix}/test.parquet"], "none"),
         "cctg": (org[org["family"] == "CCTG"].copy(),
-                 ["data/processed/splits/external_holdout_org.parquet"], "family == 'CCTG'"),
+                 [f"{logical_prefix}/external_holdout_org.parquet"], "family == 'CCTG'"),
         "oid_alt": (org[org["family"] == "OID"].copy(),
-                    ["data/processed/splits/external_holdout_org.parquet"], "family == 'OID'"),
+                    [f"{logical_prefix}/external_holdout_org.parquet"], "family == 'OID'"),
         "cdash": (pd.read_parquet(splits / "external_holdout_refslice.parquet"),
-                  ["data/processed/splits/external_holdout_refslice.parquet"], "none"),
+                  [f"{logical_prefix}/external_holdout_refslice.parquet"], "none"),
     }
 
 
 def main(argv=None):
+    argv_list = list(sys.argv[1:] if argv is None else argv)
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--dry-run", action="store_true",
@@ -143,11 +144,34 @@ def main(argv=None):
                     help="materialize only the two shipped frozen inputs (needs no splits tree)")
     ap.add_argument("--out-dir", default=None,
                     help="destination (default: $DEMAP_DATA_ROOT/data/processed/eval_canonical)")
-    args = ap.parse_args(argv)
+    ap.add_argument("--splits-dir", default=None,
+                    help="reachable caDSR split source (default: data/processed/splits)")
+    ap.add_argument("--paper-config", default=None,
+                    help="use the canonical paper build/materialization paths")
+    args = ap.parse_args(argv_list)
+
+    if args.paper_config:
+        from demap_repro.config.paper import (
+            PaperConfigError, reject_conflicting_flags, resolve_paper_data_path,
+            validate_paper_config,
+        )
+        try:
+            reject_conflicting_flags(
+                argv_list, ["--out-dir", "--splits-dir"],
+                context="materialize-eval --paper-config")
+            paper = validate_paper_config(args.paper_config)
+        except PaperConfigError as exc:
+            ap.error(str(exc))
+        args.out_dir = str(resolve_paper_data_path(
+            paper["data"]["build"]["canonical_eval_dir"]))
+        args.splits_dir = str(resolve_paper_data_path(
+            paper["data"]["build"]["reachable_splits_dir"]))
 
     root = data_root()
     out_data = Path(args.out_dir) if args.out_dir else root / "data/processed/eval_canonical"
-    out_manifest = root / "artifacts/manifests/eval_canonical"
+    if not out_data.is_absolute():
+        out_data = root / out_data
+    out_manifest = artifact_root() / "artifacts/manifests/eval_canonical"
 
     frozen_rows = materialize_frozen(out_data, dry_run=args.dry_run)
 
@@ -155,7 +179,9 @@ def main(argv=None):
         print(f"\n{'DRY-RUN (nothing written).' if args.dry_run else f'Frozen inputs -> {out_data}/'}")
         return 0
 
-    splits = root / "data/processed/splits"
+    splits = Path(args.splits_dir) if args.splits_dir else root / "data/processed/splits"
+    if not splits.is_absolute():
+        splits = root / splits
     prod = root / ("data/processed/cadsr_xml_2026-06-18/"
                    "cde_master_enriched_eval_production_cde_match.parquet")
     for p in (splits, prod):
@@ -166,7 +192,10 @@ def main(argv=None):
 
     prod_ids = set(pd.read_parquet(prod)["cde_id"].astype(str))
     summary = list(frozen_rows)
-    for name, (df, source, rule) in _source_frames(splits).items():
+    logical_prefix = ("data/processed/splits_catalog_filtered"
+                      if args.paper_config else "data/processed/splits")
+    for name, (df, source, rule) in _source_frames(
+            splits, logical_prefix=logical_prefix).items():
         assert "query_text_q3" in df.columns, f"{name}: missing query_text_q3"
         assert "cde_id" in df.columns, f"{name}: missing cde_id"
         orig = len(df)

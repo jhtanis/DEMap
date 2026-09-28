@@ -42,6 +42,8 @@ OPTIONAL_EXTRA_FOR: Dict[str, str] = {
 }
 
 STAGES: List[Stage] = [
+    Stage("paper-config", "demap_repro.config.paper", "Paper configuration",
+          "validate, inspect, and dry-run the canonical manuscript pipeline"),
     # A — dataset construction
     Stage("make-dataset", "demap_repro.data.pipeline", "A. Dataset",
           "build the benchmark: catalog extraction, queries, pairs, splits"),
@@ -71,7 +73,7 @@ STAGES: List[Stage] = [
     # C — lexical
     Stage("bm25", "demap_repro.lexical.bm25.cli", "C. Lexical",
           "BM25 baseline"),
-    Stage("cdematch-candidates", "demap_repro.lexical.cde_match.build_candidates", "C. Lexical",
+    Stage("cdematch-candidates", "demap_repro.lexical.cde_match.paper_candidates", "C. Lexical",
           "Python CDE Match approximation, or CDE Match-Fuzzy with --fuzzy-fallback"),
     Stage("non-exact-eval", "demap_repro.lexical.non_exact_subset", "C. Lexical",
           "Recall on queries with no exact-match evidence (Figure 5C)"),

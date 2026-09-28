@@ -288,6 +288,7 @@ def mine(
     block_size: int = 2048,
     encode_batch_size: int = 64,
     device: str = "auto",
+    embeddings_dir: Optional[str] = None,
     overwrite: bool = False,
     dry_run: bool = False,
 ) -> Dict[str, Any]:
@@ -359,7 +360,7 @@ def mine(
             f"{identity['parent_checkpoint_sha256']}")
 
     from demap_repro.utils.io import ensure_dir
-    emb_dir = Path("artifacts") / "embeddings"
+    emb_dir = Path(embeddings_dir) if embeddings_dir else Path("artifacts") / "embeddings"
     ensure_dir(emb_dir)
     cde_ids, cde_emb, _meta = bg._load_or_build_catalog_embeddings(
         model=model, model_slug=f"phase2hn__{identity['identity_sha256'][:16]}",

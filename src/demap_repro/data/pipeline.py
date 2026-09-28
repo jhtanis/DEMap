@@ -43,6 +43,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 from demap_repro.data import pairs as build_pairs, queries as inwild_queries, splits as split_policy
 from demap_repro.data import extract_cadsr_xml, merge_cadsr_parquet
 from demap_repro.data import catalog_filter
+from demap_repro.utils.paths import artifact_root, data_root, repo_root as source_repo_root
 from demap_repro.data import enrich_master
 from demap_repro.utils.config import load_config
 
@@ -234,6 +235,7 @@ def _write_manifest(manifest: Dict[str, Any], processed_path: Path, artifacts_pa
 
 
 def main(argv: Optional[List[str]] = None) -> None:
+    argv_list = list(sys.argv[1:] if argv is None else argv)
     ap = argparse.ArgumentParser(description="Run dataset preparation steps 1–6 in one command.")
     ap.add_argument("--config", default=os.path.join("configs", "pipeline.yaml"), help="Pipeline YAML config")
     ap.add_argument("--force", action="store_true", help="Overwrite step outputs (re-run even if outputs exist)")
@@ -266,10 +268,36 @@ def main(argv: Optional[List[str]] = None) -> None:
     ap.add_argument("--emit-splits", default=None,
                     help="Comma-separated query splits to emit in catalog-filter (e.g. 'train' "
                          "for train-only production). Defaults to the config's emit.splits.")
+    ap.add_argument("--paper-config", default=None,
+                    help="canonical final-system manifest; roots data/artifact outputs explicitly")
 
-    args = ap.parse_args(argv)
+    args = ap.parse_args(argv_list)
+    paper_mode = bool(args.paper_config)
+    if paper_mode:
+        from demap_repro.config.paper import (
+            PaperConfigError, reject_conflicting_flags, validate_paper_config,
+        )
+        try:
+            reject_conflicting_flags(
+                argv_list, ["--config"], context="make-dataset --paper-config")
+            paper = validate_paper_config(args.paper_config)
+        except PaperConfigError as exc:
+            ap.error(str(exc))
+        args.config = paper["references"]["public_build"]
 
-    cfg_path = Path(args.config)
+    source_root = source_repo_root()
+
+    def _rooted(value, *, kind: str = "data") -> Path:
+        path = Path(value)
+        if path.is_absolute() or not paper_mode:
+            return path
+        if kind == "artifact" or (path.parts and path.parts[0] == "artifacts"):
+            return artifact_root() / path
+        if kind == "repo" or (path.parts and path.parts[0] == "configs"):
+            return source_root / path
+        return data_root() / path
+
+    cfg_path = _rooted(args.config, kind="repo")
     if not cfg_path.exists():
         raise SystemExit(f"Config not found: {cfg_path}")
 
@@ -289,11 +317,11 @@ def main(argv: Optional[List[str]] = None) -> None:
     if stop_i < start_i:
         raise SystemExit("--stop-after must be at or after --start-at")
 
-    repo_root = Path.cwd()
+    repo_root = source_root if paper_mode else Path.cwd()
 
     # Manifest locations (write both)
-    processed_manifest = Path(cfg.get("manifests", {}).get("processed", os.path.join("data", "processed", "dataset_build_manifest.json")))
-    artifacts_manifest = Path(cfg.get("manifests", {}).get("artifacts", os.path.join("artifacts", "manifests", "dataset_build_manifest.json")))
+    processed_manifest = _rooted(cfg.get("manifests", {}).get("processed", os.path.join("data", "processed", "dataset_build_manifest.json")))
+    artifacts_manifest = _rooted(cfg.get("manifests", {}).get("artifacts", os.path.join("artifacts", "manifests", "dataset_build_manifest.json")), kind="artifact")
 
     # Base paths
     extract_cfg = cfg.get("extract", {})
@@ -305,23 +333,23 @@ def main(argv: Optional[List[str]] = None) -> None:
     split_cfg = cfg.get("split", {})
 
     # Query-side XML source: CLI --query-xml overrides extract.input.
-    input_xml = Path(args.query_xml) if args.query_xml else Path(
+    input_xml = _rooted(args.query_xml) if args.query_xml else _rooted(
         extract_cfg.get("input", os.path.join("data", "raw", "cadsr_xml"))
     )
-    extracted_root = Path(extract_cfg.get("out_root", os.path.join("data", "interim", "cadsr_extracted")))
-    merged_dir = Path(merge_cfg.get("merged_dir", os.path.join("data", "interim", "cadsr_merged")))
-    merge_summaries_dir = Path(merge_cfg.get("summaries_dir", os.path.join("artifacts", "summaries", "cadsr_merge")))
+    extracted_root = _rooted(extract_cfg.get("out_root", os.path.join("data", "interim", "cadsr_extracted")))
+    merged_dir = _rooted(merge_cfg.get("merged_dir", os.path.join("data", "interim", "cadsr_merged")))
+    merge_summaries_dir = _rooted(merge_cfg.get("summaries_dir", os.path.join("artifacts", "summaries", "cadsr_merge")), kind="artifact")
 
-    enriched_parquet = Path(enrich_cfg.get("out_parquet", os.path.join("data", "processed", "cde_master_enriched.parquet")))
+    enriched_parquet = _rooted(enrich_cfg.get("out_parquet", os.path.join("data", "processed", "cde_master_enriched.parquet")))
 
-    alt_parquet = Path(q_cfg.get("alt_parquet", merged_dir / "cde_alternate_names.parquet"))
-    ref_parquet = Path(q_cfg.get("ref_parquet", merged_dir / "cde_reference_documents.parquet"))
-    queries_out_dir = Path(q_cfg.get("out_dir", os.path.join("artifacts", "summaries", "inwild_strict")))
-    queries_parquet = Path(q_cfg.get("out_parquet", os.path.join("data", "processed", "queries.parquet")))
+    alt_parquet = _rooted(q_cfg.get("alt_parquet", merged_dir / "cde_alternate_names.parquet"))
+    ref_parquet = _rooted(q_cfg.get("ref_parquet", merged_dir / "cde_reference_documents.parquet"))
+    queries_out_dir = _rooted(q_cfg.get("out_dir", os.path.join("artifacts", "summaries", "inwild_strict")), kind="artifact")
+    queries_parquet = _rooted(q_cfg.get("out_parquet", os.path.join("data", "processed", "queries.parquet")))
 
-    pairs_parquet = Path(pairs_cfg.get("out_parquet", os.path.join("data", "processed", "pairs.parquet")))
+    pairs_parquet = _rooted(pairs_cfg.get("out_parquet", os.path.join("data", "processed", "pairs.parquet")))
 
-    splits_dir = Path(split_cfg.get("out_dir", os.path.join("data", "processed", "splits")))
+    splits_dir = _rooted(split_cfg.get("out_dir", os.path.join("data", "processed", "splits")))
 
     # Shared params
     language = str(enrich_cfg.get("language", q_cfg.get("language", "English")))
@@ -340,6 +368,10 @@ def main(argv: Optional[List[str]] = None) -> None:
     pv_placeholder_token = str(pv_summary_cfg.get("pv_placeholder_token", "<MISSING_PV_SUMMARY>"))
     pv_diagnostics_summary = pv_summary_cfg.get("diagnostics_summary", None)
     pv_diagnostics_records = pv_summary_cfg.get("diagnostics_records", None)
+    if pv_diagnostics_summary:
+        pv_diagnostics_summary = _rooted(pv_diagnostics_summary, kind="artifact")
+    if pv_diagnostics_records:
+        pv_diagnostics_records = _rooted(pv_diagnostics_records, kind="artifact")
 
     # Build stages
     stages: List[Stage] = []
@@ -477,10 +509,12 @@ def main(argv: Optional[List[str]] = None) -> None:
     # Optional knobs for build-queries (strict allowlist)
     alt_allowlist = q_cfg.get("alt_allowlist", q_cfg.get("alt-allowlist", None))
     if alt_allowlist:
+        alt_allowlist = _rooted(alt_allowlist, kind="repo")
         q_argv += ["--alt-allowlist", str(alt_allowlist)]
 
     refdoc_allowlist = q_cfg.get("refdoc_allowlist", q_cfg.get("refdoc-allowlist", None))
     if refdoc_allowlist:
+        refdoc_allowlist = _rooted(refdoc_allowlist, kind="repo")
         q_argv += ["--refdoc-allowlist", str(refdoc_allowlist)]
 
     excluded_top_n = q_cfg.get("excluded_top_n", q_cfg.get("excluded-top-n", None))
@@ -499,7 +533,8 @@ def main(argv: Optional[List[str]] = None) -> None:
         q_deps.append(Path(refdoc_allowlist))
     # ALT concat recipes are enabled by default via a repo-local allowlist; include
     # it as a dependency if present so edits trigger rebuilds.
-    default_recipes = Path("configs") / "allowlists" / "alt_query_recipes_current.csv"
+    default_recipes = _rooted(
+        Path("configs") / "allowlists" / "alt_query_recipes_current.csv", kind="repo")
     if default_recipes.exists() and default_recipes.is_file():
         q_deps.append(default_recipes)
 
@@ -561,9 +596,11 @@ def main(argv: Optional[List[str]] = None) -> None:
         catalog_source_mode = str(catalog_cfg.get("source_mode", "same_as_query"))
 
     catalog_xml_source = args.catalog_xml or catalog_cfg.get("xml_source", None)
+    if catalog_xml_source:
+        catalog_xml_source = _rooted(catalog_xml_source)
     catalog_eligibility = args.catalog_eligibility or str(catalog_cfg.get("eligibility", "production_cde_match"))
-    catalog_out = Path(catalog_cfg.get("out_parquet", os.path.join("data", "processed", "cde_catalog_enriched.parquet")))
-    catalog_interim_root = Path(catalog_cfg.get("interim_root", os.path.join("data", "interim", "cde_catalog")))
+    catalog_out = _rooted(catalog_cfg.get("out_parquet", os.path.join("data", "processed", "cde_catalog_enriched.parquet")))
+    catalog_interim_root = _rooted(catalog_cfg.get("interim_root", os.path.join("data", "interim", "cde_catalog")))
 
     emit_splits_list = (
         [s.strip() for s in str(args.emit_splits).split(",") if s.strip()]
@@ -571,8 +608,8 @@ def main(argv: Optional[List[str]] = None) -> None:
         else list(emit_cfg.get("splits", ["train", "val_dev", "test", "val_train"]))
     )
     emit_filter_by_catalog = bool(emit_cfg.get("filter_by_catalog", True))
-    emit_out_dir = Path(emit_cfg.get("out_dir", os.path.join("data", "processed", "splits_catalog_filtered")))
-    emit_reports_dir = Path(emit_cfg.get("reports_dir", os.path.join("artifacts", "manifests", "catalog_filter")))
+    emit_out_dir = _rooted(emit_cfg.get("out_dir", os.path.join("data", "processed", "splits_catalog_filtered")))
+    emit_reports_dir = _rooted(emit_cfg.get("reports_dir", os.path.join("artifacts", "manifests", "catalog_filter")), kind="artifact")
 
     cf_argv = [
         "--config", str(cfg_path),
@@ -643,8 +680,10 @@ def main(argv: Optional[List[str]] = None) -> None:
             "pv_small_n_generic_threshold": pv_small_n_generic_threshold,
             "pv_max_resample_attempts": pv_max_resample_attempts,
             "pv_placeholder_token": pv_placeholder_token,
-            "pv_diagnostics_summary": pv_diagnostics_summary,
-            "pv_diagnostics_records": pv_diagnostics_records,
+            "pv_diagnostics_summary": (str(pv_diagnostics_summary)
+                                       if pv_diagnostics_summary else None),
+            "pv_diagnostics_records": (str(pv_diagnostics_records)
+                                       if pv_diagnostics_records else None),
             "split_seed": split_seed,
             "val_frac": val_frac,
             "test_frac": test_frac,

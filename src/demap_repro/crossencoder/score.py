@@ -62,13 +62,13 @@ RECIPE_SEP = " | "
 SCORE_KEYS = ["winner_id", "split", "query_id", "cde_id"]
 
 
-def _set_safe_tempdir() -> Path:
+def _set_safe_tempdir(output_dir: Path | None = None) -> Path:
     """Biowulf-safe temp dir: /lscratch/$SLURM_JOB_ID if available, else an
     artifact-local (gitignored) tmp dir. Never shared /tmp."""
     job = os.environ.get("SLURM_JOB_ID")
     cand = Path(f"/lscratch/{job}") if job and Path(f"/lscratch/{job}").is_dir() else None
     if cand is None:
-        cand = DEFAULT_OUTDIR / "tmp"
+        cand = (output_dir or DEFAULT_OUTDIR) / "tmp"
         cand.mkdir(parents=True, exist_ok=True)
     tempfile.tempdir = str(cand)
     os.environ["TMPDIR"] = str(cand)
@@ -135,6 +135,7 @@ def _precache_cmd(model: str) -> str:
 
 
 def main(argv=None):
+    argv_list = list(sys.argv[1:] if argv is None else argv)
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--model", default=DEFAULT_MODEL)
@@ -159,12 +160,42 @@ def main(argv=None):
                          "the scoring catalog (the paper-v13 eligibility defect)")
     ap.add_argument("--allow-download", action="store_true",
                     help="permit HF download (otherwise offline; only on a node with internet)")
-    args = ap.parse_args(argv)
+    ap.add_argument("--paper-config", default=None)
+    ap.add_argument("--dry-run", action="store_true")
+    args = ap.parse_args(argv_list)
+
+    if args.paper_config:
+        from demap_repro.config.paper import (
+            PaperConfigError, reject_conflicting_flags, resolve_paper_artifact_path,
+            resolve_paper_data_path, stage_job,
+        )
+        try:
+            reject_conflicting_flags(
+                argv_list,
+                ["--model", "--splits", "--cde-text-recipe", "--query-text-col",
+                 "--feature-table", "--cde-master", "--out"],
+                context="ce-score --paper-config")
+            job = stage_job("ft_medcpt_score", args.paper_config)
+        except PaperConfigError as exc:
+            ap.error(str(exc))
+        args.model = str(resolve_paper_artifact_path(job["model"]))
+        args.splits = ",".join(job["splits"])
+        args.cde_text_recipe = job["cde_text_recipe"]
+        args.query_text_col = job["query_text_col"]
+        args.feature_table = str(resolve_paper_artifact_path(job["feature_table"]))
+        args.cde_master = str(resolve_paper_data_path(job["cde_master"]))
+        args.out = str(resolve_paper_artifact_path(job["out"]))
+        args.require_candidate_text = True
+        if args.dry_run:
+            print(json.dumps(job, indent=2, sort_keys=True))
+            return 0
+    elif args.dry_run:
+        ap.error("--dry-run requires --paper-config")
 
     if not args.allow_download:
         os.environ["HF_HUB_OFFLINE"] = "1"
         os.environ["TRANSFORMERS_OFFLINE"] = "1"
-    _set_safe_tempdir()
+    _set_safe_tempdir(Path(args.out).parent)
 
     splits = [s.strip() for s in args.splits.split(",") if s.strip()]
     recipe = args.cde_text_recipe

@@ -37,6 +37,13 @@ Match service is a separate narrative comparison for GDC and CIMAC, not a Table
 4 column. The Level-A bundle is included in the repository and requires no
 download.
 
+The query-level Table 4 check is Level A. The executable Level-B scientific
+contract for reconstructing the selected neural pipeline is
+`configs/paper/final_system_v1.yaml`; inspect it with `demap paper-config
+--validate`, `--show-resolved`, or `--dry-run all`. Paper-mode consumers reject
+conflicting manuscript-facing overrides, while generic historical commands
+remain available for non-paper experiments.
+
 ---
 
 ## Supplement
@@ -88,7 +95,7 @@ Not every reported number is in a table. These are asserted directly:
 | K = 30, realized mean 27.6 | S5.3 | `D_candidate_pool_k` |
 | cross-encoder: FT-MedCPT 0.912 / BGE 0.904 / MiniLM 0.874 | S5.4 | `E_crossencoder` |
 | HGBC: 3,946 queries, 109,141 pairs, 4,109 positives | S5.5 | `F_hgbc_final_model` |
-| the 117-feature no-provenance contract | S5.5 | `hgbc_feature_set.json` |
+| the exact ordered 117-feature no-provenance contract | S5.5 | `configs/paper/features_117_final_v1.json` (validated against `hgbc_feature_set.json`) |
 | GDC 70/72 and 71/72 | 3.8 | asserted as integer counts |
 | CIMAC 0.802 → 0.779, approximation 0.679 → 0.637 | 3.8 | `H1_leakage_sensitivity` |
 | allowance robustness magnitudes | S6.2 | `H2_allowance_sensitivity` |

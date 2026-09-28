@@ -52,11 +52,12 @@ def _dev_metrics(model, dev_df: pd.DataFrame, dev_pairs, batch_size: int) -> dic
 
 
 def main(argv=None):
+    argv_list = list(sys.argv[1:] if argv is None else argv)
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--base-model", default=DEFAULT_BASE)
-    ap.add_argument("--train-pairs", required=True)
-    ap.add_argument("--dev-pairs", required=True)
+    ap.add_argument("--train-pairs", default=None)
+    ap.add_argument("--dev-pairs", default=None)
     ap.add_argument("--output-dir", default=None)
     ap.add_argument("--epochs", type=int, default=2)
     ap.add_argument("--lr", type=float, default=2e-5)
@@ -70,12 +71,49 @@ def main(argv=None):
     ap.add_argument("--warmup-frac", type=float, default=0.1)
     ap.add_argument("--seed", type=int, default=20260527)
     ap.add_argument("--allow-download", action="store_true")
-    args = ap.parse_args(argv)
+    ap.add_argument("--paper-config", default=None)
+    ap.add_argument("--dry-run", action="store_true")
+    args = ap.parse_args(argv_list)
+
+    if args.paper_config:
+        from demap_repro.config.paper import (
+            PaperConfigError, reject_conflicting_flags, resolve_paper_artifact_path,
+            stage_job,
+        )
+        try:
+            reject_conflicting_flags(
+                argv_list,
+                ["--base-model", "--train-pairs", "--dev-pairs", "--output-dir",
+                 "--epochs", "--lr", "--batch-size", "--max-length",
+                 "--pos-weight", "--warmup-frac", "--seed", "--device"],
+                context="ce-train --paper-config")
+            job = stage_job("ft_medcpt_train", args.paper_config)
+        except PaperConfigError as exc:
+            ap.error(str(exc))
+        args.base_model = job["base_model"]
+        args.train_pairs = str(resolve_paper_artifact_path(job["train_pairs"]))
+        args.dev_pairs = str(resolve_paper_artifact_path(job["dev_pairs"]))
+        args.output_dir = str(resolve_paper_artifact_path(job["output_dir"]))
+        args.epochs = job["epochs"]
+        args.lr = job["lr"]
+        args.batch_size = job["batch_size"]
+        args.max_length = job["max_length"]
+        args.warmup_frac = job["warmup_fraction"]
+        args.device = job["device"]
+        args.seed = job["seed"]
+        args.pos_weight = None
+        if args.dry_run:
+            print(json.dumps(job, indent=2, sort_keys=True))
+            return 0
+    elif args.dry_run:
+        ap.error("--dry-run requires --paper-config")
+    if not args.train_pairs or not args.dev_pairs:
+        ap.error("--train-pairs and --dev-pairs are required")
 
     if not args.allow_download:
         os.environ["HF_HUB_OFFLINE"] = "1"
         os.environ["TRANSFORMERS_OFFLINE"] = "1"
-    sc._set_safe_tempdir()
+    sc._set_safe_tempdir(Path(args.output_dir).parent if args.output_dir else DEFAULT_OUT_ROOT)
 
     random.seed(args.seed); np.random.seed(args.seed)
     import torch

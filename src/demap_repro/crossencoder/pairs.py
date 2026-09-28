@@ -129,6 +129,7 @@ def _summ(df, name, cde_text_map):
 
 def main(argv=None):
     global TRAIN_SPLIT, DEV_SPLIT
+    argv_list = list(sys.argv[1:] if argv is None else argv)
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--feature-table", default=str(sc.DEFAULT_FT))
@@ -143,13 +144,52 @@ def main(argv=None):
                     help="split used for CE DEV/selection pairs (default: 'val_dev')")
     ap.add_argument("--out-dir", default=str(OUT_DATA_DIR))
     ap.add_argument("--overwrite", action="store_true")
-    args = ap.parse_args(argv)
+    ap.add_argument("--paper-config", default=None)
+    ap.add_argument("--dry-run", action="store_true")
+    args = ap.parse_args(argv_list)
+
+    if args.paper_config:
+        from demap_repro.config.paper import (
+            PaperConfigError, reject_conflicting_flags, resolve_paper_artifact_path,
+            resolve_paper_data_path, stage_job,
+        )
+        try:
+            reject_conflicting_flags(
+                argv_list,
+                ["--feature-table", "--cde-master", "--cde-text-recipe",
+                 "--query-text-col", "--neg-per-query", "--train-split",
+                 "--dev-split", "--out-dir"],
+                context="ce-pairs --paper-config")
+            train_job = stage_job("ft_medcpt_train", args.paper_config)
+            pool_job = stage_job("ft_medcpt_pool", args.paper_config)
+            score_job = stage_job("ft_medcpt_score", args.paper_config)
+        except PaperConfigError as exc:
+            ap.error(str(exc))
+        args.feature_table = str(resolve_paper_artifact_path(
+            Path(pool_job["output_dir"]) / pool_job["output_file"]))
+        args.cde_master = str(resolve_paper_data_path(score_job["cde_master"]))
+        args.cde_text_recipe = score_job["cde_text_recipe"]
+        args.query_text_col = score_job["query_text_col"]
+        args.train_split = train_job["train_split"]
+        args.dev_split = train_job["dev_split"]
+        args.neg_per_query = None
+        args.out_dir = str(resolve_paper_artifact_path(
+            "artifacts/paper/final_system_v1/ft_medcpt/pairs"))
+        if args.dry_run:
+            print(json.dumps({
+                "feature_table": args.feature_table, "cde_master": args.cde_master,
+                "cde_text_recipe": args.cde_text_recipe,
+                "query_text_col": args.query_text_col,
+                "train_split": args.train_split, "dev_split": args.dev_split,
+                "out_dir": args.out_dir, "neg_per_query": None,
+            }, indent=2, sort_keys=True))
+            return 0
 
     TRAIN_SPLIT, DEV_SPLIT = args.train_split, args.dev_split
     assert TRAIN_SPLIT not in FORBIDDEN_SPLITS and DEV_SPLIT not in FORBIDDEN_SPLITS, \
         f"train/dev split may not be a held-out eval split: {FORBIDDEN_SPLITS}"
 
-    sc._set_safe_tempdir()
+    sc._set_safe_tempdir(Path(args.out_dir))
     recipe = args.cde_text_recipe
     out_dir = Path(args.out_dir)
     train_out = out_dir / f"train_{recipe}.parquet"

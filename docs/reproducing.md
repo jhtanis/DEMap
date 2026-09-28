@@ -140,8 +140,27 @@ upstream. The four caDSR-derived sets are unaffected.
 
 ### B4 — retrain
 
-The bi-encoder and cross-encoder protocols are fully specified and start from
-public HuggingFace checkpoints. Retraining will **not** reproduce weights
+The manuscript-selected route is defined by the validated, machine-readable
+`configs/paper/final_system_v1.yaml`. It references the exact winner manifests,
+allowance and evaluation registries, and the ordered 117-feature contract. Start
+by inspecting the resolved jobs; this performs no training:
+
+```bash
+demap paper-config --validate
+demap paper-config --show-resolved --out ../demap-paper-config.json
+demap paper-config --dry-run all
+
+demap biencoder --paper-config configs/paper/final_system_v1.yaml \
+  --selected-final --stage phase1 --dry-run
+demap biencoder --paper-config configs/paper/final_system_v1.yaml \
+  --selected-final --stage phase2 --dry-run
+demap ce-train --paper-config configs/paper/final_system_v1.yaml --dry-run
+demap train-hgbc --paper-config configs/paper/final_system_v1.yaml --dry-run
+```
+
+The selected bi-encoder and cross-encoder start from public HuggingFace
+checkpoints. The fine-tuned checkpoints are not distributed, so Level B
+reconstructs them by training. Retraining will **not** reproduce weights
 bit-for-bit: different GPUs, kernel versions and non-deterministic reductions
 all move the last digits.
 
@@ -154,11 +173,11 @@ The acceptance criterion is therefore stated in
 An ordering flip is a real failure even inside the tolerance; a small magnitude
 difference is not.
 
-```bash
-demap biencoder --help      # screening, Phase 1, Phase 2
-demap ce-train --help       # one backbone under the frozen protocol
-demap train-hgbc --help     # the 16-config grid, selected on Validation
-```
+The complete ordered paper-mode commands, including the public data build,
+candidate pools, scoring, and final evaluation, are in
+[`running_experiments.md`](running_experiments.md). Generic commands without
+`--paper-config` retain historical defaults for backward compatibility and are
+not authoritative for reconstructing the final manuscript system.
 
 Settings that must not drift when retraining:
 
@@ -166,8 +185,8 @@ Settings that must not drift when retraining:
 |---|---|
 | Phase 1 | lr {7e-5, 1e-4, 1.5e-4} × temperature {0.04, 0.07, 0.10} × epochs {1,2,3}, 2 seeds |
 | Phase 2 | 1 epoch, 2 seeds, strategies `none` / `hard_top25` / `semihard_1_50` |
-| cross-encoder | BCE pointwise, 2 epochs, lr 2e-5, batch 32, max length 512, seed 20260527 |
-| HGBC | 16 configs on Validation Recall@5; final 200 / 3 / 0.05 / 30, seed 42 |
+| cross-encoder | BCE pointwise, 2 epochs, lr 2e-5, batch 32, max length 512, warmup 0.1, FP16 on CUDA, seed 20260527 |
+| HGBC | fixed final 200 / 3 / 0.05 / 30, seed 42, exact ordered 117-feature contract |
 | candidate pool | FT-MPNet top 20 ∪ CDE Match-Fuzzy top 10, dedup by public id, K = 30 |
 | allowance | 0.70 on the caDSR-derived sets, 1.0 on GDC and CIMAC, mask seed 42 |
 

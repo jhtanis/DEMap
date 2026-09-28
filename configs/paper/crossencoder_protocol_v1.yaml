@@ -19,6 +19,20 @@ dev_split: val_dev           # held-out selection split; never used for training
 selection_metric: recall@5   # selection is by dev_split (val_dev) Recall@5.
 selection_tiebreakers: [recall@10, mrr@100]
 
+# Exact selected training job. Historical bake-off drivers exposed these as CLI
+# values; paper mode validates and consumes this block instead of their defaults.
+training:
+  objective: pointwise_bce
+  epochs: 2
+  learning_rate: 2.0e-5
+  batch_size: 32
+  max_sequence_length: 512
+  warmup_fraction: 0.1
+  precision: fp16
+  device: cuda
+  seed: 20260527
+  positive_weight: negative_to_positive_ratio
+
 # --- Reporting / eval datasets -----------------------------------------------------
 # val_dev (selection) + the 6 canonical reachability-filtered eval datasets.
 # The 6 canonical names MUST equal src/demap/evaluation/canonical_datasets.py

@@ -109,10 +109,62 @@ def load_kw_pool(ds: str) -> pd.DataFrame:
 
 
 def main(argv=None) -> int:
+    global SE_FILE, KW_FILE, CATALOG, CATALOG_FULL, SPLIT_DIR, EXISTING_EVAL_POOL_SUMMARY
+    global SE_K, KW_K, WINNER_ID
+    argv_list = list(sys.argv[1:] if argv is None else argv)
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--out-dir", required=True)
+    ap.add_argument("--out-dir", required=False)
     ap.add_argument("--overwrite", action="store_true")
-    args = ap.parse_args(argv)
+    ap.add_argument("--paper-config", default=None)
+    ap.add_argument("--dry-run", action="store_true")
+    args = ap.parse_args(argv_list)
+
+    if args.paper_config:
+        from demap_repro.config.paper import (
+            PaperConfigError,
+            reject_conflicting_flags,
+            resolve_paper_artifact_path,
+            resolve_paper_data_path,
+            stage_job,
+        )
+        try:
+            reject_conflicting_flags(
+                argv_list, ["--out-dir"], context="ce-pool-train --paper-config")
+            job = stage_job("ft_medcpt_pool", args.paper_config)
+        except PaperConfigError as exc:
+            ap.error(str(exc))
+        semantic = resolve_paper_artifact_path(job["semantic_rankings"])
+        fuzzy_dir = resolve_paper_artifact_path(job["fuzzy_dir"])
+        SE_FILE = {"train": semantic, "val_dev": semantic}
+        KW_FILE = {
+            split: fuzzy_dir / filename
+            for split, filename in job["fuzzy_candidate_files"].items()
+        }
+        CATALOG = resolve_paper_data_path(job["production_catalog"])
+        CATALOG_FULL = resolve_paper_data_path(job["full_catalog"])
+        SPLIT_DIR = resolve_paper_data_path(job["splits_dir"])
+        SE_K, KW_K = job["semantic_k"], job["fuzzy_k"]
+        WINNER_ID = "phase2_allmpnet_rep_6f14e0fbed"
+        args.out_dir = str(resolve_paper_artifact_path(job["output_dir"]))
+        summary = job.get("optional_eval_pool_summary")
+        EXISTING_EVAL_POOL_SUMMARY = (
+            resolve_paper_artifact_path(summary) if summary
+            else Path(args.out_dir) / "_no_external_eval_pool_summary.json"
+        )
+        if args.dry_run:
+            print(json.dumps({
+                **job,
+                "semantic_rankings": str(semantic),
+                "fuzzy_dir": str(fuzzy_dir),
+                "production_catalog": str(CATALOG),
+                "full_catalog": str(CATALOG_FULL),
+                "splits_dir": str(SPLIT_DIR),
+                "output_dir": args.out_dir,
+            }, indent=2, sort_keys=True))
+            return 0
+    elif not args.out_dir:
+        ap.error("--out-dir is required outside paper mode")
+
     out_dir = Path(args.out_dir)
     assert "artifacts_v3_cdisc" not in str(out_dir.resolve()), "protected path"
     for p in list(SE_FILE.values()) + list(KW_FILE.values()) + [CATALOG]:

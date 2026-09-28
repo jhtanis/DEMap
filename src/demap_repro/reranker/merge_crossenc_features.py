@@ -30,6 +30,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 import tempfile
@@ -54,11 +55,11 @@ CE_FEATURES = [
 ]
 
 
-def _set_safe_tempdir() -> Path:
+def _set_safe_tempdir(output_dir: Path | None = None) -> Path:
     """Biowulf-safe temp: per-job lscratch, else repo-local .scratch/. Never /tmp."""
     job = os.environ.get("SLURM_JOB_ID")
     lscratch = Path(f"/lscratch/{job}") if job and Path(f"/lscratch/{job}").is_dir() else None
-    cand = lscratch if lscratch is not None else (REPO_ROOT / ".scratch")
+    cand = lscratch if lscratch is not None else ((output_dir or REPO_ROOT) / "tmp")
     cand.mkdir(parents=True, exist_ok=True)
     tempfile.tempdir = str(cand)
     os.environ["TMPDIR"] = str(cand)
@@ -66,20 +67,50 @@ def _set_safe_tempdir() -> Path:
 
 
 def main(argv=None) -> int:
+    argv_list = list(sys.argv[1:] if argv is None else argv)
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--feature-table", required=True)
-    ap.add_argument("--crossenc-scores", required=True)
-    ap.add_argument("--out", required=True)
+    ap.add_argument("--feature-table")
+    ap.add_argument("--crossenc-scores")
+    ap.add_argument("--out")
     ap.add_argument("--overwrite", action="store_true")
-    args = ap.parse_args(argv)
+    ap.add_argument("--paper-config", default=None)
+    ap.add_argument("--dry-run", action="store_true")
+    args = ap.parse_args(argv_list)
 
-    tmp = _set_safe_tempdir()
-    print(f"TMPDIR={tmp}")
+    if args.paper_config:
+        from demap_repro.config.paper import (
+            PaperConfigError, reject_conflicting_flags, resolve_paper_artifact_path,
+            stage_job,
+        )
+        try:
+            reject_conflicting_flags(
+                argv_list, ["--feature-table", "--crossenc-scores", "--out"],
+                context="merge-ce-features --paper-config")
+            job = stage_job("merge_ft_medcpt_features", args.paper_config)
+        except PaperConfigError as exc:
+            ap.error(str(exc))
+        args.feature_table = str(resolve_paper_artifact_path(job["feature_table"]))
+        args.crossenc_scores = str(resolve_paper_artifact_path(job["crossenc_scores"]))
+        args.out = str(resolve_paper_artifact_path(job["out"]))
+        if args.dry_run:
+            print(json.dumps({**job, "feature_table": args.feature_table,
+                              "crossenc_scores": args.crossenc_scores,
+                              "out": args.out}, indent=2, sort_keys=True))
+            return 0
+    else:
+        missing = [flag for flag, value in (
+            ("--feature-table", args.feature_table),
+            ("--crossenc-scores", args.crossenc_scores), ("--out", args.out),
+        ) if not value]
+        if missing:
+            ap.error("required outside paper mode: " + ", ".join(missing))
 
     ft_path = Path(args.feature_table)
     ce_path = Path(args.crossenc_scores)
     out_path = Path(args.out)
+    tmp = _set_safe_tempdir(out_path.parent)
+    print(f"TMPDIR={tmp}")
     if not ft_path.exists():
         sys.exit(f"ERROR: feature table not found: {ft_path}")
     if not ce_path.exists():

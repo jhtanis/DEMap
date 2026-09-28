@@ -1,0 +1,198 @@
+schema_version: 1
+manifest_id: final_system_v1
+description: Canonical executable contract for reconstructing the manuscript-selected DEMap pipeline.
+
+references:
+  biencoder_protocol: configs/paper/biencoder_protocol_v2.yaml
+  phase1_winners: configs/paper/phase1_winners_final_v2.yaml
+  phase2_winners: configs/paper/phase2_winners_final_v3.yaml
+  crossencoder_protocol: configs/paper/crossencoder_protocol_v1.yaml
+  feature_contract: configs/paper/features_117_final_v1.json
+  allowance: configs/paper/non_exact_eval_defaults.yaml
+  evaluation_registry: configs/paper/eval_datasets_v1.yaml
+  determinism: configs/paper/determinism_policy_v1.json
+  table4_results: configs/paper/table4_results_v1.yaml
+  public_build: configs/pipeline.yaml
+
+data:
+  catalog:
+    snapshot_date: '2026-06-18'
+    logical_path: data/processed/cadsr_xml_2026-06-18/cde_master_enriched_eval_production_cde_match.parquet
+    expected_records: 62976
+    expected_unique_public_ids: 62858
+    eligibility_mode: production_cde_match
+    eligibility_semantics: workflow_status does not contain RETIRED and context_name is not TEST or Training; highest available version approximates current-version selection
+  build:
+    training_splits_dir: data/processed/splits
+    reachable_splits_dir: data/processed/splits_catalog_filtered
+    canonical_eval_dir: data/processed/eval_canonical
+    training_splits: [train, val_train, val_dev]
+    historical_training_populations:
+      train: {rows: 51594, unique_queries: 47645}
+      val_train: {rows: 4260, unique_queries: 3946}
+      val_dev: {rows: 4234, unique_queries: 3934}
+    reachable_emit_splits: [train, val_train, val_dev, test, external_holdout_org, external_holdout_refslice]
+  evaluation:
+    datasets: [test, cctg, oid_alt, cdash, gdc_combined, cimac_v2]
+    canonical_names:
+      test: Test
+      cctg: CCTG
+      oid_alt: OID ALT
+      cdash: CDASH
+      gdc_combined: GDC
+      cimac_v2: CIMAC
+    reachable_gold_only: true
+    any_accepted_gold_is_hit: true
+    inject_evaluation_gold: false
+    metrics: [recall@1, recall@5, recall@10, mrr@100]
+
+ft_mpnet:
+  base_model: sentence-transformers/all-mpnet-base-v2
+  query_representation: {id: Q3, column: query_text_q3, description: raw query plus PV summary}
+  candidate_representation: {recipe: v1_v6_v2b_v3_v5, display: SN+DEC+DEF+PQT+PV, format: labeled}
+  loss: symmetric_mnrl
+  training_pair_policy:
+    source_split_rows: 51594
+    built_pairs: 50972
+    dropped_empty_query: 0
+    dropped_missing_target_text: 622
+    missing_target_text_policy: drop
+  phase1:
+    learning_rate: 1.0e-4
+    temperature: 0.04
+    epochs: 3
+    batch_size: 128
+    max_sequence_length: 256
+    precision: fp32
+    historical_requested_precision: bf16
+    fit_api: old_fit
+    optimizer: AdamW
+    weight_decay: 0.01
+    scheduler: WarmupLinear
+    warmup_ratio: 0.1
+    seeds: [0, 1]
+    selection_rule: phase1_seed_mean_lexicographic_v1
+    retained_seed: 1
+    retained_run_id: 20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr0.0001__bs128__t0.04__ep3__seed1
+    reconstruction_checkpoint: artifacts/paper/final_system_v1/ft_mpnet/phase1/retained/model
+  phase2:
+    parent_manifest: configs/paper/phase1_winners_final_v2.yaml
+    parent_run_id: 20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr0.0001__bs128__t0.04__ep3__seed1
+    negative_strategy: hard_top25
+    negative_rank_band: [1, 25]
+    negatives_per_anchor: 10
+    learning_rate: 5.0e-5
+    temperature: 0.03
+    epochs: 1
+    batch_size: 11
+    encoded_texts_per_example: 12
+    encoded_texts_per_batch: 132
+    precision: fp32
+    seeds: [0, 1]
+    selection_rule: phase2_seed_mean_lexicographic_v1
+    selection_aggregation: two_seed_mean
+    selection_metrics: [mean_val_dev_recall@5, mean_val_dev_recall@10, mean_val_dev_mrr@100]
+    retained_seed: 1
+    retained_run_id: 20260705_203956__phase2_finetuning__ft2__20260703_142804__phase1_finetuning__ft__all-mpnet-base-v2__Q-cc2ba6ac__Q3__v1_v6_v2b_v3_v5__labeled__R0__symmetric_mnrl__lr5e-05__bs11__t0.03__ep1__-6f14e0fbed
+    historical_checkpoint_hash: model.safetensors:daf47701ef073342bd802f0a8fabe50c8c779bbe29df13091425b0fc65f41927
+    hard_negative_mining:
+      mine_split: train
+      top_k: 50
+      artifact_root: artifacts/paper/final_system_v1/ft_mpnet/hardneg
+      embeddings_cache: artifacts/paper/final_system_v1/ft_mpnet/hardneg_embeddings
+      exclude_all_accepted_golds: true
+      deduplicate_by_cde_id: true
+    reconstruction_checkpoint: artifacts/paper/final_system_v1/ft_mpnet/phase2/retained/model
+    reconstruction_run_dir: artifacts/paper/final_system_v1/ft_mpnet/phase2/retained
+  retrieval:
+    full_depth: 1000
+    output: artifacts/paper/final_system_v1/ft_mpnet/retrieval
+    embeddings_cache: artifacts/paper/final_system_v1/ft_mpnet/catalog_embeddings
+
+candidate_construction:
+  ft_mpnet_top_k: 20
+  cde_match_fuzzy_top_k: 10
+  operation: union
+  deduplicate_by: cde_public_id
+  nominal_max_candidates: 30
+  inject_evaluation_gold: false
+  fuzzy:
+    variant: keyword_fuzzy_all
+    eligibility_mode: production_cde_match
+    top_k_per_rule: 500
+    exact_match_seed: 42
+    exact_match_scope: gold
+    query_id_mask: deterministic_hash
+    allowance:
+      train: 0.70
+      test: 0.70
+      cctg: 0.70
+      oid_alt: 0.70
+      cdash: 0.70
+      gdc_combined: 1.00
+      cimac_v2: 1.00
+      val_train: 0.70
+      val_dev: 0.70
+  artifacts:
+    fuzzy_cadsr_dir: artifacts/paper/final_system_v1/cde_match_fuzzy/a070
+    fuzzy_external_dir: artifacts/paper/final_system_v1/cde_match_fuzzy/a100
+    keyword_index: artifacts/paper/final_system_v1/cde_match_fuzzy/keyword_index_v3_production_cde_match.joblib
+    feature_table_base: artifacts/paper/final_system_v1/hgbc/feature_table_fixedk30.parquet
+
+ft_medcpt:
+  base_model: ncbi/MedCPT-Cross-Encoder
+  query_representation: {id: Q3, column: query_text_q3, description: raw query plus PV summary}
+  candidate_representation: {recipe: SN_DEC_DEF_PQT_PV, display: SN+DEC+DEF+PQT+PV}
+  objective: pointwise_bce
+  positive_weight: negative_to_positive_ratio
+  epochs: 2
+  learning_rate: 2.0e-5
+  batch_size: 32
+  max_sequence_length: 512
+  warmup_fraction: 0.1
+  precision: fp16
+  device: cuda
+  seed: 20260527
+  train_split: train
+  selection_split: val_dev
+  selected_checkpoint_identity: crossencoder_fulltrain_v2_eligible/runs/ncbi_MedCPT-Cross-Encoder
+  reconstruction_checkpoint: artifacts/paper/final_system_v1/ft_medcpt/checkpoint
+  final_f5_scores_identity: hgbc_features_v2_eligible/scores/crossenc_scores_ncbi_MedCPT-Cross-Encoder_fulltrain.parquet
+  final_f5_scores_source_sha256: b0300d57ae40fb04b14a440846f87da10e762e3771012c6f9d60a766828831da
+  ranking_policy: archived_score_descending_stable_order
+  note: The final F5 archived crossenc_rank is the manuscript FT-MedCPT authority; the HGBC public-ID tie rule does not apply.
+
+hgbc:
+  train_split: val_train
+  selection_split: val_dev
+  feature_contract: configs/paper/features_117_final_v1.json
+  expected_feature_count: 117
+  categorical_features: []
+  missing_values: retained_as_nan
+  class_weight: null
+  sample_weight: null
+  hyperparameters:
+    max_iter: 200
+    max_depth: 3
+    learning_rate: 0.05
+    min_samples_leaf: 30
+    random_seed: 42
+  hyperparameter_selection: fixed_final_configuration
+  feature_table: artifacts/paper/final_system_v1/hgbc/feature_table_fixedk30_crossenc.parquet
+  output_dir: artifacts/paper/final_system_v1/hgbc/final
+
+ranking:
+  final_hgbc:
+    policy_id: final_rank_v1_score_desc_then_public_id_asc
+    primary: score_descending
+    exact_tie: numeric_cde_public_id_ascending
+    nonnumeric_fallback: numeric_ids_first_then_lexicographic_text
+    incoming_row_order_is_forbidden: true
+  ft_medcpt:
+    policy_id: archived_crossenc_rank_v1
+    exact_tie: preserve_authoritative_archived_order
+
+roots:
+  data_environment_variable: DEMAP_DATA_ROOT
+  artifact_environment_variable: DEMAP_ARTIFACT_ROOT
+  paper_output_prefix: artifacts/paper/final_system_v1

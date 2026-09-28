@@ -77,19 +77,23 @@ def fuzzy_path(split: str, cadsr_dir: Path, ext_dir: Path) -> Path:
 def _build_arg_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--splits", required=True, help="comma-separated split names")
-    ap.add_argument("--splits-dir", required=True)
-    ap.add_argument("--cde-master", required=True,
+    ap.add_argument("--splits", default=None, help="comma-separated split names")
+    ap.add_argument("--splits-dir", default=None)
+    ap.add_argument("--eval-splits-dir", default=None,
+                    help="optional second directory for canonical evaluation split parquets")
+    ap.add_argument("--cde-master", default=None,
                     help="production catalog (PV/text features + version map)")
-    ap.add_argument("--rankings", required=True,
+    ap.add_argument("--rankings", default=None,
                     help="bi-encoder LONG rankings parquet (split, query_id, cde_id, "
-                         "biencoder_rank, biencoder_score)")
-    ap.add_argument("--keyword-index", required=True,
+                         "biencoder_rank, biencoder_score); comma-separate multiple files")
+    ap.add_argument("--winner-id", default=None,
+                    help="explicit bi-encoder winner identity (paper mode pins this)")
+    ap.add_argument("--keyword-index", default=None,
                     help="keyword index joblib for kw_* features. The POOL keyword source "
                          "is the fuzzy tables, NOT this index.")
-    ap.add_argument("--fuzzy-dir-cadsr", required=True,
+    ap.add_argument("--fuzzy-dir-cadsr", default=None,
                     help="dir of CDE Match-Fuzzy a0.70 candidate parquets (caDSR splits)")
-    ap.add_argument("--fuzzy-dir-external", required=True,
+    ap.add_argument("--fuzzy-dir-external", default=None,
                     help="dir of CDE Match-Fuzzy a1.0 candidate parquets (external splits)")
     ap.add_argument("--biencoder-k", type=int, default=DEFAULT_BIENCODER_K)
     ap.add_argument("--keyword-fuzzy-k", type=int, default=DEFAULT_KEYWORD_FUZZY_K)
@@ -100,19 +104,63 @@ def _build_arg_parser() -> argparse.ArgumentParser:
                     help="kw_* provenance exact-rule allow gate (caDSR-derived splits only). "
                          "Must match the fuzzy a0.70 tables so kw_* features are post-policy.")
     ap.add_argument("--keyword-allow-seed", type=int, default=DEFAULT_KEYWORD_ALLOW_SEED)
-    ap.add_argument("--out", required=True)
+    ap.add_argument("--out", default=None)
     ap.add_argument("--overwrite", action="store_true")
     ap.add_argument("--dry-run", action="store_true",
                     help="assemble the pool + audit; skip feature computation / write")
+    ap.add_argument("--paper-config", default=None,
+                    help="canonical final-system manifest; rejects competing scientific flags")
     return ap
 
 
 def main(argv=None):
-    args = _build_arg_parser().parse_args(argv)
+    argv_list = list(sys.argv[1:] if argv is None else argv)
+    ap = _build_arg_parser()
+    args = ap.parse_args(argv_list)
+    if args.paper_config:
+        from demap_repro.config.paper import (
+            PaperConfigError, reject_conflicting_flags, resolve_paper_artifact_path,
+            resolve_paper_data_path, stage_job,
+        )
+        try:
+            reject_conflicting_flags(
+                argv_list,
+                ["--splits", "--splits-dir", "--eval-splits-dir", "--cde-master",
+                 "--rankings", "--winner-id", "--keyword-index", "--fuzzy-dir-cadsr",
+                 "--fuzzy-dir-external", "--biencoder-k", "--keyword-fuzzy-k",
+                 "--keyword-allow-rate", "--keyword-allow-seed", "--out"],
+                context="fixed-k-features --paper-config")
+            job = stage_job("candidate_pool", args.paper_config)
+        except PaperConfigError as exc:
+            ap.error(str(exc))
+        args.splits = ",".join(job["splits"])
+        args.splits_dir = str(resolve_paper_data_path(job["training_splits_dir"]))
+        args.eval_splits_dir = str(resolve_paper_data_path(job["evaluation_splits_dir"]))
+        args.cde_master = str(resolve_paper_data_path(job["cde_master"]))
+        args.rankings = ",".join(str(resolve_paper_artifact_path(p)) for p in job["rankings"])
+        args.winner_id = job["winner_id"]
+        args.keyword_index = str(resolve_paper_artifact_path(job["keyword_index"]))
+        args.fuzzy_dir_cadsr = str(resolve_paper_artifact_path(job["fuzzy_dir_cadsr"]))
+        args.fuzzy_dir_external = str(resolve_paper_artifact_path(job["fuzzy_dir_external"]))
+        args.biencoder_k = job["biencoder_k"]
+        args.keyword_fuzzy_k = job["keyword_fuzzy_k"]
+        args.keyword_top_k_per_rule = job["keyword_top_k_per_rule"]
+        args.keyword_allow_rate = job["keyword_allow_rate_cadsr"]
+        args.keyword_allow_seed = job["keyword_allow_seed"]
+        args.out = str(resolve_paper_artifact_path(job["out"]))
+        if args.dry_run:
+            print(json.dumps(job, indent=2, sort_keys=True))
+            return 0
+    required = ["splits", "splits_dir", "cde_master", "rankings", "keyword_index",
+                "fuzzy_dir_cadsr", "fuzzy_dir_external", "out"]
+    missing_args = [name for name in required if not getattr(args, name)]
+    if missing_args:
+        ap.error(f"missing required arguments: {missing_args}")
     splits = [s.strip() for s in args.splits.split(",") if s.strip()]
 
     splits_dir = Path(args.splits_dir)
-    rankings_path = Path(args.rankings)
+    eval_splits_dir = Path(args.eval_splits_dir) if args.eval_splits_dir else splits_dir
+    ranking_paths = [Path(p.strip()) for p in args.rankings.split(",") if p.strip()]
     cde_master_path = Path(args.cde_master)
     keyword_index_path = Path(args.keyword_index)
     cadsr_dir = Path(args.fuzzy_dir_cadsr)
@@ -123,18 +171,22 @@ def main(argv=None):
         sys.exit(f"ERROR: {out_path} exists; pass --overwrite to replace.")
 
     # --- preflight ----------------------------------------------------------
-    for f in (rankings_path, cde_master_path, keyword_index_path):
+    for f in (*ranking_paths, cde_master_path, keyword_index_path):
         if not f.exists():
             sys.exit(f"ERROR: missing input: {f}")
     for s in splits:
         fp = fuzzy_path(s, cadsr_dir, ext_dir)
         if not fp.exists():
             sys.exit(f"ERROR: missing fuzzy table for split {s!r}: {fp}")
-        if not (splits_dir / f"{s}.parquet").exists():
-            sys.exit(f"ERROR: missing split parquet: {splits_dir / f'{s}.parquet'}")
+        split_path = ((eval_splits_dir / f"{s}.parquet")
+                      if (eval_splits_dir / f"{s}.parquet").exists()
+                      else (splits_dir / f"{s}.parquet"))
+        if not split_path.exists():
+            sys.exit(f"ERROR: missing split parquet for {s!r} in {splits_dir} or "
+                     f"{eval_splits_dir}")
 
     print("=== build fixed-K feature table ===")
-    print(f"  rankings     : {rankings_path}")
+    print(f"  rankings     : {ranking_paths}")
     print(f"  cde master   : {cde_master_path}")
     print(f"  keyword index: {keyword_index_path}")
     print(f"  fuzzy caDSR  : {cadsr_dir} (a0.70)")
@@ -144,13 +196,20 @@ def main(argv=None):
     print(f"  splits       : {splits}")
     print(f"  OUT          : {out_path}")
 
-    winner = _infer_winner_id(rankings_path)
-    rankings_df = pd.read_parquet(rankings_path)
+    winner = args.winner_id or _infer_winner_id(ranking_paths[0])
+    rankings_df = pd.concat([pd.read_parquet(path) for path in ranking_paths], ignore_index=True)
     import joblib
     kidx = joblib.load(keyword_index_path)
     print(f"[keyword index] CDEs: {kidx.n_cde}")
     cde_master_small = pd.read_parquet(cde_master_path, columns=["cde_publicid", "cde_version"])
-    split_meta = _load_split_meta(splits_dir, splits)
+    eval_splits = [s for s in splits if (eval_splits_dir / f"{s}.parquet").exists()]
+    train_splits = [s for s in splits if s not in eval_splits]
+    meta_parts = []
+    if train_splits:
+        meta_parts.append(_load_split_meta(splits_dir, train_splits))
+    if eval_splits:
+        meta_parts.append(_load_split_meta(eval_splits_dir, eval_splits))
+    split_meta = pd.concat(meta_parts, ignore_index=True)
 
     unions, kw_feats_all, exact_sets = [], [], []
     for split in splits:
@@ -185,7 +244,8 @@ def main(argv=None):
         unions.append(u)
 
         # kw_* features (schema parity): full provenance, post-policy, attached by publicid.
-        queries = pd.read_parquet(splits_dir / f"{split}.parquet")
+        source_dir = eval_splits_dir if split in eval_splits else splits_dir
+        queries = pd.read_parquet(source_dir / f"{split}.parquet")
         prov = B.keyword_provenance(queries, kidx,
                                     top_k_per_rule=args.keyword_top_k_per_rule)
         # gold-by-query (pre-dedup; multi-gold covered) for the shared gold-scoped
@@ -218,7 +278,8 @@ def main(argv=None):
     # recall number.
     gold_keys = set()
     for s in splits:
-        g = pd.read_parquet(splits_dir / f"{s}.parquet", columns=["query_id", "cde_id"])
+        source_dir = eval_splits_dir if s in eval_splits else splits_dir
+        g = pd.read_parquet(source_dir / f"{s}.parquet", columns=["query_id", "cde_id"])
         gold_keys.update(zip(
             [s] * len(g),
             g["query_id"].astype(str),
@@ -302,7 +363,8 @@ def main(argv=None):
         "build": "fixed_k",
         "cde_master": str(cde_master_path),
         "splits_dir": str(splits_dir),
-        "rankings": str(rankings_path),
+        "rankings": [str(path) for path in ranking_paths],
+        "winner_id": winner,
         "keyword_index": str(keyword_index_path),
         "fuzzy_dir_cadsr": str(cadsr_dir),
         "fuzzy_dir_external": str(ext_dir),

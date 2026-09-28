@@ -22,6 +22,95 @@ DEFAULT_WINNERS = "configs/paper/section4_3_winners_v1.yaml"
 DEFAULT_PHASE1_MANIFEST = "configs/paper/phase1_winners_for_phase2_v1.yaml"
 
 
+def _selected_paper_run(args) -> None:
+    """Run only the manuscript-retained FT-MPNet seed from the canonical job."""
+    from demap_repro.config.paper import (
+        resolve_paper_artifact_path, resolve_paper_data_path, stage_job,
+    )
+
+    stage = "ft_mpnet_phase1" if args.stage == "phase1" else "ft_mpnet_phase2"
+    job = stage_job(stage, args.paper_config)
+    if args.dry_run:
+        print(json.dumps(job, indent=2, sort_keys=True))
+        print("[paper biencoder] selected-final dry-run: no files written, no training run.")
+        return
+    if args.stage == "phase1":
+        from demap_repro.biencoder.engine import finetune_phase1
+        block = job["finetune_phase1"]
+        train = block["train"]
+        finetune_phase1.main([
+            "--cde-master-enriched", str(resolve_paper_data_path(block["cde_master_enriched"])),
+            "--splits-dir", str(resolve_paper_data_path(block["splits_dir"])),
+            "--artifacts-dir", str(resolve_paper_artifact_path(block["artifacts_dir"])),
+            "--runs-dir", "auto", "--model-name", block["model_name"],
+            "--base-model-id", block["base_model_id"],
+            "--query-variant", block["query_variant"], "--recipe", block["recipe"],
+            "--cde-format", block["cde_format"], "--losses", block["loss"],
+            "--seeds", str(job["selection"]["retained_seed"]),
+            "--lrs", str(train["lrs"][0]), "--temperatures", str(train["temperatures"][0]),
+            "--epochs", str(train["epochs"][0]),
+            "--batch-sizes", str(train["batch_sizes"][0]),
+            "--max-seq-length", str(train["max_seq_length"]),
+            "--fit-api", train["fit_api"], "--no-bf16", "--no-fp16",
+            "--device", "cuda", "--eval-splits", "val_dev",
+        ])
+        return
+
+    from demap_repro.biencoder.engine import finetune_phase2
+    block = job["finetune_phase2"]
+    train = block["train"]
+    parent = args.parent_checkpoint or block["init_model_name_or_path"]
+    parent = str(resolve_paper_artifact_path(parent))
+    if args.mine_hardneg:
+        mining = block["hard_negative_mining"]
+        splits_dir = resolve_paper_data_path(block["splits_dir"])
+        catalog = resolve_paper_data_path(block["cde_master_enriched"])
+        identity = _hn.build_identity(
+            model_id="all-mpnet-base-v2",
+            parent_checkpoint=parent,
+            parent_checkpoint_sha256=_hn.checkpoint_hash(parent),
+            query_variant=block["query_variant"], recipe=block["recipe"],
+            cde_format=block["cde_format"],
+            train_split_sha256=_hn.sha256_file(
+                str(splits_dir / f"{mining['mine_split']}.parquet")),
+            catalog_sha256=_hn.sha256_file(str(catalog)),
+            top_k=mining["top_k"], n_negatives=train["nneg"],
+            mine_split=mining["mine_split"], code_commit=_git_commit(),
+        )
+        result = _hn.mine(
+            identity=identity,
+            root=str(resolve_paper_artifact_path(mining["artifact_root"])),
+            splits_dir=str(splits_dir), catalog_path=str(catalog),
+            recipe_configs=block["recipe_configs"],
+            embeddings_dir=str(resolve_paper_artifact_path(mining["embeddings_cache"])),
+            overwrite=args.overwrite_hardneg, device="cuda",
+        )
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return
+    if not args.mined_parquet:
+        raise SystemExit(
+            "[paper biencoder] selected Phase 2 requires --mined-parquet produced with "
+            "hard_top25 ranks 1-25 from the retained Phase-1 checkpoint")
+    finetune_phase2.main([
+        "--cde-master-enriched", str(resolve_paper_data_path(block["cde_master_enriched"])),
+        "--splits-dir", str(resolve_paper_data_path(block["splits_dir"])),
+        "--artifacts-dir", str(resolve_paper_artifact_path(block["artifacts_dir"])),
+        "--runs-dir", "auto", "--base-model-id", block["base_model_id"],
+        "--init-model-name-or-path", parent,
+        "--miner-model-name-or-path", parent,
+        "--mined-parquet", args.mined_parquet,
+        "--query-variant", block["query_variant"], "--recipe", block["recipe"],
+        "--cde-format", block["cde_format"], "--losses", block["loss"],
+        "--seeds", str(job["selection"]["retained_seed"]),
+        "--lrs", str(train["lrs"][0]), "--temperatures", str(train["temperatures"][0]),
+        "--epochs", str(train["epochs"][0]),
+        "--batch-sizes", str(train["batch_sizes"][0]),
+        "--strategies", train["strategies"][0], "--nneg", str(train["nneg"]),
+        "--hard-band", "1-25", "--device", "cuda", "--require-gpu",
+        "--eval-splits", "val_dev",
+    ])
+
+
 def _git_commit() -> str:
     try:
         return subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
@@ -147,6 +236,7 @@ def _phase2(args, *, check_rows: bool) -> None:
 
 
 def main(argv: Optional[List[str]] = None) -> None:
+    argv_list = list(argv) if argv is not None else list(os.sys.argv[1:])
     ap = argparse.ArgumentParser(prog="demap paper biencoder")
     ap.add_argument("--protocol", default=DEFAULT_PROTOCOL)
     ap.add_argument("--winners", default=DEFAULT_WINNERS)
@@ -177,7 +267,15 @@ def main(argv: Optional[List[str]] = None) -> None:
     ap.add_argument("--verify-submission", action="store_true",
                     help="re-validate the generated submission + token (used by the array launcher guard)")
     ap.add_argument("--launcher", default="slurm/paper_biencoder_phase1_canonical_array.sbatch")
-    args = ap.parse_args(argv)
+    ap.add_argument("--paper-config", default=None,
+                    help="canonical final-system manifest")
+    ap.add_argument("--selected-final", action="store_true",
+                    help="paper mode: train only the retained FT-MPNet seed/configuration")
+    ap.add_argument("--parent-checkpoint", default=None,
+                    help="paper selected Phase 2: path to reconstructed retained Phase-1 model")
+    ap.add_argument("--mined-parquet", default=None,
+                    help="paper selected Phase 2: hard_top25 mined-negative parquet")
+    args = ap.parse_args(argv_list)
 
     # Stage-specific defaults (kept out of argparse so each stage owns its own lock).
     if args.precision is None:
@@ -187,6 +285,27 @@ def main(argv: Optional[List[str]] = None) -> None:
                          else "artifacts/phase1_canonical_v1")
 
     check_rows = not args.no_check_rows
+
+    if args.paper_config:
+        from demap_repro.config.paper import PaperConfigError, reject_conflicting_flags, validate_paper_config
+        try:
+            reject_conflicting_flags(
+                argv_list,
+                ["--protocol", "--winners", "--phase1-manifest", "--models",
+                 "--precision", "--allow-legacy", "--allow-winner-override"],
+                context="biencoder --paper-config")
+            paper = validate_paper_config(args.paper_config)
+        except PaperConfigError as exc:
+            ap.error(str(exc))
+        args.protocol = paper["references"]["biencoder_protocol"]
+        args.phase1_manifest = paper["references"]["phase1_winners"]
+        args.models = "all-mpnet-base-v2"
+        if args.stage == "phase0":
+            ap.error("final-system paper mode supports Phase 1 and Phase 2, not the Phase-0 screen")
+        if not args.selected_final:
+            ap.error("--paper-config requires --selected-final for the bounded final-model path")
+        _selected_paper_run(args)
+        return
 
     # Independent submission-guard used by the array launcher: refuse the array unless a valid
     # token (written by the canonical --submit path) matches the current generated state.

@@ -119,8 +119,20 @@ There are two distinct goals — full detail in
   gold public IDs, and frozen per-method rankings. The repository includes this
   bundle at `data/frozen/table4_v1/`.
 - **Level B: full / expensive reproduction.** Fixture regression, artifact-backed
-  model evaluation, public-data rebuilding, and retraining remain separate
-  workflows. They are not substitutes for the Level-A query-level check.
+  model evaluation, public-data rebuilding, and retraining use the canonical
+  manuscript entry point `configs/paper/final_system_v1.yaml`. Validate and
+  inspect exactly what paper mode will consume before scheduling compute:
+
+  ```bash
+  demap paper-config --validate
+  demap paper-config --show-resolved
+  demap paper-config --dry-run all
+  ```
+
+  Paper-mode stage commands reject conflicting scientific overrides instead of
+  falling back to generic historical defaults. Level B is not a substitute for
+  the Level-A query-level check, and a full retraining was not run as part of
+  preparing this release.
 
 ---
 

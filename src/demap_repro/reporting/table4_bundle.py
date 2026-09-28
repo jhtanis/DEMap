@@ -21,6 +21,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import yaml
 
+from demap_repro.ranking import canonical_score_order, public_id_sort_key
 from demap_repro.utils.paths import repo_root
 
 QUERY_FILE = "table4_queries.parquet"
@@ -162,10 +163,7 @@ def _require_safe_token(value: Any, label: str, *, max_length: int = 160) -> str
 
 def _public_id_sort_key(public_id: str) -> tuple[int, int, str]:
     """Numeric IDs first numerically; deterministic lexical fallback otherwise."""
-    try:
-        return (0, int(public_id), "")
-    except ValueError:
-        return (1, 0, public_id)
+    return public_id_sort_key(public_id)
 
 
 def sort_public_ids(values: Iterable[Any]) -> list[str]:
@@ -190,11 +188,10 @@ def canonical_hgbc_order(
         raise Table4VerificationError("duplicate candidate public identifier")
     if any(not math.isfinite(value) for value in numeric_scores):
         raise Table4VerificationError("non-finite candidate score")
-    order = sorted(
-        range(len(ids)),
-        key=lambda index: (-numeric_scores[index], _public_id_sort_key(ids[index])),
-    )
-    return [ids[index] for index in order], [numeric_scores[index] for index in order]
+    try:
+        return canonical_score_order(ids, numeric_scores)
+    except ValueError as exc:
+        raise Table4VerificationError(str(exc)) from exc
 
 
 def validate_ft_medcpt_order(public_ids: list[str], scores: list[float]) -> None:

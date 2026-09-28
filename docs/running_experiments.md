@@ -11,6 +11,20 @@ export DEMAP_DATA_ROOT=/path/to/data
 export DEMAP_ARTIFACT_ROOT=/path/to/artifacts
 ```
 
+The final manuscript path is owned by
+`configs/paper/final_system_v1.yaml`; generic defaults are retained only for
+historical compatibility. Before running anything expensive:
+
+```bash
+demap paper-config --validate
+demap paper-config --show-resolved --out ../demap-paper-config.json
+demap paper-config --dry-run all
+```
+
+Every paper-mode command below rejects a conflicting manuscript-facing CLI
+override. Relative `data/` inputs resolve under `DEMAP_DATA_ROOT`; relative
+`artifacts/` outputs resolve under `DEMAP_ARTIFACT_ROOT`.
+
 Stages marked **GPU** are the only expensive ones. Everything else is CPU work
 measured in minutes.
 
@@ -19,15 +33,13 @@ measured in minutes.
 ## 1. Benchmark and datasets
 
 ```bash
-demap make-dataset --config configs/pipeline.yaml
-demap catalog-filter --catalog-xml /path/to/cadsr_2026-06-18 \
-                     --catalog-eligibility production_cde_match
+demap make-dataset --paper-config configs/paper/final_system_v1.yaml \
+  --query-xml /path/to/cadsr_2026-01-12 \
+  --catalog-xml /path/to/cadsr_2026-06-18 \
+  --stop-after catalog-filter
 demap import-gdc                     # supplied input
 demap import-cimac                   # supplied input
-demap reachable-splits --splits-dir data/processed/splits \
-                       --eligible data/processed/cde_catalog_enriched.parquet \
-                       --out-dir data/processed/splits_catalog_filtered
-demap materialize-eval               # derives four, materializes the two frozen
+demap materialize-eval --paper-config configs/paper/final_system_v1.yaml
 demap leakage-filter
 demap characterize                   # Tables 1, S1, S2
 ```
@@ -59,13 +71,21 @@ non-anchor cell.
 
 ## 3. Phase 1 fine-tuning — **GPU**
 
-Grid: learning rate {7e-5, 1e-4, 1.5e-4} × temperature {0.04, 0.07, 0.10} ×
-epochs {1, 2, 3} = 27 configurations, two seeds each, **54 runs per model**.
-Max sequence length 256, batch 128 pairs, FP16 autocast with FP32 parameters,
-no-duplicate batch sampler.
+The historical search was learning rate {7e-5, 1e-4, 1.5e-4} × temperature
+{0.04, 0.07, 0.10} × epochs {1, 2, 3}, two seeds each. The selected FT-MPNet
+parent is pinned in the canonical manifest: lr 1e-4, temperature 0.04, 3 epochs,
+batch 128, max length 256, symmetric MNRL, retained seed 1. Its effective run
+precision was FP32; the manifest separately records the historical BF16 request
+so those two facts cannot be conflated.
 
 Selection is on Validation Recall@5, then Recall@10, then MRR@100 — ties only.
 Winners: `configs/paper/phase1_winners_final_v2.yaml`.
+
+```bash
+demap biencoder --paper-config configs/paper/final_system_v1.yaml \
+  --selected-final --stage phase1 --dry-run
+# Remove --dry-run to train the retained Phase-1 reconstruction on a GPU.
+```
 
 ---
 
@@ -82,12 +102,30 @@ configuration is retained downstream.
 
 Produces Figure 3, Figure S4, Table S4.
 
+```bash
+demap biencoder --paper-config configs/paper/final_system_v1.yaml \
+  --selected-final --stage phase2 --dry-run
+# After Phase 1, remove --dry-run and add --mine-hardneg plus the reconstructed
+# parent checkpoint. Then train from the emitted hash-addressed parquet:
+demap biencoder --paper-config configs/paper/final_system_v1.yaml \
+  --selected-final --stage phase2 --mine-hardneg \
+  --parent-checkpoint artifacts/paper/final_system_v1/ft_mpnet/phase1/retained/model
+demap biencoder --paper-config configs/paper/final_system_v1.yaml \
+  --selected-final --stage phase2 \
+  --parent-checkpoint artifacts/paper/final_system_v1/ft_mpnet/phase1/retained/model \
+  --mined-parquet /path/printed/by/the/mining/command.parquet
+```
+
 ---
 
 ## 5. Deep FT-MPNet retrieval — **GPU** to encode, then CPU
 
 ```bash
-demap deep-retrieval
+demap deep-retrieval --paper-config configs/paper/final_system_v1.yaml \
+  --paper-split-group training --dry-run
+demap deep-retrieval --paper-config configs/paper/final_system_v1.yaml \
+  --paper-split-group evaluation --dry-run
+# Remove --dry-run for the two retrieval runs.
 ```
 
 Ranks the full 62,976-record catalog for every query and writes the top-1000
@@ -101,10 +139,10 @@ Both lexical methods, from the implementations in
 `src/demap_repro/lexical/cde_match/`.
 
 ```bash
-# CDE Match-Fuzzy — the arm that contributes candidates
-demap cdematch-candidates --splits test --fuzzy-fallback keyword_fuzzy_all \
-    --eligibility production_cde_match \
-    --exact-query-match-allow-rate 0.70 --exact-match-seed 42
+# CDE Match-Fuzzy — the arm that contributes candidates. Repeat for train,
+# val_train, val_dev, test, cctg, oid_alt, cdash, gdc_combined, and cimac_v2.
+demap cdematch-candidates --paper-config configs/paper/final_system_v1.yaml \
+  --paper-dataset test --dry-run
 
 # The Python approximation to NCI CDE Match — a Table 4 comparison method,
 # and the source of seven HGBC features. It contributes no candidates.
@@ -129,6 +167,7 @@ demap figure5-inputs      # Figure 5 input tables
 ```bash
 demap select-k --grid <k_selection_grid.csv>    # the K = 20/30/40/60 ceiling
 demap coverage                                   # Table S5
+demap fixed-k-features --paper-config configs/paper/final_system_v1.yaml --dry-run
 ```
 
 The pool is **FT-MPNet top-20 ∪ CDE Match-Fuzzy top-10**, deduplicated by CDE
@@ -143,19 +182,27 @@ evidence that the union beats either arm on every dataset.
 ## 8. Cross-encoder — **GPU**
 
 ```bash
-demap ce-pool-train      # training pool, including the 172-query exclusion
-demap ce-pool-eval       # evaluation pool
-demap ce-pairs           # training pairs
-demap ce-train           # one backbone under the frozen protocol
-demap ce-score           # score a pool
+demap ce-pool-train --paper-config configs/paper/final_system_v1.yaml --dry-run
+demap ce-pairs --paper-config configs/paper/final_system_v1.yaml --dry-run
+demap ce-train --paper-config configs/paper/final_system_v1.yaml --dry-run
+demap ce-score --paper-config configs/paper/final_system_v1.yaml --dry-run
 demap ce-select          # aggregate the bake-off, write CE_WINNER.json
 demap ce-evaluate
 demap figure4-inputs     # Figure 4
 ```
 
+Remove `--dry-run` to execute each selected paper stage. `ce-pool-train` is the
+full `train` + `val_dev` construction used for FT-MedCPT training; the separate
+fixed-K pool in step 7 is the eight-split, no-gold-injection pool used by the
+final scorer and HGBC.
+
+The generic `demap ce-pool-eval` stage remains available for the historical
+three-backbone bake-off; the selected final paper path uses the fixed-K pool.
+
 One frozen protocol for all three backbones: BCE pointwise, 2 epochs, lr 2e-5,
-batch 32, max length 512, **seed 20260527**, positive class weighted by the
-negative-to-positive ratio. Compared on Validation Recall@5.
+batch 32, max length 512, warmup fraction 0.1, FP16 on CUDA,
+**seed 20260527**, positive class weighted by the negative-to-positive ratio.
+Compared on Validation Recall@5.
 
 **FT-MedCPT selected at 0.912**, ahead of FT-BGE (0.904) and FT-MiniLM (0.874).
 
@@ -164,19 +211,21 @@ negative-to-positive ratio. Compared on Validation Recall@5.
 ## 9. The 117-feature HGBC reranker
 
 ```bash
-demap fixed-k-features        # assemble the K=30 candidate feature table
-demap merge-ce-features       # merge the six crossenc_* features
-demap train-hgbc              # train and select
+demap fixed-k-features --paper-config configs/paper/final_system_v1.yaml --dry-run
+demap merge-ce-features --paper-config configs/paper/final_system_v1.yaml --dry-run
+demap train-hgbc --paper-config configs/paper/final_system_v1.yaml --dry-run
 ```
 
 Trained on **Reranker Training** (`val_train`): 3,946 queries, 109,141
 query–candidate pairs, 4,109 positive (~3.7%). No negative sampling, no class
 weighting.
 
-Grid: 16 combinations of `max_iter {200,500}` × `max_depth {3,5}` ×
+Historically, a grid of 16 combinations of `max_iter {200,500}` × `max_depth {3,5}` ×
 `learning_rate {0.05,0.1}` × `min_samples_leaf {10,30}`, selected on Validation
-Recall@5. **Selected: 200 / 3 / 0.05 / 30, seed 42**, on the feature set without
-query-provenance variables (`configs/paper/features_117_noprov.json`).
+Recall@5. Paper mode does not rerun that grid: it fits the selected
+**200 / 3 / 0.05 / 30, seed 42** configuration against the exact ordered
+contract in `configs/paper/features_117_final_v1.json`, with no categorical
+features and no class or sample weighting.
 
 To train one fixed configuration instead of searching — which is what the
 ablation needs:
@@ -190,7 +239,7 @@ demap train-hgbc --fixed-config '{"max_iter":200,"max_depth":3,"learning_rate":0
 ## 10. Final six-dataset evaluation
 
 ```bash
-demap eval-by-dataset         # per-dataset Recall@1/5/10 and MRR@100
+demap eval-by-dataset --paper-config configs/paper/final_system_v1.yaml --dry-run
 demap table4                  # Table 4, the six-method comparison
 ```
 

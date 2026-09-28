@@ -53,12 +53,27 @@ the only place the two vocabularies meet.
 parameter for stages 1–6. Read it before running anything — it is short, and it
 is the file to edit rather than passing a dozen flags.
 
+For the manuscript path, supply both dated snapshots and let paper mode root all
+`data/` and `artifacts/` paths under the configured roots:
+
 ```bash
-demap make-dataset --config configs/pipeline.yaml
+export DEMAP_ARTIFACT_ROOT=/path/to/your/artifact/tree
+demap make-dataset --paper-config configs/paper/final_system_v1.yaml \
+  --query-xml /path/to/cadsr_2026-01-12 \
+  --catalog-xml /path/to/cadsr_2026-06-18 \
+  --stop-after catalog-filter
 ```
 
-Runs, in order: `extract` → `merge` → `enrich` → `build-queries` → `build-pairs`
-→ `split`. Resumable and idempotent: each stage skips if its outputs exist.
+This executes `extract` → `merge` → `enrich` → `build-queries` →
+`build-pairs` → `split` → `catalog-filter`. The unfiltered `splits/` tree is the
+historical training population consumed by the selected FT-MPNet and FT-MedCPT
+training jobs. The last stage also writes the canonical June production catalog
+and reachable-gold `splits_catalog_filtered/` tree consumed by evaluation
+materialization. Both roles are explicit in `final_system_v1.yaml`.
+
+Without `--stop-after catalog-filter`, the generic default runs `extract` →
+`merge` → `enrich` → `build-queries` → `build-pairs` → `split`.
+Both routes are resumable and idempotent: each stage skips if its outputs exist.
 
 ```bash
 demap make-dataset --start-at build-queries        # resume partway
@@ -79,7 +94,8 @@ demap make-dataset --query-xml /path/to/cadsr_2026-01-12
 | `data/processed/cde_master_enriched.parquet` | 79,479 records, the January construction catalog |
 | `data/processed/queries.parquet` | normalized ALT and REF source-like query strings |
 | `data/processed/pairs.parquet` | **69,102** constructed query–CDE pairs |
-| `data/processed/splits/` | `train`, `val_train`, `val_dev`, `test`, and the three caDSR-derived holdouts |
+| `data/processed/splits/` | unfiltered construction splits |
+| `data/processed/splits_catalog_filtered/` | reachable-gold copies used to derive canonical evaluation sets |
 
 Which alternate-name and reference-document types become queries is *not*
 hardcoded — it is the three curator allowlists in `configs/allowlists/`, which
@@ -96,12 +112,17 @@ in two splits.
 This is the **June** snapshot, and the step where the two-snapshot distinction
 becomes concrete.
 
-```bash
-demap catalog-filter \
-    --catalog-xml /path/to/cadsr_2026-06-18 \
-    --catalog-eligibility production_cde_match \
-    --catalog-out data/processed/cde_catalog_enriched.parquet
+The paper-mode `make-dataset` command above performs this stage. Its canonical
+output is:
+
 ```
+data/processed/cadsr_xml_2026-06-18/
+  cde_master_enriched_eval_production_cde_match.parquet
+```
+
+The generic `demap catalog-filter` command remains available for historical or
+research layouts, but `cde_catalog_enriched.parquet` is not the authoritative
+paper-path filename.
 
 Eligibility mode `production_cde_match` reproduces the production filter:
 
@@ -156,15 +177,25 @@ by anyone. Those queries are **dropped**, never counted as misses — this is wh
 makes the denominators honest.
 
 ```bash
-demap reachable-splits \
-    --splits-dir data/processed/splits \
-    --eligible   data/processed/cde_catalog_enriched.parquet \
-    --out-dir    data/processed/splits_catalog_filtered
-
-demap materialize-eval               # writes the six canonical sets
-demap materialize-eval --dry-run     # report only, writes nothing
+demap materialize-eval --paper-config configs/paper/final_system_v1.yaml
+demap materialize-eval --paper-config configs/paper/final_system_v1.yaml --dry-run
 demap materialize-eval --frozen-only # just the two shipped inputs, no splits tree needed
 ```
+
+`make-dataset ... --stop-after catalog-filter` already performed the reachable-
+gold filtering into `data/processed/splits_catalog_filtered/`. Paper-mode
+materialization reads that directory explicitly and writes
+`data/processed/eval_canonical/`; there is no implicit `splits/` ↔
+`splits_catalog_filtered/` rename.
+
+The generic `demap reachable-splits` stage remains available for historical or
+custom layouts; the canonical paper build invokes the equivalent filtering as
+its `catalog-filter` stage.
+
+The canonical emit list includes `test`, `external_holdout_org`, and
+`external_holdout_refslice`; these are required to derive Test, CCTG, OID ALT,
+and CDASH. Training still reads the original `splits/` population. This is
+intentional, not an alias between the two directories.
 
 The registry that defines the six sets is `configs/paper/eval_datasets_v1.yaml`.
 

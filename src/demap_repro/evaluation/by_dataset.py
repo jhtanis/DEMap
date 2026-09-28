@@ -53,6 +53,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -174,17 +175,54 @@ def load_scored(path: Path) -> pd.DataFrame:
 
 
 def main(argv=None) -> int:
+    argv_list = list(sys.argv[1:] if argv is None else argv)
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--scored-rankings", required=True)
+    ap.add_argument("--scored-rankings", default=None)
     ap.add_argument("--reachable-splits-dir", default=str(DEFAULT_REACH_DIR))
     ap.add_argument("--label", default="hgbc")
     ap.add_argument("--allow-missing-splits", action="store_true",
                     help="skip splits with no query-set parquet instead of failing")
-    ap.add_argument("--out-csv", required=True)
+    ap.add_argument("--out-csv", default=None)
     ap.add_argument("--cimac-strata-out", default=None,
                     help="if set and cimac_v2 present, also write 131/92/39 strata metrics")
-    args = ap.parse_args(argv)
+    ap.add_argument("--paper-config", default=None)
+    ap.add_argument("--dry-run", action="store_true")
+    args = ap.parse_args(argv_list)
+    if args.paper_config:
+        from demap_repro.config.paper import (
+            PaperConfigError, reject_conflicting_flags, resolve_paper_artifact_path,
+            resolve_paper_data_path, stage_job,
+        )
+        try:
+            reject_conflicting_flags(
+                argv_list,
+                ["--scored-rankings", "--reachable-splits-dir", "--label",
+                 "--allow-missing-splits", "--out-csv", "--cimac-strata-out"],
+                context="eval-by-dataset --paper-config")
+            eval_job = stage_job("evaluation", args.paper_config)
+            hgbc_job = stage_job("hgbc", args.paper_config)
+        except PaperConfigError as exc:
+            ap.error(str(exc))
+        out_root = resolve_paper_artifact_path(hgbc_job["out"])
+        args.scored_rankings = str(out_root / "hgbc_scored_rankings.parquet")
+        args.reachable_splits_dir = str(resolve_paper_data_path(eval_job["eval_dir"]))
+        args.label = "hgbc_final_system_v1"
+        args.allow_missing_splits = False
+        args.out_csv = str(out_root / "hgbc_eval_by_dataset.csv")
+        args.cimac_strata_out = None
+        if args.dry_run:
+            print(json.dumps({
+                "scored_rankings": args.scored_rankings,
+                "reachable_splits_dir": args.reachable_splits_dir,
+                "datasets": eval_job["datasets"], "metrics": eval_job["metrics"],
+                "out_csv": args.out_csv, "allow_missing_splits": False,
+            }, indent=2, sort_keys=True))
+            return 0
+    elif args.dry_run:
+        ap.error("--dry-run requires --paper-config")
+    if not args.scored_rankings or not args.out_csv:
+        ap.error("--scored-rankings and --out-csv are required")
 
     scored = load_scored(Path(args.scored_rankings))
     bd = by_dataset(scored, Path(args.reachable_splits_dir), args.label,

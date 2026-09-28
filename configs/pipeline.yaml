@@ -84,12 +84,12 @@ pipeline:
     source_mode: same_as_query
     xml_source: null                       # required iff source_mode: separate
     eligibility: production_cde_match       # none | production_cde_match (production CDE-Match filter)
-    out_parquet: data/processed/cde_catalog_enriched.parquet
+    out_parquet: data/processed/cadsr_xml_2026-06-18/cde_master_enriched_eval_production_cde_match.parquet
     interim_root: data/interim/cde_catalog  # only used when source_mode: separate
 
   # Which query splits to emit (filtered against the catalog), and where.
   emit:
-    splits: [train, val_dev, test, val_train]  # set to [train] for train-only production
+    splits: [train, val_train, val_dev, test, external_holdout_org, external_holdout_refslice]
     filter_by_catalog: true
     out_dir: data/processed/splits_catalog_filtered
     reports_dir: artifacts/manifests/catalog_filter

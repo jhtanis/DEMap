@@ -164,6 +164,7 @@ def _slurm_encode_and_wait(args, paths, t0):
 
 
 def main(argv=None) -> int:
+    argv_list = list(sys.argv[1:] if argv is None else argv)
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--run-dir", default=str(DEFAULT_RUN_DIR), help="Phase-2 natural winner run dir")
     ap.add_argument("--splits", default=",".join(DEFAULT_SPLITS))
@@ -192,7 +193,44 @@ def main(argv=None) -> int:
     ap.add_argument("--encode-only", action="store_true",
                     help="build + cache the catalog embeddings, then exit (no retrieval). "
                          "This is the isolated stage the Slurm fallback submits.")
-    args = ap.parse_args(argv)
+    ap.add_argument("--paper-config", default=None)
+    ap.add_argument("--paper-split-group", choices=["training", "evaluation"], default=None,
+                    help="paper mode: choose training/selection or six evaluation splits")
+    ap.add_argument("--dry-run", action="store_true")
+    args = ap.parse_args(argv_list)
+    if args.paper_config:
+        from demap_repro.config.paper import (
+            PaperConfigError, reject_conflicting_flags, resolve_paper_artifact_path,
+            resolve_paper_data_path, stage_job,
+        )
+        try:
+            reject_conflicting_flags(
+                argv_list,
+                ["--run-dir", "--splits", "--splits-dir", "--cde-master",
+                 "--out-dir", "--top-k", "--embeddings-cache-dir"],
+                context="deep-retrieval --paper-config")
+            job = stage_job("deep_retrieval", args.paper_config)
+        except PaperConfigError as exc:
+            ap.error(str(exc))
+        if args.paper_split_group is None:
+            if args.dry_run:
+                print(json.dumps(job, indent=2, sort_keys=True))
+                return 0
+            ap.error("--paper-config execution requires --paper-split-group")
+        group = job["split_groups"][args.paper_split_group]
+        args.run_dir = str(resolve_paper_artifact_path(job["run_dir"]))
+        args.splits = ",".join(group["splits"])
+        args.splits_dir = str(resolve_paper_data_path(group["splits_dir"]))
+        args.cde_master = str(resolve_paper_data_path(job["cde_master"]))
+        args.out_dir = str(resolve_paper_artifact_path(group["out_dir"]))
+        args.top_k = job["top_k"]
+        args.embeddings_cache_dir = str(resolve_paper_artifact_path(
+            job["embeddings_cache_dir"]))
+        if args.dry_run:
+            print(json.dumps(job, indent=2, sort_keys=True))
+            return 0
+    elif args.dry_run:
+        ap.error("--dry-run requires --paper-config")
     set_safe_tempdir()
     t0 = time.time()
 

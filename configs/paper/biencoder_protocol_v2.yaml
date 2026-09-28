@@ -124,7 +124,7 @@ phase1:
 # canonical Phase 1 winner manifest and inherits that model's query/CDE representation,
 # CDE format and LOSS. Nothing here may be overridden by a base config.
 phase2:
-  parent_source: configs/paper/phase1_winners_for_phase2_v1.yaml   # the ONLY parent source
+  parent_source: configs/paper/phase1_winners_final_v2.yaml   # the ONLY parent source
   loss_source: phase1_winner                # per-model inherited loss; NOT a fixed value
   # Precision: deliberate honest FP32. This matches the effective precision of the
   # completed all-MPNet Phase 2 experiment (which recorded bf16 but ran fp32 because

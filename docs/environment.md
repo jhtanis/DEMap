@@ -68,8 +68,11 @@ prepared tree needs no configuration. `DEMAP_ARTIFACT_ROOT` falls back to
 `DEMAP_DATA_ROOT`; in practice the two are often the same directory, and they are
 separate knobs because you may hold one without the other.
 
-**No stage resolves a path outside these roots.** A test asserts that no config
-resolves a developer path at runtime.
+The explicit paper-mode path resolves configured `data/` inputs under the data
+root and generated `artifacts/` outputs under the artifact root. Repository
+contracts under `configs/` remain repository-relative. Tests assert that the
+resolved public paper config contains no developer path and that root overrides
+are applied before paper jobs are assembled.
 
 ---
 
@@ -85,16 +88,20 @@ $DEMAP_DATA_ROOT/
     interim/                           # extraction and merge scratch
     processed/
       cde_master_enriched.parquet      # January construction catalog
-      cde_catalog_enriched.parquet     # June retrieval catalog, 62,976 records
+      cadsr_xml_2026-06-18/
+        cde_master_enriched_eval_production_cde_match.parquet
+                                       # June retrieval catalog, 62,976 records
       queries.parquet
       pairs.parquet                    # 69,102 pairs
       splits/
+      splits_catalog_filtered/         # reachable-gold training/evaluation sources
       eval_canonical/                  # the six evaluation sets
                                        #   written by `demap materialize-eval`
 
 $DEMAP_ARTIFACT_ROOT/
   artifacts/
-    final_reranker/                    # candidate tables, feature tables, models
+    paper/final_system_v1/             # canonical reconstruction outputs
+    final_reranker/                    # historical artifact layout
     bm25_canonical_v1/
     evaluation/
 ```
@@ -148,8 +155,10 @@ criterion for each.
 
 ## Determinism
 
-Ties are broken by ascending CDE public identifier throughout, so ranking output
-is deterministic given the same scores. Seeds are fixed and recorded:
+For the final HGBC ranking, equal scores are broken by ascending numeric CDE
+public identifier (with a deterministic lexical fallback for nonnumeric IDs).
+The standalone FT-MedCPT result preserves the authoritative archived ordering;
+the HGBC tie policy is not imposed on it. Seeds are fixed and recorded:
 
 | | |
 |---|---|

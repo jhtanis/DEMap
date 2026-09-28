@@ -15,7 +15,7 @@ materialized_dir: data/processed/eval_canonical
 canonical:
   - name: test
     path: data/processed/eval_canonical/test.parquet
-    source: [data/processed/splits/test.parquet]
+    source: [data/processed/splits_catalog_filtered/test.parquet]
     rule: reachability_filter
     original_rows: 4258
     reachable_rows: 4258
@@ -25,7 +25,7 @@ canonical:
 
   - name: cctg
     path: data/processed/eval_canonical/cctg.parquet
-    source: [data/processed/splits/external_holdout_org.parquet]
+    source: [data/processed/splits_catalog_filtered/external_holdout_org.parquet]
     rule: "family == 'CCTG' (query_source REF) + reachability_filter"
     original_rows: 1169
     reachable_rows: 1159
@@ -35,7 +35,7 @@ canonical:
 
   - name: oid_alt
     path: data/processed/eval_canonical/oid_alt.parquet
-    source: [data/processed/splits/external_holdout_org.parquet]
+    source: [data/processed/splits_catalog_filtered/external_holdout_org.parquet]
     rule: "family == 'OID' (query_source ALT) + reachability_filter"
     original_rows: 2007
     reachable_rows: 1908
@@ -45,7 +45,7 @@ canonical:
 
   - name: cdash
     path: data/processed/eval_canonical/cdash.parquet
-    source: [data/processed/splits/external_holdout_refslice.parquet]
+    source: [data/processed/splits_catalog_filtered/external_holdout_refslice.parquet]
     rule: "rename of refslice (CDASH/Refslice) + reachability_filter"
     original_rows: 527
     reachable_rows: 526

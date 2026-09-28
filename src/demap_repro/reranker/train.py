@@ -24,6 +24,7 @@ import numpy as np
 import pandas as pd
 
 from demap_repro.utils.paths import data_root
+from demap_repro.ranking import assign_canonical_score_ranks
 
 REPO_ROOT = data_root()
 
@@ -207,9 +208,20 @@ def compute_ranking_metrics(
         results["n_queries_with_gold_in_candidates"] = 0
         return results
 
-    scored = df[[query_col, score_col, label_col]].copy()
-    scored = scored.sort_values([query_col, score_col], ascending=[True, False])
-    scored["_rank"] = scored.groupby(query_col).cumcount() + 1
+    identity_col = "cde_publicid" if "cde_publicid" in df.columns else (
+        "cde_id" if "cde_id" in df.columns else None)
+    keep = [query_col, score_col, label_col] + ([identity_col] if identity_col else [])
+    scored = df[keep].copy()
+    if identity_col is not None and score_col == "hgbc_score":
+        if identity_col == "cde_id":
+            scored["__public_id"] = scored[identity_col].astype(str).str.split("::").str[0]
+            identity_col = "__public_id"
+        scored = assign_canonical_score_ranks(
+            scored, group_cols=[query_col], score_col=score_col,
+            public_id_col=identity_col, rank_col="_rank")
+    else:
+        scored = scored.sort_values([query_col, score_col], ascending=[True, False])
+        scored["_rank"] = scored.groupby(query_col).cumcount() + 1
 
     gold = scored[scored[label_col]]
     if gold.empty:
@@ -243,9 +255,20 @@ def _precompute_gold_ranks(
     """
     if df.empty:
         return pd.Series(dtype=float, name="_gold_rank")
-    scored = df[[query_col, score_col, label_col]].copy()
-    scored = scored.sort_values([query_col, score_col], ascending=[True, False])
-    scored["_rank"] = scored.groupby(query_col).cumcount() + 1
+    identity_col = "cde_publicid" if "cde_publicid" in df.columns else (
+        "cde_id" if "cde_id" in df.columns else None)
+    keep = [query_col, score_col, label_col] + ([identity_col] if identity_col else [])
+    scored = df[keep].copy()
+    if identity_col is not None and score_col == "hgbc_score":
+        if identity_col == "cde_id":
+            scored["__public_id"] = scored[identity_col].astype(str).str.split("::").str[0]
+            identity_col = "__public_id"
+        scored = assign_canonical_score_ranks(
+            scored, group_cols=[query_col], score_col=score_col,
+            public_id_col=identity_col, rank_col="_rank")
+    else:
+        scored = scored.sort_values([query_col, score_col], ascending=[True, False])
+        scored["_rank"] = scored.groupby(query_col).cumcount() + 1
     gold = scored[scored[label_col]]
     if gold.empty:
         return pd.Series(dtype=float, name="_gold_rank")
@@ -392,6 +415,7 @@ def run_grid_search(
     feature_names: List[str],
     categorical_features: List[int] | None = None,
     configs: List[Tuple[int, int, float, int]] | None = None,
+    random_state: int = 42,
 ) -> Tuple[Any, Dict, pd.DataFrame]:
     from sklearn.ensemble import HistGradientBoostingClassifier
 
@@ -424,7 +448,7 @@ def run_grid_search(
             max_depth=max_depth,
             learning_rate=lr,
             min_samples_leaf=min_leaf,
-            random_state=42,
+            random_state=random_state,
             **extra_kwargs,
         )
         with warnings.catch_warnings():
@@ -464,6 +488,7 @@ def run_grid_search(
 
 
 def main(argv=None):
+    argv_list = list(sys.argv[1:] if argv is None else argv)
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--feature-table", default=str(REPO_ROOT / DEFAULT_FT))
     ap.add_argument("--out", default=str(REPO_ROOT / DEFAULT_OUT))
@@ -487,10 +512,40 @@ def main(argv=None):
                          "hyperparameters frozen across feature ablations so that the "
                          "feature set is the only design change. Omitted by default, in "
                          "which case the full predefined grid is searched as before.")
-    args = ap.parse_args(argv)
+    ap.add_argument("--paper-config", default=None,
+                    help="canonical final-system manifest; rejects competing scientific flags")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="with --paper-config, print the resolved fixed job and exit")
+    args = ap.parse_args(argv_list)
 
-    fixed_config = None
-    if args.fixed_config:
+    paper_features = None
+    paper_seed = 42
+    if args.paper_config:
+        from demap_repro.config.paper import (
+            PaperConfigError, reject_conflicting_flags, resolve_paper_artifact_path, stage_job,
+        )
+        try:
+            reject_conflicting_flags(
+                argv_list,
+                ["--feature-table", "--out", "--exclude-features-file",
+                 "--keep-features-file", "--categorical-mode", "--fixed-config"],
+                context="train-hgbc --paper-config")
+            job = stage_job("hgbc", args.paper_config)
+        except PaperConfigError as exc:
+            ap.error(str(exc))
+        args.feature_table = str(resolve_paper_artifact_path(job["feature_table"]))
+        args.out = str(resolve_paper_artifact_path(job["out"]))
+        args.categorical_mode = "stable"
+        paper_features = list(job["features"])
+        fixed_config = {k: job["hyperparameters"][k] for k in FIXED_CONFIG_KEYS}
+        paper_seed = int(job["hyperparameters"]["random_seed"])
+        if args.dry_run:
+            print(json.dumps(job, indent=2, sort_keys=True))
+            return 0
+    else:
+        fixed_config = None
+
+    if args.fixed_config and fixed_config is None:
         try:
             fixed_config = parse_fixed_config(args.fixed_config)
         except ValueError as exc:
@@ -548,8 +603,9 @@ def main(argv=None):
     all_features = list(feature_names)
     drop_from_exclude = (_load_feature_spec(args.exclude_features_file, "drop")
                          if args.exclude_features_file else [])
-    keep_only = (_load_feature_spec(args.keep_features_file, "keep_only")
-                 if args.keep_features_file else None)
+    keep_only = (paper_features if paper_features is not None else
+                 (_load_feature_spec(args.keep_features_file, "keep_only")
+                  if args.keep_features_file else None))
     drop_set = set(drop_from_exclude)
     if keep_only is not None:
         drop_set |= {c for c in all_features if c not in set(keep_only)}
@@ -558,6 +614,11 @@ def main(argv=None):
     excluded_features = [c for c in all_features if c not in feature_names]
     exclude_not_present = sorted(c for c in drop_from_exclude if c not in all_features)
     keep_not_present = sorted(c for c in (keep_only or []) if c not in all_features)
+    if paper_features is not None and keep_not_present:
+        sys.exit(f"ERROR: paper feature table is missing required features: {keep_not_present}")
+    if paper_features is not None:
+        feature_names = list(paper_features)
+        X_all = X_all[feature_names]
     if args.exclude_features_file or args.keep_features_file:
         print(f"  feature exclusion: {len(all_features)} -> {len(feature_names)} features "
               f"(dropped {len(excluded_features)})")
@@ -645,6 +706,7 @@ def main(argv=None):
         X_train, y_train, X_tune, tune_df, feature_names,
         categorical_features=(cat_indices if args.categorical_mode == "stable" else None),
         configs=grid_configs,
+        random_state=paper_seed,
     )
     grid_df.to_csv(out_dir / "hgbc_grid_results.csv", index=False)
     print(f"\nBest config: {best_config}")
@@ -671,8 +733,13 @@ def main(argv=None):
     df = df.copy()
     df["hgbc_score"] = proba_all
     # Final HGBC rank per (split, query): 1 = highest score.
-    df["hgbc_rank"] = (df.groupby(["split", "query_id"])["hgbc_score"]
-                       .rank(ascending=False, method="first").astype("Int64"))
+    if "cde_publicid" not in df.columns:
+        if "cde_id" not in df.columns:
+            sys.exit("ERROR: final HGBC ranking needs cde_publicid or cde_id")
+        df["cde_publicid"] = df["cde_id"].astype(str).str.split("::").str[0]
+    df = assign_canonical_score_ranks(
+        df, group_cols=["split", "query_id"], score_col="hgbc_score",
+        public_id_col="cde_publicid", rank_col="hgbc_rank")
 
     # Report splits: derive from the table (all splits except train/tune) so the
     # eval set tracks whatever the feature table contains; fall back to the
