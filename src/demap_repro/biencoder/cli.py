@@ -43,6 +43,7 @@ def _selected_paper_run(args) -> None:
             "--splits-dir", str(resolve_paper_data_path(block["splits_dir"])),
             "--artifacts-dir", str(resolve_paper_artifact_path(block["artifacts_dir"])),
             "--runs-dir", "auto", "--model-name", block["model_name"],
+            "--model-revision", block["model_revision"],
             "--base-model-id", block["base_model_id"],
             "--query-variant", block["query_variant"], "--recipe", block["recipe"],
             "--cde-format", block["cde_format"], "--losses", block["loss"],
@@ -269,6 +270,8 @@ def main(argv: Optional[List[str]] = None) -> None:
     ap.add_argument("--launcher", default="slurm/paper_biencoder_phase1_canonical_array.sbatch")
     ap.add_argument("--paper-config", default=None,
                     help="canonical final-system manifest")
+    ap.add_argument("--model-revision", default=None,
+                    help="generic upstream revision; paper mode owns this value")
     ap.add_argument("--selected-final", action="store_true",
                     help="paper mode: train only the retained FT-MPNet seed/configuration")
     ap.add_argument("--parent-checkpoint", default=None,
@@ -292,7 +295,8 @@ def main(argv: Optional[List[str]] = None) -> None:
             reject_conflicting_flags(
                 argv_list,
                 ["--protocol", "--winners", "--phase1-manifest", "--models",
-                 "--precision", "--allow-legacy", "--allow-winner-override"],
+                 "--precision", "--allow-legacy", "--allow-winner-override",
+                 "--model-revision"],
                 context="biencoder --paper-config")
             paper = validate_paper_config(args.paper_config)
         except PaperConfigError as exc:

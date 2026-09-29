@@ -83,8 +83,8 @@ $DEMAP_DATA_ROOT/
   data/
     raw/
       cadsr_xml/                       # the 2026-01-12 export (or its zip)
-      gdc/                             # supplied: the two curation tables
-      cimac/                           # public download: the Appendix A workbook
+      gdc/                             # optional historical raw-import input
+      cimac/                           # optional historical raw-import input
     interim/                           # extraction and merge scratch
     processed/
       cde_master_enriched.parquet      # January construction catalog
@@ -134,13 +134,18 @@ headline result from frozen artifacts costs seconds rather than GPU-days — see
 
 ## Model checkpoints
 
-All six are public, and are downloaded from HuggingFace on first use:
+All six are public, and are downloaded from HuggingFace on first use. Paper
+mode pins the selected bases to the immutable historical revisions shown here;
+the other models were screening comparators rather than final reconstruction
+inputs.
 
 ```
-sentence-transformers/all-mpnet-base-v2        bi-encoder (selected: FT-MPNet)
+sentence-transformers/all-mpnet-base-v2@e8c3b32edf5434bc2275fc9bab85f82640a19130
+                                               bi-encoder (selected: FT-MPNet)
 kamalkraj/BioSimCSE-BioLinkBERT-BASE           bi-encoder
 NeuML/pubmedbert-base-embeddings               bi-encoder
-ncbi/MedCPT-Cross-Encoder                      cross-encoder (selected: FT-MedCPT)
+ncbi/MedCPT-Cross-Encoder@71caf65d4927987813984f54c284405a13fcca49
+                                               cross-encoder (selected: FT-MedCPT)
 BAAI/bge-reranker-base                         cross-encoder   (base, not large)
 cross-encoder/ms-marco-MiniLM-L-6-v2           cross-encoder
 ```

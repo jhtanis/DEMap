@@ -37,12 +37,18 @@ demap make-dataset --paper-config configs/paper/final_system_v1.yaml \
   --query-xml /path/to/cadsr_2026-01-12 \
   --catalog-xml /path/to/cadsr_2026-06-18 \
   --stop-after catalog-filter
-demap import-gdc                     # supplied input
-demap import-cimac                   # supplied input
 demap materialize-eval --paper-config configs/paper/final_system_v1.yaml
 demap leakage-filter
 demap characterize                   # Tables 1, S1, S2
 ```
+
+The manuscript's canonical GDC and CIMAC inputs are already included as
+`data/frozen/gdc_combined.parquet` and `data/frozen/cimac_v2.parquet`.
+`materialize-eval` verifies and installs those exact files; no private GDC
+curation tables or superseded CIMAC workbook are required. `demap import-gdc`
+and `demap import-cimac` remain optional historical/raw-source regeneration
+utilities for readers who independently hold those source formats, and are not
+steps in the paper reconstruction path.
 
 Full detail, including the counts to expect:
 [`building_datasets.md`](building_datasets.md).

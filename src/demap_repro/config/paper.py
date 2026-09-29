@@ -195,6 +195,8 @@ def validate_paper_config(path: str | Path = DEFAULT_PAPER_CONFIG) -> dict[str, 
         _expect(p1[key], value, f"FT-MPNet Phase-1 {key}")
     _expect(mpnet["base_model"], "sentence-transformers/all-mpnet-base-v2",
             "FT-MPNet public base")
+    _expect(mpnet["base_revision"], "e8c3b32edf5434bc2275fc9bab85f82640a19130",
+            "FT-MPNet public base revision")
     _expect(mpnet["training_pair_policy"], {
         "source_split_rows": 51594, "built_pairs": 50972,
         "dropped_empty_query": 0, "dropped_missing_target_text": 622,
@@ -265,6 +267,7 @@ def validate_paper_config(path: str | Path = DEFAULT_PAPER_CONFIG) -> dict[str, 
     med = cfg["ft_medcpt"]
     for key, expected in {
         "base_model": "ncbi/MedCPT-Cross-Encoder",
+        "base_revision": "71caf65d4927987813984f54c284405a13fcca49",
         "objective": "pointwise_bce",
         "positive_weight": "negative_to_positive_ratio",
         "epochs": 2,
@@ -358,6 +361,7 @@ def resolved_paper_config(path: str | Path = DEFAULT_PAPER_CONFIG) -> dict[str, 
                 "artifacts_dir": "artifacts/paper/final_system_v1/ft_mpnet/phase1",
                 "runs_dir": "auto", "base_model_id": mp["base_model"],
                 "model_name": mp["base_model"],
+                "model_revision": mp["base_revision"],
                 "query_variant": mp["query_representation"]["id"],
                 "recipe": mp["candidate_representation"]["recipe"],
                 "cde_format": mp["candidate_representation"]["format"],
@@ -484,7 +488,8 @@ def resolved_paper_config(path: str | Path = DEFAULT_PAPER_CONFIG) -> dict[str, 
             "out": pool["artifacts"]["feature_table_base"],
         },
         "ft_medcpt_train": {
-            "base_model": med["base_model"], "objective": med["objective"],
+            "base_model": med["base_model"], "model_revision": med["base_revision"],
+            "objective": med["objective"],
             "query_text_col": med["query_representation"]["column"],
             "cde_text_recipe": med["candidate_representation"]["recipe"],
             "epochs": med["epochs"], "lr": med["learning_rate"],

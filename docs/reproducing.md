@@ -159,8 +159,13 @@ demap train-hgbc --paper-config configs/paper/final_system_v1.yaml --dry-run
 ```
 
 The selected bi-encoder and cross-encoder start from public HuggingFace
-checkpoints. The fine-tuned checkpoints are not distributed, so Level B
-reconstructs them by training. Retraining will **not** reproduce weights
+checkpoints at immutable historical revisions:
+
+- `sentence-transformers/all-mpnet-base-v2@e8c3b32edf5434bc2275fc9bab85f82640a19130`
+- `ncbi/MedCPT-Cross-Encoder@71caf65d4927987813984f54c284405a13fcca49`
+
+Paper mode passes those revisions explicitly. The fine-tuned checkpoints are
+not distributed, so Level B reconstructs them by training. Retraining will **not** reproduce weights
 bit-for-bit: different GPUs, kernel versions and non-deterministic reductions
 all move the last digits.
 

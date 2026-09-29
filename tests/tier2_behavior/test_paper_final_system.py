@@ -25,6 +25,8 @@ from demap_repro.ranking import assign_canonical_score_ranks
 pytestmark = pytest.mark.tier2
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PAPER_CONFIG = REPO_ROOT / "configs/paper/final_system_v1.yaml"
+MPNET_REVISION = "e8c3b32edf5434bc2275fc9bab85f82640a19130"
+MEDCPT_REVISION = "71caf65d4927987813984f54c284405a13fcca49"
 
 
 def test_final_system_manifest_validates_and_references_exist():
@@ -38,6 +40,7 @@ def test_ft_mpnet_final_lineage_is_exact_and_two_seed_selection_is_retained():
     paper = validate_paper_config(PAPER_CONFIG)
     model = paper["ft_mpnet"]
     assert model["base_model"] == "sentence-transformers/all-mpnet-base-v2"
+    assert model["base_revision"] == MPNET_REVISION
     assert model["phase1"] == {
         **model["phase1"],
         "learning_rate": 1e-4,
@@ -87,6 +90,7 @@ def test_ft_medcpt_contract_and_distinct_ranking_policy_are_exact():
     paper = validate_paper_config(PAPER_CONFIG)
     med = paper["ft_medcpt"]
     assert med["base_model"] == "ncbi/MedCPT-Cross-Encoder"
+    assert med["base_revision"] == MEDCPT_REVISION
     assert med["query_representation"]["id"] == "Q3"
     assert med["candidate_representation"]["recipe"] == "SN_DEC_DEF_PQT_PV"
     assert (med["objective"], med["epochs"], med["learning_rate"]) == (
@@ -252,11 +256,19 @@ def test_ft_mpnet_selected_dry_run_has_no_stale_may_fallback(capsys):
     assert "May" not in output
 
 
+def test_ft_mpnet_phase1_dry_run_exposes_upstream_revision(capsys):
+    from demap_repro.biencoder import cli
+    cli.main(["--paper-config", str(PAPER_CONFIG), "--selected-final",
+              "--stage", "phase1", "--dry-run"])
+    assert MPNET_REVISION in capsys.readouterr().out
+
+
 def test_ft_medcpt_dry_run_cannot_fall_back_to_minilm(capsys):
     from demap_repro.crossencoder import train
     assert train.main(["--paper-config", str(PAPER_CONFIG), "--dry-run"]) == 0
     output = capsys.readouterr().out
     assert "ncbi/MedCPT-Cross-Encoder" in output
+    assert MEDCPT_REVISION in output
     assert "MiniLM" not in output
 
 
@@ -265,6 +277,92 @@ def test_paper_mode_rejects_conflicting_scientific_override():
     with pytest.raises(SystemExit):
         train.main(["--paper-config", str(PAPER_CONFIG), "--dry-run",
                     "--base-model", "cross-encoder/ms-marco-MiniLM-L-6-v2"])
+
+
+def test_paper_mode_rejects_conflicting_model_revisions():
+    from demap_repro.biencoder import cli
+    from demap_repro.crossencoder import train
+
+    with pytest.raises(SystemExit):
+        cli.main(["--paper-config", str(PAPER_CONFIG), "--selected-final",
+                  "--stage", "phase1", "--dry-run",
+                  "--model-revision", "deadbeef"])
+    with pytest.raises(SystemExit):
+        train.main(["--paper-config", str(PAPER_CONFIG), "--dry-run",
+                    "--model-revision", "deadbeef"])
+
+
+def test_paper_jobs_expose_verified_upstream_revisions():
+    phase1 = stage_job("ft_mpnet_phase1", PAPER_CONFIG)["finetune_phase1"]
+    medcpt = stage_job("ft_medcpt_train", PAPER_CONFIG)
+    assert phase1["model_revision"] == MPNET_REVISION
+    assert medcpt["model_revision"] == MEDCPT_REVISION
+
+
+def test_sentence_transformer_loader_forwards_revision(monkeypatch):
+    from demap_repro.biencoder.engine import st_loader
+
+    captured = {}
+
+    class FakeSentenceTransformer:
+        def __init__(self, model, **kwargs):
+            captured.update(model=model, kwargs=kwargs)
+
+    fake = types.ModuleType("sentence_transformers")
+    fake.SentenceTransformer = FakeSentenceTransformer
+    monkeypatch.setitem(sys.modules, "sentence_transformers", fake)
+    monkeypatch.setattr(st_loader, "apply_pooling_variant", lambda model, variant: None)
+    monkeypatch.setattr(st_loader, "enforce_min_max_seq_length", lambda model, length: None)
+
+    st_loader.load_sentence_transformer(
+        "sentence-transformers/all-mpnet-base-v2", device="cuda",
+        revision=MPNET_REVISION,
+    )
+    assert captured == {
+        "model": "sentence-transformers/all-mpnet-base-v2",
+        "kwargs": {"revision": MPNET_REVISION, "device": "cuda"},
+    }
+
+
+def test_cross_encoder_loader_forwards_revision(monkeypatch):
+    from demap_repro.crossencoder import train
+
+    captured = {}
+
+    class FakeCrossEncoder:
+        def __init__(self, model, **kwargs):
+            captured.update(model=model, kwargs=kwargs)
+
+    fake = types.ModuleType("sentence_transformers")
+    fake.CrossEncoder = FakeCrossEncoder
+    monkeypatch.setitem(sys.modules, "sentence_transformers", fake)
+
+    train._load_cross_encoder(
+        "ncbi/MedCPT-Cross-Encoder", revision=MEDCPT_REVISION,
+        max_length=512, device="cuda",
+    )
+    assert captured == {
+        "model": "ncbi/MedCPT-Cross-Encoder",
+        "kwargs": {
+            "num_labels": 1, "max_length": 512, "device": "cuda",
+            "revision": MEDCPT_REVISION,
+        },
+    }
+
+
+def test_level_b_docs_use_included_external_evaluation_inputs():
+    running = (REPO_ROOT / "docs/running_experiments.md").read_text(encoding="utf-8")
+    building = (REPO_ROOT / "docs/building_datasets.md").read_text(encoding="utf-8")
+    combined = running + "\n" + building
+
+    assert "data/frozen/gdc_combined.parquet" in combined
+    assert "data/frozen/cimac_v2.parquet" in combined
+    assert "no private GDC" in running
+    assert "superseded CIMAC workbook" in running
+    assert "optional historical/raw-source regeneration" in combined
+    assert "demap materialize-eval --paper-config" in running
+    assert "GDC tables | **must be supplied**" not in building
+    assert "CIMAC workbook | **must be supplied**" not in building
 
 
 def test_fuzzy_paper_adapter_rejects_generic_scientific_override():

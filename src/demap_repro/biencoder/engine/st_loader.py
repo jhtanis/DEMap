@@ -253,6 +253,7 @@ def load_sentence_transformer(
     model_name_or_path: str,
     *,
     device: Optional[str] = None,
+    revision: Optional[str] = None,
     min_max_seq_length: int = 256,
 ):
     """Load a SentenceTransformer model, supporting pooling-variant suffixes."""
@@ -262,10 +263,10 @@ def load_sentence_transformer(
     # Import lazily so CLIs can show --help in minimal environments.
     from sentence_transformers import SentenceTransformer  # type: ignore
 
-    if device is None:
-        model = SentenceTransformer(spec.base_model)
-    else:
-        model = SentenceTransformer(spec.base_model, device=device)
+    kwargs = {"revision": revision} if revision is not None else {}
+    if device is not None:
+        kwargs["device"] = device
+    model = SentenceTransformer(spec.base_model, **kwargs)
 
     apply_pooling_variant(model, spec.variant)
 

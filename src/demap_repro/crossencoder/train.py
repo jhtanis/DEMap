@@ -51,11 +51,24 @@ def _dev_metrics(model, dev_df: pd.DataFrame, dev_pairs, batch_size: int) -> dic
     return thr._deployment_metrics(d, "_s")
 
 
+def _load_cross_encoder(base_model: str, *, revision: str | None,
+                        max_length: int, device: str):
+    """Load the public base, forwarding an immutable revision when supplied."""
+    from sentence_transformers import CrossEncoder
+
+    kwargs = {"num_labels": 1, "max_length": max_length, "device": device}
+    if revision is not None:
+        kwargs["revision"] = revision
+    return CrossEncoder(base_model, **kwargs)
+
+
 def main(argv=None):
     argv_list = list(sys.argv[1:] if argv is None else argv)
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--base-model", default=DEFAULT_BASE)
+    ap.add_argument("--model-revision", default=None,
+                    help="Optional immutable Hugging Face revision for --base-model.")
     ap.add_argument("--train-pairs", default=None)
     ap.add_argument("--dev-pairs", default=None)
     ap.add_argument("--output-dir", default=None)
@@ -83,7 +96,7 @@ def main(argv=None):
         try:
             reject_conflicting_flags(
                 argv_list,
-                ["--base-model", "--train-pairs", "--dev-pairs", "--output-dir",
+                ["--base-model", "--model-revision", "--train-pairs", "--dev-pairs", "--output-dir",
                  "--epochs", "--lr", "--batch-size", "--max-length",
                  "--pos-weight", "--warmup-frac", "--seed", "--device"],
                 context="ce-train --paper-config")
@@ -91,6 +104,7 @@ def main(argv=None):
         except PaperConfigError as exc:
             ap.error(str(exc))
         args.base_model = job["base_model"]
+        args.model_revision = job["model_revision"]
         args.train_pairs = str(resolve_paper_artifact_path(job["train_pairs"]))
         args.dev_pairs = str(resolve_paper_artifact_path(job["dev_pairs"]))
         args.output_dir = str(resolve_paper_artifact_path(job["output_dir"]))
@@ -120,9 +134,7 @@ def main(argv=None):
     torch.manual_seed(args.seed)
     from datasets import Dataset
     from transformers import TrainerCallback
-    from sentence_transformers import (
-        CrossEncoder, CrossEncoderTrainer, CrossEncoderTrainingArguments,
-    )
+    from sentence_transformers import CrossEncoderTrainer, CrossEncoderTrainingArguments
     from sentence_transformers.cross_encoder.losses import BinaryCrossEntropyLoss
 
     train = pd.read_parquet(args.train_pairs)
@@ -147,8 +159,10 @@ def main(argv=None):
     out_dir.mkdir(parents=True, exist_ok=True)
 
     try:
-        model = CrossEncoder(args.base_model, num_labels=1,
-                             max_length=args.max_length, device=args.device)
+        model = _load_cross_encoder(
+            args.base_model, revision=args.model_revision,
+            max_length=args.max_length, device=args.device,
+        )
     except Exception as e:
         print(f"\nERROR loading base model (offline={'no' if args.allow_download else 'yes'}): "
               f"{type(e).__name__}: {e}")
@@ -213,7 +227,8 @@ def main(argv=None):
     trainer.train()
 
     summary = {
-        "base_model": args.base_model, "train_pairs": args.train_pairs,
+        "base_model": args.base_model, "model_revision": args.model_revision,
+        "train_pairs": args.train_pairs,
         "dev_pairs": args.dev_pairs, "output_dir": str(out_dir),
         "epochs": args.epochs, "lr": args.lr, "batch_size": args.batch_size,
         "max_length": args.max_length, "pos_weight": pos_weight,

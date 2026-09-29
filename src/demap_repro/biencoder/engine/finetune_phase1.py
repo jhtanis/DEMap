@@ -326,12 +326,16 @@ def _set_seed(seed: int) -> None:
         pass
 
 
-def _load_sentence_transformer(model_name_or_path: str, *, device: str):
+def _load_sentence_transformer(
+    model_name_or_path: str, *, device: str, revision: Optional[str] = None
+):
     # Import lazily so `demap finetune-phase1 --help` works even if
     # sentence-transformers isn't installed in the current environment.
     from demap_repro.biencoder.engine.st_loader import load_sentence_transformer
 
-    return load_sentence_transformer(model_name_or_path, device=device)
+    return load_sentence_transformer(
+        model_name_or_path, device=device, revision=revision
+    )
 
 
 def _input_example(text_a: str, text_b: str):
@@ -365,6 +369,7 @@ def _make_run_config(
     device: str,
     base_model: str,
     base_model_id: Optional[str] = None,
+    model_revision: Optional[str] = None,
     init_model_name_or_path: Optional[str] = None,
     initfrom_tag: Optional[str] = None,
     query_variant: str,
@@ -418,6 +423,7 @@ def _make_run_config(
         "base_model": str(base_model),
 
         "base_model_id": str(base_model_id or base_model),
+        "model_revision": str(model_revision) if model_revision is not None else None,
         "init_model_name_or_path": str(init_model_name_or_path) if init_model_name_or_path is not None else None,
         "initfrom_tag": str(initfrom_tag) if initfrom_tag is not None else None,
 
@@ -1095,6 +1101,8 @@ def main(argv: Optional[List[str]] = None) -> None:
 
     # Fixed representation choices (Phase 1)
     ap.add_argument("--model-name", default="sentence-transformers/all-MiniLM-L6-v2")
+    ap.add_argument("--model-revision", default=None,
+                    help="Optional immutable Hugging Face revision for --model-name.")
     ap.add_argument("--base-model-id", default=None, help="Canonical hub id for the model family (recommended when model_name is a local path).")
     ap.add_argument("--query-variant", default="Q3")
     ap.add_argument("--recipe", default="v1_v2_v3_v5")
@@ -1207,6 +1215,7 @@ def main(argv: Optional[List[str]] = None) -> None:
         for key, flag in [
             ("base_model_id", "--base-model-id"),
             ("model_name", "--model-name"),
+            ("model_revision", "--model-revision"),
             ("query_variant", "--query-variant"),
             ("recipe", "--recipe"),
             ("cde_format", "--cde-format"),
@@ -1481,7 +1490,10 @@ def main(argv: Optional[List[str]] = None) -> None:
             sampler = BatchSamplerAsSampler(batch_sampler)
 
             # Build model
-            model = _load_sentence_transformer(str(args.model_name), device=device)
+            model = _load_sentence_transformer(
+                str(args.model_name), device=device,
+                revision=getattr(args, "model_revision", None),
+            )
             try:
                 model.max_seq_length = int(args.max_seq_length)
             except Exception:
@@ -1610,6 +1622,7 @@ def main(argv: Optional[List[str]] = None) -> None:
                 device=str(device),
                 base_model=str(base_model_id),
                 base_model_id=str(base_model_id),
+                model_revision=getattr(args, "model_revision", None),
                 init_model_name_or_path=str(args.model_name),
                 initfrom_tag=str(initfrom_tag) if initfrom_tag is not None else None,
                 query_variant=str(args.query_variant),

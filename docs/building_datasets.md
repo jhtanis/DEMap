@@ -153,7 +153,9 @@ Why each is frozen rather than rebuilt is in
 [`data_sources.md`](data_sources.md): CIMAC's permissible-value workbook changed
 upstream, and GDC's gold mappings are expert curation with no public source.
 
-The importers remain available if you hold the raw inputs yourself:
+The importers remain available as optional historical/raw-source regeneration
+utilities if you hold the raw inputs yourself. They are not required by the
+paper path:
 
 ```bash
 demap import-gdc --help          # the two curated GDC tables -> split parquet schema
@@ -298,8 +300,10 @@ It takes a few seconds and needs no GPU.
 | curator allowlists | **this repository**, `configs/allowlists/` |
 | pipeline contract | **this repository**, `configs/pipeline.yaml` |
 | evaluation registry | **this repository**, `configs/paper/eval_datasets_v1.yaml` |
-| GDC tables | **must be supplied** |
-| CIMAC workbook | **must be supplied** |
+| canonical GDC evaluation input | **this repository**, `data/frozen/gdc_combined.parquet` |
+| canonical CIMAC evaluation input | **this repository**, `data/frozen/cimac_v2.parquet` |
 
-Nothing on this page requires an artifact tree, a GPU, or network access beyond
-the two caDSR downloads.
+Nothing on the canonical path on this page requires the raw GDC curation tables
+or the superseded CIMAC workbook. `demap materialize-eval` consumes the two
+included canonical inputs. The build needs no artifact tree or GPU, and no
+network access beyond the two caDSR downloads.

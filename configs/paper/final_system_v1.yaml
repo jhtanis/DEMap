@@ -48,6 +48,7 @@ data:
 
 ft_mpnet:
   base_model: sentence-transformers/all-mpnet-base-v2
+  base_revision: e8c3b32edf5434bc2275fc9bab85f82640a19130
   query_representation: {id: Q3, column: query_text_q3, description: raw query plus PV summary}
   candidate_representation: {recipe: v1_v6_v2b_v3_v5, display: SN+DEC+DEF+PQT+PV, format: labeled}
   loss: symmetric_mnrl
@@ -141,6 +142,7 @@ candidate_construction:
 
 ft_medcpt:
   base_model: ncbi/MedCPT-Cross-Encoder
+  base_revision: 71caf65d4927987813984f54c284405a13fcca49
   query_representation: {id: Q3, column: query_text_q3, description: raw query plus PV summary}
   candidate_representation: {recipe: SN_DEC_DEF_PQT_PV, display: SN+DEC+DEF+PQT+PV}
   objective: pointwise_bce
